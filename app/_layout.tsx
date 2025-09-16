@@ -18,6 +18,7 @@ export default function RootLayout() {
     <ThemeProvider>
       <Stack>
         <Stack.Screen name="menu" options={{ headerShown: false }} />
+        <Stack.Screen name="game" options={{ headerShown: false }} />
         <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>

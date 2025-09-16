@@ -1,12 +1,15 @@
 import { StyleSheet, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 export default function GameMenuScreen() {
+  const router = useRouter();
+
   const handleNewGame = () => {
-    // TODO: 在此處實作新遊戲邏輯
     console.log('Starting a new game...');
+    router.push('/game');
   };
 
   const handleLoadGame = () => {
