@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { ThemedView } from './ThemedView';
 import { ThemedText } from './ThemedText';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { Colors } from '@/constants/Colors';
+import { useLanguage } from '@/hooks/use-language';
 
 const user = {
   name: 'Jason',
@@ -23,6 +23,7 @@ const Avatar = ({ name }: { name: string }) => {
 export function LoginButton() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const borderColor = useThemeColor({}, 'icon');
+  const { t } = useLanguage();
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -38,16 +39,16 @@ export function LoginButton() {
         <View style={styles.userInfoContainer}>
           <Avatar name={user.name} />
           <View>
-            <ThemedText>Email: {user.email}</ThemedText>
-            <ThemedText>Password: {user.password}</ThemedText>
+            <ThemedText>{t('login', 'email')}: {user.email}</ThemedText>
+            <ThemedText>{t('login', 'password')}: {user.password}</ThemedText>
           </View>
           <Pressable style={[styles.button, { borderColor }]} onPress={handleLogout}>
-            <ThemedText>Logout</ThemedText>
+            <ThemedText>{t('login', 'logout')}</ThemedText>
           </Pressable>
         </View>
       ) : (
         <Pressable style={[styles.button, { borderColor }]} onPress={handleLogin}>
-          <ThemedText>Login</ThemedText>
+          <ThemedText>{t('login', 'login')}</ThemedText>
         </Pressable>
       )}
     </ThemedView>

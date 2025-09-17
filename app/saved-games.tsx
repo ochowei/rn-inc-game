@@ -6,14 +6,14 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useGameStorage, GameProfile } from '@/hooks/use-game-storage';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { useLanguage } from '@/hooks/use-language';
 
 export default function SavedGamesScreen() {
   const router = useRouter();
   const { profiles, loading, deleteProfile } = useGameStorage();
+  const { t } = useLanguage();
   const tintColor = useThemeColor({}, 'tint');
-  const borderColor = useThemeColor({}, 'border'); // 假設有一個 'border' color
 
-  // --- 新增狀態來管理自定義確認視窗 ---
   const [isConfirming, setIsConfirming] = useState(false);
   const [profileToDelete, setProfileToDelete] = useState<number | null>(null);
 
@@ -22,7 +22,6 @@ export default function SavedGamesScreen() {
   };
 
   const handleDeleteGame = (index: number) => {
-    // 點擊刪除按鈕時，設定狀態以顯示自定義視窗
     setProfileToDelete(index);
     setIsConfirming(true);
   };
@@ -39,18 +38,17 @@ export default function SavedGamesScreen() {
     setIsConfirming(false);
     setProfileToDelete(null);
   };
-  // ------------------------------------
 
   const renderItem = ({ item, index }: { item: GameProfile, index: number }) => (
     <ThemedView style={styles.saveItem}>
-      <ThemedText>Save Slot {index + 1}</ThemedText>
+      <ThemedText>{t('savedGames', 'saveSlot')} {index + 1}</ThemedText>
       <ThemedText>{new Date(item.createdAt).toLocaleString()}</ThemedText>
       <ThemedView style={styles.buttonsContainer}>
         <Pressable onPress={() => handleLoadGame(item)} style={[styles.button, { borderColor: tintColor }]}>
-          <ThemedText style={styles.buttonText}>Load</ThemedText>
+          <ThemedText style={styles.buttonText}>{t('savedGames', 'load')}</ThemedText>
         </Pressable>
         <Pressable onPress={() => handleDeleteGame(index)} style={[styles.button, styles.deleteButton]}>
-          <ThemedText style={styles.buttonText}>Delete</ThemedText>
+          <ThemedText style={styles.buttonText}>{t('savedGames', 'delete')}</ThemedText>
         </Pressable>
       </ThemedView>
     </ThemedView>
@@ -66,33 +64,31 @@ export default function SavedGamesScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <Stack.Screen options={{ title: 'Saved Games' }} />
+      <Stack.Screen options={{ title: t('savedGames', 'title') }} />
       <FlatList
         data={[...profiles].reverse()}
         renderItem={renderItem}
         keyExtractor={(item) => item.createdAt}
-        ListEmptyComponent={<ThemedText>No saved games found.</ThemedText>}
+        ListEmptyComponent={<ThemedText>{t('savedGames', 'noSaves')}</ThemedText>}
         extraData={profiles}
       />
 
-      {/* --- 自定義確認視窗 UI --- */}
       {isConfirming && (
         <ThemedView style={styles.confirmationContainer}>
           <ThemedView style={styles.confirmationBox}>
-            <ThemedText type="subtitle">確認刪除</ThemedText>
-            <ThemedText>您確定要刪除此存檔嗎？</ThemedText>
+            <ThemedText type="subtitle">{t('savedGames', 'confirmDelete')}</ThemedText>
+            <ThemedText>{t('savedGames', 'confirmDeleteMessage')}</ThemedText>
             <ThemedView style={styles.confirmationButtons}>
               <Pressable onPress={handleCancelDelete} style={[styles.button, { borderColor: tintColor }]}>
-                <ThemedText style={styles.buttonText}>取消</ThemedText>
+                <ThemedText style={styles.buttonText}>{t('savedGames', 'cancel')}</ThemedText>
               </Pressable>
               <Pressable onPress={handleConfirmDelete} style={[styles.button, styles.deleteButton]}>
-                <ThemedText style={styles.buttonText}>確定</ThemedText>
+                <ThemedText style={styles.buttonText}>{t('savedGames', 'confirm')}</ThemedText>
               </Pressable>
             </ThemedView>
           </ThemedView>
         </ThemedView>
       )}
-      {/* --------------------------- */}
     </ThemedView>
   );
 }

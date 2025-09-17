@@ -8,10 +8,12 @@ import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { producibleGames } from '@/constants/Games';
 import { ResourceBar } from '@/components/ResourceBar';
+import { useLanguage } from '@/hooks/use-language';
 
 export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const { t } = useLanguage();
   const tintColor = useThemeColor({}, 'tint');
   const backgroundColor = useThemeColor({}, 'background');
 
@@ -29,7 +31,7 @@ export default function GameScreen() {
     money: 100,
   });
   const [assets, setAssets] = useState([
-    { name: '工程師', count: 1 },
+    { name: t('game', 'engineer'), count: 1 },
   ]);
 
   useEffect(() => {
@@ -64,49 +66,49 @@ export default function GameScreen() {
         } else {
           await AsyncStorage.setItem('game_profiles', JSON.stringify(gameProfiles));
         }
-        Alert.alert("Game Saved", "Your game has been saved successfully.");
+        Alert.alert(t('game', 'gameSaved'), t('game', 'gameSavedSuccess'));
       } else {
-        Alert.alert("Save Limit Reached", "You can only have up to 5 saved games.");
+        Alert.alert(t('game', 'saveLimitReached'), t('game', 'saveLimitMessage'));
       }
     } catch (error) {
       console.error('Failed to save game profile', error);
-      Alert.alert("Error", "Failed to save the game.");
+      Alert.alert(t('game', 'error'), t('game', 'failedToSave'));
     }
   };
 
   return (
     <ThemedView style={styles.container}>
-      <Stack.Screen options={{ title: '新遊戲', headerShown: false }} />
+      <Stack.Screen options={{ title: t('game', 'newGameTitle'), headerShown: false }} />
       <ResourceBar resources={resources} />
-      <ThemedText type="title">新遊戲</ThemedText>
+      <ThemedText type="title">{t('game', 'newGameTitle')}</ThemedText>
 
       <Pressable onPress={() => router.push('/menu')} style={[styles.backButton, buttonStyle]}>
-        <ThemedText style={[styles.backButtonText, buttonTextStyle]}>返回主選單</ThemedText>
+        <ThemedText style={[styles.backButtonText, buttonTextStyle]}>{t('game', 'backToMenu')}</ThemedText>
       </Pressable>
 
       <Pressable onPress={handleSaveGame} style={[styles.saveButton, buttonStyle]}>
-        <ThemedText style={[styles.saveButtonText, buttonTextStyle]}>Save Game</ThemedText>
+        <ThemedText style={[styles.saveButtonText, buttonTextStyle]}>{t('game', 'saveGame')}</ThemedText>
       </Pressable>
 
       <ThemedView style={styles.sectionContainer}>
-        <ThemedText type="subtitle">資產</ThemedText>
+        <ThemedText type="subtitle">{t('game', 'assets')}</ThemedText>
         {assets.map((asset, index) => (
           <ThemedText key={index}>
-            {asset.name}：{asset.count} 名
+            {asset.name}：{asset.count} {t('game', 'peopleClassifier')}
           </ThemedText>
         ))}
       </ThemedView>
 
       <ThemedView style={styles.sectionContainer}>
-        <ThemedText type="subtitle">可生產的遊戲</ThemedText>
+        <ThemedText type="subtitle">{t('game', 'producibleGames')}</ThemedText>
         {producibleGames.map((game, index) => (
           <ThemedView key={index} style={styles.gameContainer}>
-            <ThemedText type="defaultSemiBold">{game.name}</ThemedText>
-            <ThemedText>成本：{game.cost} 元</ThemedText>
-            <ThemedText>生產力：{game.productivity}</ThemedText>
-            <ThemedText>創意：{game.creativity}</ThemedText>
-            <ThemedText>完成時間：{game.timeToComplete} 秒</ThemedText>
-            <ThemedText>收入：每 10 秒 {game.income} 元</ThemedText>
+            <ThemedText type="defaultSemiBold">{t('games', 'miniPuzzleGame')}</ThemedText>
+            <ThemedText>{t('game', 'cost')}：{game.cost} {t('game', 'currencyUnit')}</ThemedText>
+            <ThemedText>{t('game', 'productivity')}：{game.productivity}</ThemedText>
+            <ThemedText>{t('game', 'creativity')}：{game.creativity}</ThemedText>
+            <ThemedText>{t('game', 'timeToComplete')}：{game.timeToComplete} {t('game', 'seconds')}</ThemedText>
+            <ThemedText>{t('game', 'income')}：{t('game', 'per10Seconds')} {game.income} {t('game', 'currencyUnit')}</ThemedText>
           </ThemedView>
         ))}
       </ThemedView>
