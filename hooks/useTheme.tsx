@@ -29,7 +29,7 @@ const useIsomorphicLayoutEffect =
 
 export function ThemeProvider({ children }: React.PropsWithChildren) {
   const navigationState = useRootNavigationState();
-  const [theme, setTheme] = useState<Theme>('system');
+  const [theme, setTheme] = useState<Theme>('dark');
   const systemTheme = useColorScheme() ?? 'light';
 
   useIsomorphicLayoutEffect(() => {
