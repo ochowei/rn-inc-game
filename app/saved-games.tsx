@@ -15,17 +15,27 @@ export default function SavedGamesScreen() {
   };
 
   const handleDeleteGame = (index: number) => {
+    console.log('Attempting to delete profile at index:', index);
     Alert.alert(
-      "Delete Save",
-      "Are you sure you want to delete this save file?",
+      "刪除存檔",
+      "您確定要刪除此存檔嗎？",
       [
         {
-          text: "Cancel",
+          text: "取消",
           style: "cancel"
         },
         {
-          text: "OK",
-          onPress: () => deleteProfile(index)
+          text: "確定",
+          onPress: async () => {
+            console.log('User confirmed deletion for index:', index);
+            try {
+              await deleteProfile(index);
+              Alert.alert("刪除成功", "遊戲存檔已成功刪除。");
+            } catch (error) {
+              console.error('刪除遊戲存檔失敗', error);
+              Alert.alert("刪除失敗", "刪除遊戲存檔時發生錯誤。");
+            }
+          }
         }
       ]
     );
