@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable, Platform } from 'react-native';
+import { StyleSheet, Pressable, Platform, Alert } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useCallback } from 'react';
 
@@ -23,6 +23,12 @@ export default function GameMenuScreen() {
   );
 
   const handleNewGame = async () => {
+    if (profiles.length >= 5) {
+      Alert.alert("存檔已達上限", "請先刪除多餘的存檔，最多只能有 5 個存檔。");
+      router.push('/saved-games');
+      return;
+    }
+
     const newGameProfile = {
       resources: { creativity: 10, productivity: 10, money: 100 },
       assets: [{ name: '工程師', count: 1 }],
