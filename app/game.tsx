@@ -68,6 +68,10 @@ export default function GameScreen() {
       <ResourceBar resources={resources} />
       <ThemedText type="title">新遊戲</ThemedText>
 
+      <Pressable onPress={() => router.push('/menu')} style={styles.backButton}>
+        <ThemedText style={styles.backButtonText}>返回主選單</ThemedText>
+      </Pressable>
+
       <Pressable onPress={handleSaveGame} style={styles.saveButton}>
         <ThemedText style={styles.saveButtonText}>Save Game</ThemedText>
       </Pressable>
@@ -135,6 +139,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   saveButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 100,
+    left: 16,
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#fff',
+  },
+  backButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
   },
