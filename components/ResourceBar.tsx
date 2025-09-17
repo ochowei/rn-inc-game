@@ -16,18 +16,35 @@ interface ResourceBarProps {
 
 export function ResourceBar({ resources }: ResourceBarProps) {
   const iconColor = useThemeColor({}, 'text');
+  const borderColor = useThemeColor({}, 'icon');
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedView style={styles.resourceItem}>
+    <ThemedView
+      style={[styles.container, { borderBottomColor: borderColor }]}
+      lightColor="rgba(255, 255, 255, 0.9)"
+      darkColor="rgba(21, 23, 24, 0.9)"
+    >
+      <ThemedView
+        style={styles.resourceItem}
+        lightColor="transparent"
+        darkColor="transparent"
+      >
         <IconSymbol name="lightbulb.fill" size={20} color={iconColor} />
         <ThemedText style={styles.resourceText}>{resources.creativity}</ThemedText>
       </ThemedView>
-      <ThemedView style={styles.resourceItem}>
+      <ThemedView
+        style={styles.resourceItem}
+        lightColor="transparent"
+        darkColor="transparent"
+      >
         <IconSymbol name="gearshape.fill" size={20} color={iconColor} />
         <ThemedText style={styles.resourceText}>{resources.productivity}</ThemedText>
       </ThemedView>
-      <ThemedView style={styles.resourceItem}>
+      <ThemedView
+        style={styles.resourceItem}
+        lightColor="transparent"
+        darkColor="transparent"
+      >
         <IconSymbol name="dollarsign.circle.fill" size={20} color={iconColor} />
         <ThemedText style={styles.resourceText}>{resources.money}</ThemedText>
       </ThemedView>
@@ -47,8 +64,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },
   resourceItem: {
     flexDirection: 'row',
