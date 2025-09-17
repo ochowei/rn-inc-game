@@ -5,10 +5,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 export default function GameMenuScreen() {
   const router = useRouter();
   const [hasSavedGames, setHasSavedGames] = useState(false);
+
+  const disabledBackgroundColor = useThemeColor({}, 'disabledBackground');
+  const disabledBorderColor = useThemeColor({}, 'disabledBorder');
 
   useEffect(() => {
     const checkSavedGames = async () => {
@@ -74,6 +78,11 @@ export default function GameMenuScreen() {
     router.push('/saved-games');
   };
 
+  const disabledButtonStyle = {
+    backgroundColor: disabledBackgroundColor,
+    borderColor: disabledBorderColor,
+  };
+
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title">Game Menu</ThemedText>
@@ -83,7 +92,7 @@ export default function GameMenuScreen() {
         </Pressable>
         <Pressable
           onPress={handleLoadGame}
-          style={[styles.button, !hasSavedGames && styles.disabledButton]}
+          style={[styles.button, !hasSavedGames && disabledButtonStyle]}
           disabled={!hasSavedGames}
         >
           <ThemedText style={styles.buttonText}>Saved Game</ThemedText>
@@ -117,9 +126,5 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  disabledButton: {
-    backgroundColor: '#f0f0f0',
-    borderColor: '#ddd',
   },
 });
