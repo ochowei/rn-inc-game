@@ -9,8 +9,8 @@ import { ResourceBar } from '@/components/ResourceBar';
 
 export default function GameScreen() {
   const [resources, setResources] = useState({
-    creativity: 10,
-    productivity: 10,
+    creativity: 0,
+    productivity: 0,
     money: 100,
   });
   const [assets, setAssets] = useState([
@@ -42,6 +42,7 @@ export default function GameScreen() {
             <ThemedText>創意：{game.creativity}</ThemedText>
             <ThemedText>完成時間：{game.timeToComplete} 秒</ThemedText>
             <ThemedText>收入：每 10 秒 {game.income} 元</ThemedText>
+            <ThemedText>維護成本：每分鐘 {game.maintenanceCost} 生產力</ThemedText>
           </ThemedView>
         ))}
       </ThemedView>
