@@ -7,6 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useGameStorage } from '@/hooks/use-game-storage';
 import { useLanguage } from '@/hooks/use-language';
+import { createNewGameProfile } from '@/utils/game_logic';
 
 export default function GameMenuScreen() {
   const router = useRouter();
@@ -32,12 +33,7 @@ export default function GameMenuScreen() {
       return;
     }
 
-    const newGameProfile = {
-      resources: { creativity: 10, productivity: 10, money: 100 },
-      employees: [{ name: 'engineer', count: 1 }],
-      games: [],
-      createdAt: new Date().toISOString(),
-    };
+    const newGameProfile = createNewGameProfile();
 
     await addProfile(newGameProfile);
     router.push('/game');
