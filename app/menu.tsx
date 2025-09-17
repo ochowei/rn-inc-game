@@ -1,5 +1,6 @@
 import { StyleSheet, Pressable, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
+import React, { useCallback } from 'react';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -8,11 +9,18 @@ import { useGameStorage } from '@/hooks/use-game-storage';
 
 export default function GameMenuScreen() {
   const router = useRouter();
-  const { profiles, addProfile } = useGameStorage();
+  const { profiles, addProfile, fetchProfiles } = useGameStorage();
   const hasSavedGames = profiles.length > 0;
 
   const disabledBackgroundColor = useThemeColor({}, 'disabledBackground');
   const disabledBorderColor = useThemeColor({}, 'disabledBorder');
+
+  // 使用 useFocusEffect 在螢幕被聚焦時重新載入存檔
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfiles();
+    }, [fetchProfiles])
+  );
 
   const handleNewGame = async () => {
     const newGameProfile = {
