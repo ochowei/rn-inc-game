@@ -81,6 +81,11 @@ export default function GameMenuScreen() {
   const disabledButtonStyle = {
     backgroundColor: disabledBackgroundColor,
     borderColor: disabledBorderColor,
+    ...Platform.select({
+      web: {
+        cursor: 'not-allowed',
+      },
+    }),
   };
 
   return (
