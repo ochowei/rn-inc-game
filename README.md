@@ -48,3 +48,35 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+---
+
+## 遊戲設定
+
+### 起始資源
+- **工程師:** 1 名
+- **起始資金:** 100 元
+
+### 工程師能力
+- **創意值:** 10 / min
+- **生產力:** 20 / min
+
+### 可開發遊戲
+
+#### Novel Game
+- **開發時間:** 30 sec
+- **開發成本:**
+  - 10 生產力
+  - 5 創意值
+  - 20 元
+- **收入:** 1 元 / 10 sec
+- **維護成本:** 0.5 生產力 / min
+
+#### Puzzle Game
+- **開發時間:** 30 sec
+- **開發成本:**
+  - 15 生產力
+  - 10 創意值
+  - 30 元
+- **收入:** 1 元 / 10 sec
+- **維護成本:** 0.5 生產力 / min
