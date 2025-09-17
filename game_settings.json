@@ -2,7 +2,9 @@
   "game_tick_interval_sec": 5,
   "initial_resources": {
     "engineers": 1,
-    "funding": 100
+    "funding": 100,
+    "creativity": 10,
+    "productivity": 10
   },
   "engineer_abilities": {
     "creativity_per_min": 10,
