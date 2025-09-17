@@ -1,41 +1,20 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, Pressable, FlatList, Platform, Alert } from 'react-native';
+import { StyleSheet, Pressable, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useGameStorage, GameProfile } from '@/hooks/use-game-storage';
 
 export default function SavedGamesScreen() {
   const router = useRouter();
-  const [savedGames, setSavedGames] = useState<any[]>([]);
+  const { profiles, loading, deleteProfile } = useGameStorage();
 
-  useEffect(() => {
-    const fetchSavedGames = async () => {
-      try {
-        let profiles = null;
-        if (Platform.OS === 'web') {
-          profiles = localStorage.getItem('game_profiles');
-        } else {
-          profiles = await AsyncStorage.getItem('game_profiles');
-        }
-        if (profiles) {
-          setSavedGames(JSON.parse(profiles));
-        }
-      } catch (error) {
-        console.error('Failed to fetch saved games', error);
-      }
-    };
-
-    fetchSavedGames();
-  }, []);
-
-  const handleLoadGame = (gameProfile: any) => {
+  const handleLoadGame = (gameProfile: GameProfile) => {
     // Navigate to game screen with the selected profile
     router.push({ pathname: '/game', params: { profile: JSON.stringify(gameProfile) } });
   };
 
-  const handleDeleteGame = async (index: number) => {
+  const handleDeleteGame = (index: number) => {
     Alert.alert(
       "Delete Save",
       "Are you sure you want to delete this save file?",
@@ -46,27 +25,13 @@ export default function SavedGamesScreen() {
         },
         {
           text: "OK",
-          onPress: async () => {
-            try {
-              const newSavedGames = [...savedGames];
-              newSavedGames.splice(index, 1);
-              setSavedGames(newSavedGames);
-
-              if (Platform.OS === 'web') {
-                localStorage.setItem('game_profiles', JSON.stringify(newSavedGames));
-              } else {
-                await AsyncStorage.setItem('game_profiles', JSON.stringify(newSavedGames));
-              }
-            } catch (error) {
-              console.error('Failed to delete game profile', error);
-            }
-          }
+          onPress: () => deleteProfile(index)
         }
       ]
     );
   };
 
-  const renderItem = ({ item, index }: { item: any, index: number }) => (
+  const renderItem = ({ item, index }: { item: GameProfile, index: number }) => (
     <ThemedView style={styles.saveItem}>
       <ThemedText>Save Slot {index + 1}</ThemedText>
       <ThemedText>{new Date(item.createdAt).toLocaleString()}</ThemedText>
@@ -81,11 +46,19 @@ export default function SavedGamesScreen() {
     </ThemedView>
   );
 
+  if (loading) {
+    return (
+      <ThemedView style={styles.container}>
+        <ActivityIndicator size="large" />
+      </ThemedView>
+    );
+  }
+
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ title: 'Saved Games' }} />
       <FlatList
-        data={savedGames}
+        data={profiles}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         ListEmptyComponent={<ThemedText>No saved games found.</ThemedText>}

@@ -1,76 +1,27 @@
-import { useState, useEffect } from 'react';
 import { StyleSheet, Pressable, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { useGameStorage } from '@/hooks/use-game-storage';
 
 export default function GameMenuScreen() {
   const router = useRouter();
-  const [hasSavedGames, setHasSavedGames] = useState(false);
+  const { profiles, addProfile } = useGameStorage();
+  const hasSavedGames = profiles.length > 0;
 
   const disabledBackgroundColor = useThemeColor({}, 'disabledBackground');
   const disabledBorderColor = useThemeColor({}, 'disabledBorder');
 
-  useEffect(() => {
-    const checkSavedGames = async () => {
-      try {
-        let profiles = null;
-        if (Platform.OS === 'web') {
-          profiles = localStorage.getItem('game_profiles');
-        } else {
-          profiles = await AsyncStorage.getItem('game_profiles');
-        }
-        if (profiles) {
-          setHasSavedGames(JSON.parse(profiles).length > 0);
-        } else {
-          setHasSavedGames(false);
-        }
-      } catch (error) {
-        console.error('Failed to check saved games', error);
-        setHasSavedGames(false);
-      }
-    };
-
-    checkSavedGames();
-  }, []);
-
-  const handleNewGame = () => {
+  const handleNewGame = async () => {
     const newGameProfile = {
       resources: { creativity: 10, productivity: 10, money: 100 },
       assets: [{ name: '工程師', count: 1 }],
       createdAt: new Date().toISOString(),
     };
 
-    try {
-      if (Platform.OS === 'web') {
-        const gameProfilesStr = localStorage.getItem('game_profiles');
-        let gameProfiles = gameProfilesStr ? JSON.parse(gameProfilesStr) : [];
-        if (gameProfiles.length < 5) {
-          gameProfiles.push(newGameProfile);
-          localStorage.setItem('game_profiles', JSON.stringify(gameProfiles));
-          if (gameProfiles.length > 0) {
-            setHasSavedGames(true);
-          }
-        }
-      } else {
-        AsyncStorage.getItem('game_profiles').then(gameProfilesStr => {
-          let gameProfiles = gameProfilesStr ? JSON.parse(gameProfilesStr) : [];
-          if (gameProfiles.length < 5) {
-            gameProfiles.push(newGameProfile);
-            AsyncStorage.setItem('game_profiles', JSON.stringify(gameProfiles));
-            if (gameProfiles.length > 0) {
-              setHasSavedGames(true);
-            }
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Failed to handle game profiles', error);
-    }
-
+    await addProfile(newGameProfile);
     router.push('/game');
   };
 
