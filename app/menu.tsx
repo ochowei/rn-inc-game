@@ -8,7 +8,27 @@ export default function GameMenuScreen() {
   const router = useRouter();
 
   const handleNewGame = () => {
-    console.log('Starting a new game...');
+    const newGameProfile = {
+      resources: { creativity: 10, productivity: 10, money: 100 },
+      assets: [{ name: '工程師', count: 1 }],
+    };
+
+    try {
+      const gameProfilesStr = localStorage.getItem('game_profiles');
+      if (gameProfilesStr) {
+        const gameProfiles = JSON.parse(gameProfilesStr);
+        if (gameProfiles.length < 5) {
+          gameProfiles.push(newGameProfile);
+          localStorage.setItem('game_profiles', JSON.stringify(gameProfiles));
+        }
+      } else {
+        localStorage.setItem('game_profiles', JSON.stringify([newGameProfile]));
+      }
+    } catch (error) {
+      console.error('Failed to handle game profiles in localStorage', error);
+      // Even if localStorage fails, we should still proceed to the game screen
+    }
+
     router.push('/game');
   };
 
