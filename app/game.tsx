@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, Pressable, Platform, Alert } from 'react-native';
+import { StyleSheet, Pressable, Platform } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -30,22 +30,25 @@ export default function GameScreen() {
     productivity: 10,
     money: 100,
   });
-  const [assets, setAssets] = useState([
-    { name: 'engineer', count: 1 },
-  ]);
+  const [employees, setEmployees] = useState([{ name: 'engineer', count: 1 }]);
+  const [games, setGames] = useState<{ name: string; count: number }[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: '', message: '' });
 
   useEffect(() => {
     if (params.profile) {
       const profile = JSON.parse(params.profile as string);
       setResources(profile.resources);
-      setAssets(profile.assets);
+      setEmployees(profile.employees);
+      setGames(profile.games || []);
     }
   }, [params.profile]);
 
   const handleSaveGame = async () => {
     const newGameProfile = {
       resources,
-      assets,
+      employees,
+      games,
       createdAt: new Date().toISOString(),
     };
 
@@ -66,14 +69,21 @@ export default function GameScreen() {
         } else {
           await AsyncStorage.setItem('game_profiles', JSON.stringify(gameProfiles));
         }
-        Alert.alert(t('game', 'gameSaved'), t('game', 'gameSavedSuccess'));
+        setModalContent({ title: t('game', 'gameSaved'), message: t('game', 'gameSavedSuccess') });
+        setIsModalVisible(true);
       } else {
-        Alert.alert(t('game', 'saveLimitReached'), t('game', 'saveLimitMessage'));
+        setModalContent({ title: t('game', 'saveLimitReached'), message: t('game', 'saveLimitMessage') });
+        setIsModalVisible(true);
       }
     } catch (error) {
       console.error('Failed to save game profile', error);
-      Alert.alert(t('game', 'error'), t('game', 'failedToSave'));
+      setModalContent({ title: t('game', 'error'), message: t('game', 'failedToSave') });
+      setIsModalVisible(true);
     }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
   };
 
   return (
@@ -91,12 +101,25 @@ export default function GameScreen() {
       </Pressable>
 
       <ThemedView style={styles.sectionContainer}>
-        <ThemedText type="subtitle">{t('game', 'assets')}</ThemedText>
-        {assets.map((asset, index) => (
+        <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
+        {employees.map((employee, index) => (
           <ThemedText key={index}>
-            {t('game', asset.name as any)}：{asset.count} {t('game', 'peopleClassifier')}
+            {t('game', employee.name as any)}：{employee.count} {t('game', 'peopleClassifier')}
           </ThemedText>
         ))}
+      </ThemedView>
+
+      <ThemedView style={styles.sectionContainer}>
+        <ThemedText type="subtitle">{t('game', 'games')}</ThemedText>
+        {games.length === 0 ? (
+          <ThemedText>{t('game', 'noGamesDeveloped')}</ThemedText>
+        ) : (
+          games.map((game, index) => (
+            <ThemedText key={index}>
+              {t('games', game.name as any)}：{game.count}
+            </ThemedText>
+          ))
+        )}
       </ThemedView>
 
       <ThemedView style={styles.sectionContainer}>
@@ -112,6 +135,18 @@ export default function GameScreen() {
           </ThemedView>
         ))}
       </ThemedView>
+
+      {isModalVisible && (
+        <ThemedView style={styles.confirmationContainer}>
+          <ThemedView style={styles.confirmationBox}>
+            <ThemedText type="subtitle">{modalContent.title}</ThemedText>
+            <ThemedText>{modalContent.message}</ThemedText>
+            <Pressable onPress={handleCloseModal} style={[styles.button, { borderColor: tintColor }]}>
+              <ThemedText style={styles.buttonText}>{t('game', 'close')}</ThemedText>
+            </Pressable>
+          </ThemedView>
+        </ThemedView>
+      )}
     </ThemedView>
   );
 }
@@ -165,5 +200,32 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  button: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  confirmationContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  confirmationBox: {
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+    gap: 15,
   },
 });

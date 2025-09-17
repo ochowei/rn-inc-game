@@ -11,7 +11,11 @@ export interface GameProfile {
     productivity: number;
     money: number;
   };
-  assets: {
+  employees: {
+    name: string;
+    count: number;
+  }[];
+  games: {
     name: string;
     count: number;
   }[];
