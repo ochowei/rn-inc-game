@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Stack } from 'expo-router';
+import { useState, useEffect } from 'react';
+import { StyleSheet, Pressable, Platform, Alert } from 'react-native';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -8,6 +9,8 @@ import { producibleGames } from '@/constants/Games';
 import { ResourceBar } from '@/components/ResourceBar';
 
 export default function GameScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
   const [resources, setResources] = useState({
     creativity: 10,
     productivity: 10,
@@ -17,11 +20,57 @@ export default function GameScreen() {
     { name: '工程師', count: 1 },
   ]);
 
+  useEffect(() => {
+    if (params.profile) {
+      const profile = JSON.parse(params.profile as string);
+      setResources(profile.resources);
+      setAssets(profile.assets);
+    }
+  }, [params.profile]);
+
+  const handleSaveGame = async () => {
+    const newGameProfile = {
+      resources,
+      assets,
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      let gameProfiles = [];
+      if (Platform.OS === 'web') {
+        const gameProfilesStr = localStorage.getItem('game_profiles');
+        gameProfiles = gameProfilesStr ? JSON.parse(gameProfilesStr) : [];
+      } else {
+        const gameProfilesStr = await AsyncStorage.getItem('game_profiles');
+        gameProfiles = gameProfilesStr ? JSON.parse(gameProfilesStr) : [];
+      }
+
+      if (gameProfiles.length < 5) {
+        gameProfiles.push(newGameProfile);
+        if (Platform.OS === 'web') {
+          localStorage.setItem('game_profiles', JSON.stringify(gameProfiles));
+        } else {
+          await AsyncStorage.setItem('game_profiles', JSON.stringify(gameProfiles));
+        }
+        Alert.alert("Game Saved", "Your game has been saved successfully.");
+      } else {
+        Alert.alert("Save Limit Reached", "You can only have up to 5 saved games.");
+      }
+    } catch (error) {
+      console.error('Failed to save game profile', error);
+      Alert.alert("Error", "Failed to save the game.");
+    }
+  };
+
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ title: '新遊戲', headerShown: false }} />
       <ResourceBar resources={resources} />
       <ThemedText type="title">新遊戲</ThemedText>
+
+      <Pressable onPress={handleSaveGame} style={styles.saveButton}>
+        <ThemedText style={styles.saveButtonText}>Save Game</ThemedText>
+      </Pressable>
 
       <ThemedView style={styles.sectionContainer}>
         <ThemedText type="subtitle">資產</ThemedText>
@@ -58,7 +107,7 @@ const styles = StyleSheet.create({
     paddingTop: 60, // Add padding to avoid overlap with the resource bar
   },
   sectionContainer: {
-    marginTop: 32,
+    marginTop: 16,
     padding: 16,
     borderRadius: 10,
     borderWidth: 1,
@@ -74,5 +123,19 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
     width: '100%',
     alignItems: 'center',
+  },
+  saveButton: {
+    position: 'absolute',
+    top: 100,
+    right: 16,
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#fff',
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

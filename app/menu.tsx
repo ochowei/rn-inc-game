@@ -1,40 +1,91 @@
-import { StyleSheet, Pressable } from 'react-native';
+import { useState, useEffect } from 'react';
+import { StyleSheet, Pressable, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 export default function GameMenuScreen() {
   const router = useRouter();
+  const [hasSavedGames, setHasSavedGames] = useState(false);
+
+  const disabledBackgroundColor = useThemeColor({}, 'disabledBackground');
+  const disabledBorderColor = useThemeColor({}, 'disabledBorder');
+
+  useEffect(() => {
+    const checkSavedGames = async () => {
+      try {
+        let profiles = null;
+        if (Platform.OS === 'web') {
+          profiles = localStorage.getItem('game_profiles');
+        } else {
+          profiles = await AsyncStorage.getItem('game_profiles');
+        }
+        if (profiles) {
+          setHasSavedGames(JSON.parse(profiles).length > 0);
+        } else {
+          setHasSavedGames(false);
+        }
+      } catch (error) {
+        console.error('Failed to check saved games', error);
+        setHasSavedGames(false);
+      }
+    };
+
+    checkSavedGames();
+  }, []);
 
   const handleNewGame = () => {
     const newGameProfile = {
       resources: { creativity: 10, productivity: 10, money: 100 },
       assets: [{ name: '工程師', count: 1 }],
+      createdAt: new Date().toISOString(),
     };
 
     try {
-      const gameProfilesStr = localStorage.getItem('game_profiles');
-      if (gameProfilesStr) {
-        const gameProfiles = JSON.parse(gameProfilesStr);
+      if (Platform.OS === 'web') {
+        const gameProfilesStr = localStorage.getItem('game_profiles');
+        let gameProfiles = gameProfilesStr ? JSON.parse(gameProfilesStr) : [];
         if (gameProfiles.length < 5) {
           gameProfiles.push(newGameProfile);
           localStorage.setItem('game_profiles', JSON.stringify(gameProfiles));
+          if (gameProfiles.length > 0) {
+            setHasSavedGames(true);
+          }
         }
       } else {
-        localStorage.setItem('game_profiles', JSON.stringify([newGameProfile]));
+        AsyncStorage.getItem('game_profiles').then(gameProfilesStr => {
+          let gameProfiles = gameProfilesStr ? JSON.parse(gameProfilesStr) : [];
+          if (gameProfiles.length < 5) {
+            gameProfiles.push(newGameProfile);
+            AsyncStorage.setItem('game_profiles', JSON.stringify(gameProfiles));
+            if (gameProfiles.length > 0) {
+              setHasSavedGames(true);
+            }
+          }
+        });
       }
     } catch (error) {
-      console.error('Failed to handle game profiles in localStorage', error);
-      // Even if localStorage fails, we should still proceed to the game screen
+      console.error('Failed to handle game profiles', error);
     }
 
     router.push('/game');
   };
 
   const handleLoadGame = () => {
-    // TODO: 在此處實作載入遊戲邏輯
-    console.log('Loading a saved game...');
+    router.push('/saved-games');
+  };
+
+  const disabledButtonStyle = {
+    backgroundColor: disabledBackgroundColor,
+    borderColor: disabledBorderColor,
+    ...Platform.select({
+      web: {
+        cursor: 'not-allowed',
+      },
+    }),
   };
 
   return (
@@ -44,8 +95,12 @@ export default function GameMenuScreen() {
         <Pressable onPress={handleNewGame} style={styles.button}>
           <ThemedText style={styles.buttonText}>New Game</ThemedText>
         </Pressable>
-        <Pressable onPress={handleLoadGame} style={styles.button}>
-          <ThemedText style={styles.buttonText}>Load Saved Game</ThemedText>
+        <Pressable
+          onPress={handleLoadGame}
+          style={[styles.button, !hasSavedGames && disabledButtonStyle]}
+          disabled={!hasSavedGames}
+        >
+          <ThemedText style={styles.buttonText}>Saved Game</ThemedText>
         </Pressable>
       </ThemedView>
     </ThemedView>
