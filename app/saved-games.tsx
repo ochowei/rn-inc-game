@@ -60,8 +60,9 @@ export default function SavedGamesScreen() {
       <FlatList
         data={profiles}
         renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.createdAt}
         ListEmptyComponent={<ThemedText>No saved games found.</ThemedText>}
+        extraData={profiles}
       />
     </ThemedView>
   );
