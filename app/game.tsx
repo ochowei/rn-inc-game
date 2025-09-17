@@ -5,12 +5,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import { producibleGames } from '@/constants/Games';
 import { ResourceBar } from '@/components/ResourceBar';
 
 export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const tintColor = useThemeColor({}, 'tint');
+  const backgroundColor = useThemeColor({}, 'background');
+
+  const buttonStyle = {
+    borderColor: tintColor,
+    backgroundColor: backgroundColor,
+  };
+  const buttonTextStyle = {
+    color: tintColor,
+  };
+
   const [resources, setResources] = useState({
     creativity: 10,
     productivity: 10,
@@ -68,12 +80,12 @@ export default function GameScreen() {
       <ResourceBar resources={resources} />
       <ThemedText type="title">新遊戲</ThemedText>
 
-      <Pressable onPress={() => router.push('/menu')} style={styles.backButton}>
-        <ThemedText style={styles.backButtonText}>返回主選單</ThemedText>
+      <Pressable onPress={() => router.push('/menu')} style={[styles.backButton, buttonStyle]}>
+        <ThemedText style={[styles.backButtonText, buttonTextStyle]}>返回主選單</ThemedText>
       </Pressable>
 
-      <Pressable onPress={handleSaveGame} style={styles.saveButton}>
-        <ThemedText style={styles.saveButtonText}>Save Game</ThemedText>
+      <Pressable onPress={handleSaveGame} style={[styles.saveButton, buttonStyle]}>
+        <ThemedText style={[styles.saveButtonText, buttonTextStyle]}>Save Game</ThemedText>
       </Pressable>
 
       <ThemedView style={styles.sectionContainer}>
@@ -135,8 +147,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
   },
   saveButtonText: {
     fontSize: 16,
@@ -149,8 +159,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
   },
   backButtonText: {
     fontSize: 16,
