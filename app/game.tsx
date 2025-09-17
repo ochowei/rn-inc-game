@@ -31,7 +31,7 @@ export default function GameScreen() {
     money: 100,
   });
   const [assets, setAssets] = useState([
-    { name: t('game', 'engineer'), count: 1 },
+    { name: 'engineer', count: 1 },
   ]);
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function GameScreen() {
         <ThemedText type="subtitle">{t('game', 'assets')}</ThemedText>
         {assets.map((asset, index) => (
           <ThemedText key={index}>
-            {asset.name}：{asset.count} {t('game', 'peopleClassifier')}
+            {t('game', asset.name as any)}：{asset.count} {t('game', 'peopleClassifier')}
           </ThemedText>
         ))}
       </ThemedView>
