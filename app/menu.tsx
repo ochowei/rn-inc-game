@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable, Platform } from 'react-native';
+import { StyleSheet, Pressable, Platform, View } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 
@@ -6,10 +6,12 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useGameStorage } from '@/hooks/use-game-storage';
+import { useLanguage } from '@/hooks/use-language';
 
 export default function GameMenuScreen() {
   const router = useRouter();
   const { profiles, addProfile, fetchProfiles } = useGameStorage();
+  const { language, setLanguage, t } = useLanguage();
   const hasSavedGames = profiles.length > 0;
   const tintColor = useThemeColor({}, 'tint');
 
@@ -18,7 +20,6 @@ export default function GameMenuScreen() {
   const disabledBackgroundColor = useThemeColor({}, 'disabledBackground');
   const disabledBorderColor = useThemeColor({}, 'disabledBorder');
 
-  // 使用 useFocusEffect 在螢幕被聚焦時重新載入存檔
   useFocusEffect(
     useCallback(() => {
       fetchProfiles();
@@ -33,7 +34,7 @@ export default function GameMenuScreen() {
 
     const newGameProfile = {
       resources: { creativity: 10, productivity: 10, money: 100 },
-      assets: [{ name: '工程師', count: 1 }],
+      assets: [{ name: t('game', 'engineer'), count: 1 }],
       createdAt: new Date().toISOString(),
     };
 
@@ -66,31 +67,45 @@ export default function GameMenuScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title">Game Menu</ThemedText>
+      <View style={styles.languageButtons}>
+        <Pressable
+          onPress={() => setLanguage('zh')}
+          style={[styles.langButton, language === 'zh' && styles.langButtonActive]}
+        >
+          <ThemedText>{t('settings', 'chinese')}</ThemedText>
+        </Pressable>
+        <Pressable
+          onPress={() => setLanguage('en')}
+          style={[styles.langButton, language === 'en' && styles.langButtonActive]}
+        >
+          <ThemedText>{t('settings', 'english')}</ThemedText>
+        </Pressable>
+      </View>
+      <ThemedText type="title">{t('menu', 'title')}</ThemedText>
       <ThemedView style={styles.buttonsContainer}>
         <Pressable onPress={handleNewGame} style={styles.button}>
-          <ThemedText style={styles.buttonText}>New Game</ThemedText>
+          <ThemedText style={styles.buttonText}>{t('menu', 'newGame')}</ThemedText>
         </Pressable>
         <Pressable
           onPress={handleLoadGame}
           style={[styles.button, !hasSavedGames && disabledButtonStyle]}
           disabled={!hasSavedGames}
         >
-          <ThemedText style={styles.buttonText}>Saved Game</ThemedText>
+          <ThemedText style={styles.buttonText}>{t('menu', 'savedGame')}</ThemedText>
         </Pressable>
       </ThemedView>
 
       {isLimitModalVisible && (
         <ThemedView style={styles.confirmationContainer}>
           <ThemedView style={styles.confirmationBox}>
-            <ThemedText type="subtitle">存檔已達上限</ThemedText>
-            <ThemedText>請先刪除多餘的存檔，最多只能有 5 個存檔。</ThemedText>
+            <ThemedText type="subtitle">{t('menu', 'saveLimitReached')}</ThemedText>
+            <ThemedText>{t('menu', 'saveLimitMessage')}</ThemedText>
             <ThemedView style={styles.confirmationButtons}>
               <Pressable onPress={handleCloseModal} style={[styles.button, { borderColor: tintColor }]}>
-                <ThemedText style={styles.buttonText}>關閉</ThemedText>
+                <ThemedText style={styles.buttonText}>{t('menu', 'close')}</ThemedText>
               </Pressable>
               <Pressable onPress={handleGoToSaves} style={[styles.button, { borderColor: tintColor }]}>
-                <ThemedText style={styles.buttonText}>前往存檔</ThemedText>
+                <ThemedText style={styles.buttonText}>{t('menu', 'goToSaves')}</ThemedText>
               </Pressable>
             </ThemedView>
           </ThemedView>
@@ -106,6 +121,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
+  },
+  languageButtons: {
+    flexDirection: 'row',
+    gap: 10,
+    position: 'absolute',
+    top: 40,
+    right: 16,
+  },
+  langButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  langButtonActive: {
+    backgroundColor: '#0a7ea4',
+    borderColor: '#0a7ea4',
   },
   buttonsContainer: {
     marginTop: 32,

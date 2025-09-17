@@ -3,6 +3,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { useLanguage } from '@/hooks/use-language';
 
 interface Resources {
   creativity: number;
@@ -17,6 +18,7 @@ interface ResourceBarProps {
 export function ResourceBar({ resources }: ResourceBarProps) {
   const iconColor = useThemeColor({}, 'text');
   const borderColor = useThemeColor({}, 'icon');
+  const { t } = useLanguage();
 
   return (
     <ThemedView
@@ -30,7 +32,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
         darkColor="transparent"
       >
         <IconSymbol name="lightbulb.fill" size={20} color={iconColor} />
-        <ThemedText style={styles.resourceText}>{resources.creativity}</ThemedText>
+        <ThemedText style={styles.resourceText}>{t('resources', 'creativity')}: {resources.creativity}</ThemedText>
       </ThemedView>
       <ThemedView
         style={styles.resourceItem}
@@ -38,7 +40,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
         darkColor="transparent"
       >
         <IconSymbol name="gearshape.fill" size={20} color={iconColor} />
-        <ThemedText style={styles.resourceText}>{resources.productivity}</ThemedText>
+        <ThemedText style={styles.resourceText}>{t('resources', 'productivity')}: {resources.productivity}</ThemedText>
       </ThemedView>
       <ThemedView
         style={styles.resourceItem}
@@ -46,7 +48,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
         darkColor="transparent"
       >
         <IconSymbol name="dollarsign.circle.fill" size={20} color={iconColor} />
-        <ThemedText style={styles.resourceText}>{resources.money}</ThemedText>
+        <ThemedText style={styles.resourceText}>{t('resources', 'money')}: {resources.money}</ThemedText>
       </ThemedView>
     </ThemedView>
   );
