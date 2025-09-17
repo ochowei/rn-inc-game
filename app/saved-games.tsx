@@ -68,7 +68,7 @@ export default function SavedGamesScreen() {
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ title: 'Saved Games' }} />
       <FlatList
-        data={profiles}
+        data={[...profiles].reverse()}
         renderItem={renderItem}
         keyExtractor={(item) => item.createdAt}
         ListEmptyComponent={<ThemedText>No saved games found.</ThemedText>}
