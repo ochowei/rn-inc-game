@@ -34,7 +34,7 @@ export default function GameMenuScreen() {
 
     const newGameProfile = {
       resources: { creativity: 10, productivity: 10, money: 100 },
-      assets: [{ name: t('game', 'engineer'), count: 1 }],
+      assets: [{ name: 'engineer', count: 1 }],
       createdAt: new Date().toISOString(),
     };
 
