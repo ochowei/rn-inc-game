@@ -54,7 +54,7 @@ export function useGameStorage() {
     fetchProfiles();
   }, [fetchProfiles]);
 
-  const saveProfiles = async (newProfiles: GameProfile[]) => {
+  const saveProfiles = useCallback(async (newProfiles: GameProfile[]) => {
     try {
       const storage = await getStorage();
       await storage.setItem(PROFILES_KEY, JSON.stringify(newProfiles));
@@ -62,20 +62,19 @@ export function useGameStorage() {
     } catch (error) {
       console.error('Failed to save game profiles', error);
     }
-  };
+  }, []);
 
-  const deleteProfile = async (index: number) => {
-    const newProfiles = [...profiles];
-    newProfiles.splice(index, 1);
+  const deleteProfile = useCallback(async (index: number) => {
+    const newProfiles = profiles.filter((_, i) => i !== index);
     await saveProfiles(newProfiles);
-  };
+  }, [profiles, saveProfiles]);
 
-  const addProfile = async (profile: GameProfile) => {
+  const addProfile = useCallback(async (profile: GameProfile) => {
     if (profiles.length < 5) {
       const newProfiles = [...profiles, profile];
       await saveProfiles(newProfiles);
     }
-  };
+  }, [profiles, saveProfiles]);
 
   return { profiles, loading, fetchProfiles, saveProfiles, deleteProfile, addProfile };
 }
