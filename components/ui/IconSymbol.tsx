@@ -19,6 +19,8 @@ const MAPPING = {
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
   'gearshape.fill': 'settings',
+  'lightbulb.fill': 'lightbulb-outline',
+  'dollarsign.circle.fill': 'attach-money',
 } as IconMapping;
 
 /**

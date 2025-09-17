@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { producibleGames } from '@/constants/Games';
+import { ResourceBar } from '@/components/ResourceBar';
 
 export default function GameScreen() {
   const [resources, setResources] = useState({
@@ -19,14 +20,8 @@ export default function GameScreen() {
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ title: '新遊戲', headerShown: false }} />
+      <ResourceBar resources={resources} />
       <ThemedText type="title">新遊戲</ThemedText>
-
-      <ThemedView style={styles.sectionContainer}>
-        <ThemedText type="subtitle">資源</ThemedText>
-        <ThemedText>創意：{resources.creativity}</ThemedText>
-        <ThemedText>生產力：{resources.productivity}</ThemedText>
-        <ThemedText>金錢：{resources.money}</ThemedText>
-      </ThemedView>
 
       <ThemedView style={styles.sectionContainer}>
         <ThemedText type="subtitle">資產</ThemedText>
@@ -60,6 +55,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
+    paddingTop: 60, // Add padding to avoid overlap with the resource bar
   },
   sectionContainer: {
     marginTop: 32,
