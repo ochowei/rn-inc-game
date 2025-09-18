@@ -4,7 +4,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
-import { GameProfile, updateGameProfile } from '@/utils/game_logic';
+import { GameProfile, updateGameProfile, developGame } from '@/utils/game_logic';
 import gameSettings from '@/game_settings.json';
 import { useState, useEffect } from 'react';
 import { Card, Title, Paragraph, Button } from 'react-native-paper';
@@ -41,6 +41,13 @@ export default function DevelopGameScreen() {
       resources.creativity >= cost.creativity &&
       resources.productivity >= cost.productivity
     );
+  };
+
+  const handleDevelopPress = (gameName: string) => {
+    if (profile) {
+      const newProfile = developGame(profile, gameName);
+      setProfile(newProfile);
+    }
   };
 
   if (!resources) {
@@ -86,7 +93,7 @@ export default function DevelopGameScreen() {
             <Card.Actions>
               <Button
                 mode="contained"
-                onPress={() => console.log('Develop ' + game.name)}
+                onPress={() => handleDevelopPress(game.name)}
                 disabled={!canDevelop(game)}
               >
                 {t('developGame', 'develop')}
