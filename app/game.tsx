@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, Pressable } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
@@ -9,6 +8,8 @@ import { producibleGames } from '@/constants/Games';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameStorage } from '@/hooks/use-game-storage';
+import { GameProfile, updateGameProfile } from '../utils/game_logic';
+import gameSettings from '../game_settings.json';
 
 export default function GameScreen() {
   const router = useRouter();
@@ -30,6 +31,11 @@ export default function GameScreen() {
     creativity: 10,
     productivity: 10,
     money: 100,
+    creativity_max: 100,
+    productivity_max: 100,
+    creativity_per_tick: 0,
+    productivity_per_tick: 0,
+    money_per_tick: 0,
   });
   const [employees, setEmployees] = useState([{ name: 'engineer', count: 1 }]);
   const [games, setGames] = useState<{ name: string; count: number }[]>([]);
@@ -39,15 +45,43 @@ export default function GameScreen() {
 
   useEffect(() => {
     if (params.profile) {
-      const profile = JSON.parse(params.profile as string);
-      setResources(profile.resources);
-      setEmployees(profile.employees);
-      setGames(profile.games || []);
+      const profile: GameProfile = JSON.parse(params.profile as string);
+      const now = new Date();
+      const createdAt = new Date(profile.createdAt);
+      const elapsedMilliseconds = now.getTime() - createdAt.getTime();
+
+      const updatedProfile = updateGameProfile(profile, elapsedMilliseconds);
+
+      setResources(updatedProfile.resources);
+      setEmployees(updatedProfile.employees);
+      setGames(updatedProfile.games || []);
     }
     if (params.saveSlotIndex) {
       setSaveSlotIndex(parseInt(params.saveSlotIndex as string, 10));
     }
   }, [params.profile, params.saveSlotIndex]);
+
+  useEffect(() => {
+    const gameTickInterval = gameSettings.game_tick_interval_sec * 1000;
+
+    const intervalId = setInterval(() => {
+      setResources((prevResources) => {
+        const currentProfile: GameProfile = {
+          resources: prevResources,
+          employees,
+          games,
+          createdAt: new Date().toISOString(),
+        };
+        const updatedProfile = updateGameProfile(
+          currentProfile,
+          gameTickInterval
+        );
+        return updatedProfile.resources;
+      });
+    }, gameTickInterval);
+
+    return () => clearInterval(intervalId);
+  }, [employees, games]);
 
   const handleSaveGame = async () => {
     const newGameProfile = {
