@@ -43,3 +43,71 @@ export const createNewGameProfile = (): GameProfile => {
     createdAt: new Date().toISOString(),
   };
 };
+
+export const updateGameProfile = (
+  currentProfile: GameProfile,
+  elapsedMilliseconds: number
+): GameProfile => {
+  const newProfile = JSON.parse(JSON.stringify(currentProfile));
+
+  const ticks = Math.floor(
+    elapsedMilliseconds / (gameSettings.game_tick_interval_sec * 1000)
+  );
+
+  if (ticks <= 0) {
+    return newProfile;
+  }
+
+  // 1. Employee resource generation
+  let totalCreativityPerTick = 0;
+  let totalProductivityPerTick = 0;
+
+  newProfile.employees.forEach((employee) => {
+    const employeeSettings = (gameSettings as any)[employee.name];
+    if (employeeSettings) {
+      totalCreativityPerTick +=
+        employee.count * employeeSettings.creativity_per_tick;
+      totalProductivityPerTick +=
+        employee.count * employeeSettings.productivity_per_tick;
+    }
+  });
+
+  newProfile.resources.creativity = Math.min(
+    newProfile.resources.creativity_max,
+    newProfile.resources.creativity + totalCreativityPerTick * ticks
+  );
+
+  newProfile.resources.productivity = Math.min(
+    newProfile.resources.productivity_max,
+    newProfile.resources.productivity + totalProductivityPerTick * ticks
+  );
+
+  // 2. Game income and maintenance
+  // TODO: need update
+  let totalIncome = 0;
+  let totalMaintenanceCost = 0;
+
+  newProfile.games.forEach((game: any) => {
+    const gameData = gameSettings.developable_games.find(
+      (g) => g.name === game.name
+    );
+    if (gameData) {
+      const incomePerTick =
+        gameData.income_per_10_sec / (10 / gameSettings.game_tick_interval_sec);
+      totalIncome += incomePerTick * ticks;
+
+      const maintenancePerTick =
+        gameData.maintenance_cost_per_min.productivity /
+        (60 / gameSettings.game_tick_interval_sec);
+      totalMaintenanceCost += maintenancePerTick * ticks;
+    }
+  });
+
+  newProfile.resources.money += totalIncome;
+  newProfile.resources.productivity = Math.max(
+    0,
+    newProfile.resources.productivity - totalMaintenanceCost
+  );
+
+  return newProfile;
+};
