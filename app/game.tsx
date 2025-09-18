@@ -10,6 +10,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { useGameStorage } from '@/hooks/use-game-storage';
 import { GameProfile, updateGameProfile } from '../utils/game_logic';
 import Fab from '@/components/Fab';
+import gameSettings from '@/game_settings.json';
 
 export default function GameScreen() {
   const router = useRouter();
@@ -49,7 +50,7 @@ export default function GameScreen() {
       const now = new Date();
       const createdAt = new Date(profile.createdAt);
       const elapsedMilliseconds = now.getTime() - createdAt.getTime();
-      const ticks = Math.floor(elapsedMilliseconds / 5000);
+      const ticks = Math.floor(elapsedMilliseconds / gameSettings.gameTickInterval);
 
       const updatedProfile = updateGameProfile(profile, ticks);
 
@@ -63,8 +64,6 @@ export default function GameScreen() {
   }, [params.profile, params.saveId]);
 
   useEffect(() => {
-    const gameTickInterval = 5000;
-
     const intervalId = setInterval(() => {
       setResources((prevResources) => {
         const currentProfile: GameProfile = {
@@ -76,7 +75,7 @@ export default function GameScreen() {
         const updatedProfile = updateGameProfile(currentProfile, 1);
         return updatedProfile.resources;
       });
-    }, gameTickInterval);
+    }, gameSettings.gameTickInterval);
 
     return () => clearInterval(intervalId);
   }, [employees, games]);
