@@ -1,14 +1,16 @@
 {
   "game_tick_interval_sec": 5,
-  "initial_resources": {
-    "engineers": 1,
-    "funding": 100,
-    "creativity": 10,
-    "productivity": 10
+  "initial_resources": {    
+    "money": 100,
+    "employees": {
+      "engineer_level_1": 1
+    }
   },
-  "engineer_abilities": {
-    "creativity_per_min": 10,
-    "productivity_per_min": 20
+  "engineer_level_1": {
+    "creativity_per_tick": 10,
+    "productivity_per_tick": 20,
+    "creativity_max": 100,
+    "productivity_max": 100
   },
   "developable_games": [
     {
