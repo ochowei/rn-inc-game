@@ -4,6 +4,8 @@ export interface GameProfile {
   resources: {
     creativity: number;
     productivity: number;
+    creativity_max: number;
+    productivity_max: number;
     money: number;
   };
   employees: {
@@ -15,18 +17,20 @@ export interface GameProfile {
 }
 
 export const createNewGameProfile = (): GameProfile => {
-  const { initial_resources } = gameSettings;
+  const { initial_resources, engineer_level_1 } = gameSettings;
 
   return {
     resources: {
-      creativity: initial_resources.creativity,
-      productivity: initial_resources.productivity,
-      money: initial_resources.funding,
+      creativity: 0, // Initial creativity
+      productivity: 0, // Initial productivity
+      creativity_max: engineer_level_1.creativity_max,
+      productivity_max: engineer_level_1.productivity_max,
+      money: initial_resources.money,
     },
     employees: [
       {
-        name: 'engineer',
-        count: initial_resources.engineers,
+        name: 'engineer_level_1',
+        count: initial_resources.employees.engineer_level_1,
       },
     ],
     games: [],
