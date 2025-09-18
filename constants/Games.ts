@@ -3,17 +3,17 @@ export interface Game {
   cost: number;
   productivity: number;
   creativity: number;
-  timeToComplete: number; // in seconds
-  income: number; // per 10 seconds
+  timeToComplete: number; // in ticks
+  income: number; // per tick
 }
 
 export const producibleGames: Game[] = [
   {
-    name: 'mini puzzle game',
-    cost: 20,
-    productivity: 10,
+    name: 'Puzzle Game',
+    cost: 30,
+    productivity: 15,
     creativity: 10,
-    timeToComplete: 30,
-    income: 1,
+    timeToComplete: 6,
+    income: 0.5,
   },
 ];

@@ -22,10 +22,6 @@ export interface GameProfile {
 export const createNewGameProfile = (): GameProfile => {
   const { initial_resources, engineer_level_1 } = gameSettings;
 
-  const tickIntervalMs = gameSettings.game_tick_interval_sec * 1000;
-  const flooredTimestamp =
-    Math.floor(new Date().getTime() / tickIntervalMs) * tickIntervalMs;
-
   return {
     resources: {
       creativity: 0,
@@ -44,19 +40,15 @@ export const createNewGameProfile = (): GameProfile => {
       },
     ],
     games: [],
-    createdAt: new Date(flooredTimestamp).toISOString(),
+    createdAt: new Date().toISOString(),
   };
 };
 
 export const updateGameProfile = (
   currentProfile: GameProfile,
-  elapsedMilliseconds: number
+  ticks: number
 ): GameProfile => {
   const newProfile = JSON.parse(JSON.stringify(currentProfile));
-
-  const ticks = Math.floor(
-    elapsedMilliseconds / (gameSettings.game_tick_interval_sec * 1000)
-  );
 
   if (ticks <= 0) {
     return newProfile;
@@ -87,23 +79,17 @@ export const updateGameProfile = (
   );
 
   // 2. Game income and maintenance
-  // TODO: need update
   let totalIncome = 0;
   let totalMaintenanceCost = 0;
 
   newProfile.games.forEach((game: any) => {
-    const gameData = gameSettings.developable_games.find(
-      (g) => g.name === game.name
+    const gameData = (gameSettings.developable_games as any).find(
+      (g: any) => g.name === game.name
     );
     if (gameData) {
-      const incomePerTick =
-        gameData.income_per_10_sec / (10 / gameSettings.game_tick_interval_sec);
-      totalIncome += incomePerTick * ticks;
-
-      const maintenancePerTick =
-        gameData.maintenance_cost_per_min.productivity /
-        (60 / gameSettings.game_tick_interval_sec);
-      totalMaintenanceCost += maintenancePerTick * ticks;
+      totalIncome += gameData.income_per_tick * ticks;
+      totalMaintenanceCost +=
+        gameData.maintenance_cost_per_tick.productivity * ticks;
     }
   });
 
