@@ -1,22 +1,22 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, Pressable } from 'react-native';
+import { StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { producibleGames } from '@/constants/Games';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameStorage } from '@/hooks/use-game-storage';
-import { GameProfile, updateGameProfile } from '../utils/game_logic';
+import { GameProfile } from '../utils/game_logic';
 import Fab from '@/components/Fab';
-import gameSettings from '@/game_settings.json';
+import { useGameContext } from '@/contexts/GameContext';
 
 export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { t } = useLanguage();
   const { addProfile, updateProfile, profiles } = useGameStorage();
+  const { profile, loadProfile } = useGameContext();
   const tintColor = useThemeColor({}, 'tint');
   const backgroundColor = useThemeColor({}, 'background');
 
@@ -28,64 +28,61 @@ export default function GameScreen() {
     color: tintColor,
   };
 
-  const [resources, setResources] = useState<GameProfile['resources']>({
-    creativity: 10,
-    productivity: 10,
-    money: 100,
-    creativity_max: 100,
-    productivity_max: 100,
-    creativity_per_tick: 0,
-    productivity_per_tick: 0,
-    money_per_tick: 0,
-  });
-  const [employees, setEmployees] = useState([{ name: 'engineer', count: 1 }]);
-  const [games, setGames] = useState<{ name: string; count: number }[]>([]);
   const [saveId, setSaveId] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState({ title: '', message: '' });
 
   useEffect(() => {
-    if (params.profile) {
-      const profile: GameProfile = JSON.parse(params.profile as string);
-      const now = new Date();
-      const createdAt = new Date(profile.createdAt);
-      const elapsedMilliseconds = now.getTime() - createdAt.getTime();
-      const ticks = Math.floor(elapsedMilliseconds / gameSettings.gameTickInterval);
-
-      const updatedProfile = updateGameProfile(profile, ticks);
-
-      setResources(updatedProfile.resources);
-      setEmployees(updatedProfile.employees);
-      setGames(updatedProfile.games || []);
-    }
     if (params.saveId) {
       setSaveId(params.saveId as string);
     }
-  }, [params.profile, params.saveId]);
+  }, [params.saveId]);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setResources((prevResources) => {
-        const currentProfile: GameProfile = {
-          resources: prevResources,
-          employees,
-          games,
-          createdAt: new Date().toISOString(),
-        };
-        const updatedProfile = updateGameProfile(currentProfile, 1);
-        return updatedProfile.resources;
-      });
-    }, gameSettings.gameTickInterval);
+    // If there's no profile and no "newGame" flag, redirect to menu
+    if (!profile && !params.newGame) {
+      router.replace('/menu');
+    }
 
-    return () => clearInterval(intervalId);
-  }, [employees, games]);
+    // If it's a new game, create a default profile
+    if (params.newGame && !profile) {
+      const defaultProfile: GameProfile = {
+        id: '', // No ID for a new, unsaved game
+        resources: {
+          creativity: 10,
+          productivity: 10,
+          money: 100,
+          creativity_max: 100,
+          productivity_max: 100,
+          creativity_per_tick: 0,
+          productivity_per_tick: 0,
+          money_per_tick: 0,
+        },
+        employees: [{ name: 'engineer', count: 1 }],
+        games: [],
+        createdAt: new Date().toISOString(),
+      };
+      loadProfile(defaultProfile);
+    }
+  }, [profile, params.newGame, router, loadProfile]);
+
 
   const handleSaveGame = async () => {
+    if (!profile) return;
+
+    const now = new Date();
+    const createdAt = new Date(profile.createdAt);
+    const elapsedMilliseconds = now.getTime() - createdAt.getTime();
+    const ticks = Math.floor(elapsedMilliseconds / gameSettings.gameTickInterval);
+
+    const updatedProfileForSave = updateGameProfile(profile, ticks);
+    updatedProfileForSave.createdAt = now.toISOString();
+
     const gameProfileData = {
-      resources,
-      employees,
-      games,
-      createdAt: new Date().toISOString(),
+      resources: updatedProfileForSave.resources,
+      employees: updatedProfileForSave.employees,
+      games: updatedProfileForSave.games,
+      createdAt: updatedProfileForSave.createdAt,
     };
 
     try {
@@ -99,7 +96,10 @@ export default function GameScreen() {
         setIsModalVisible(true);
       } else {
         if (profiles.length < 5) {
-          await addProfile(gameProfileData);
+          const newProfile = await addProfile(gameProfileData);
+          if(newProfile) {
+            setSaveId(newProfile.id);
+          }
           setModalContent({ title: t('game', 'gameSaved'), message: t('game', 'gameSavedSuccess') });
           setIsModalVisible(true);
         } else {
@@ -118,10 +118,19 @@ export default function GameScreen() {
     setIsModalVisible(false);
   };
 
+  if (!profile) {
+    return (
+      <ThemedView style={styles.container}>
+        <ActivityIndicator size="large" />
+        <ThemedText>Loading Game...</ThemedText>
+      </ThemedView>
+    );
+  }
+
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ title: t('game', 'newGameTitle'), headerShown: false }} />
-      <ResourceBar resources={resources} />
+      <ResourceBar resources={profile.resources} />
       <ThemedText type="title">{t('game', 'newGameTitle')}</ThemedText>
 
       <Pressable onPress={() => router.push('/menu')} style={[styles.backButton, buttonStyle]}>
@@ -134,9 +143,18 @@ export default function GameScreen() {
 
       <ThemedView style={styles.sectionContainer}>
         <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
-        {employees.map((employee, index) => (
+        {profile.employees.map((employee, index) => (
           <ThemedText key={index}>
             {t('game', employee.name as any)}：{employee.count} {t('game', 'peopleClassifier')}
+          </ThemedText>
+        ))}
+      </ThemedView>
+
+      <ThemedView style={styles.sectionContainer}>
+        <ThemedText type="subtitle">{t('game', 'producibleGames')}</ThemedText>
+        {profile.games.map((game, index) => (
+          <ThemedText key={index}>
+            {t('games', game.name as any) || game.name}：{game.count}
           </ThemedText>
         ))}
       </ThemedView>

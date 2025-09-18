@@ -67,6 +67,17 @@ export const locales = {
     games: {
       'Puzzle Game': 'Puzzle Game',
     },
+    developGame: {
+      title: 'Game Development',
+      backToGame: 'Back to Game',
+      develop: 'Develop',
+      cost: 'Cost',
+      developmentTime: 'Development Time',
+      incomePerTick: 'Income/Tick',
+      maintenanceCostPerTick: 'Maintenance/Tick',
+      notEnoughResources: 'Not enough resources',
+      funding: 'Funding',
+    },
   },
   zh: {
     menu: {
@@ -135,6 +146,17 @@ export const locales = {
     },
     games: {
       'Puzzle Game': '益智遊戲',
+    },
+    developGame: {
+      title: '遊戲開發',
+      backToGame: '返回遊戲',
+      develop: '開發',
+      cost: '成本',
+      developmentTime: '開發時間',
+      incomePerTick: '收入/Tick',
+      maintenanceCostPerTick: '維護成本/Tick',
+      notEnoughResources: '資源不足',
+      funding: '資金',
     },
   },
 };

@@ -7,11 +7,12 @@ import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useGameStorage } from '@/hooks/use-game-storage';
 import { useLanguage } from '@/hooks/use-language';
-import { createNewGameProfile } from '@/utils/game_logic';
+import { useGameContext } from '@/contexts/GameContext';
 
 export default function GameMenuScreen() {
   const router = useRouter();
-  const { profiles, addProfile, fetchProfiles } = useGameStorage();
+  const { profiles, fetchProfiles } = useGameStorage();
+  const { loadProfile } = useGameContext();
   const { language, setLanguage, t } = useLanguage();
   const hasSavedGames = profiles.length > 0;
   const tintColor = useThemeColor({}, 'tint');
@@ -24,25 +25,16 @@ export default function GameMenuScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchProfiles();
-    }, [fetchProfiles])
+      // Reset the profile when returning to the menu
+      loadProfile(null as any);
+    }, [fetchProfiles, loadProfile])
   );
 
-  const handleNewGame = async () => {
-    if (profiles.length >= 5) {
-      setIsLimitModalVisible(true);
-      return;
-    }
-
-    const newGameProfile = createNewGameProfile();
-
-    const addedProfile = await addProfile(newGameProfile);
-
-    if (addedProfile) {
-      router.push({
-        pathname: '/game',
-        params: { profile: JSON.stringify(addedProfile), saveId: addedProfile.id },
-      });
-    }
+  const handleNewGame = () => {
+    router.push({
+      pathname: '/game',
+      params: { newGame: 'true' },
+    });
   };
 
   const handleLoadGame = () => {
