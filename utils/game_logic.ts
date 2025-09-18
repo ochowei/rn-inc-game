@@ -83,6 +83,7 @@ export const updateGameProfile = (
   );
 
   // 2. Game income and maintenance
+  // TODO: need update
   let totalIncome = 0;
   let totalMaintenanceCost = 0;
 
