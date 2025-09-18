@@ -66,7 +66,7 @@ export const updateGameProfile = (
   let totalCreativityPerTick = 0;
   let totalProductivityPerTick = 0;
 
-  newProfile.employees.forEach((employee) => {
+  newProfile.employees.forEach((employee: { name: string; count: number }) => {
     const employeeSettings = (gameSettings as any)[employee.name];
     if (employeeSettings) {
       totalCreativityPerTick +=
