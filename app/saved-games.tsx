@@ -17,8 +17,8 @@ export default function SavedGamesScreen() {
   const [isConfirming, setIsConfirming] = useState(false);
   const [profileToDelete, setProfileToDelete] = useState<number | null>(null);
 
-  const handleLoadGame = (gameProfile: GameProfile) => {
-    router.push({ pathname: '/game', params: { profile: JSON.stringify(gameProfile) } });
+  const handleLoadGame = (gameProfile: GameProfile, index: number) => {
+    router.push({ pathname: '/game', params: { profile: JSON.stringify(gameProfile), saveSlotIndex: index } });
   };
 
   const handleDeleteGame = (index: number) => {
@@ -44,7 +44,7 @@ export default function SavedGamesScreen() {
       <ThemedText>{t('savedGames', 'saveSlot')} {index + 1}</ThemedText>
       <ThemedText>{new Date(item.createdAt).toLocaleString()}</ThemedText>
       <ThemedView style={styles.buttonsContainer}>
-        <Pressable onPress={() => handleLoadGame(item)} style={[styles.button, { borderColor: tintColor }]}>
+        <Pressable onPress={() => handleLoadGame(item, index)} style={[styles.button, { borderColor: tintColor }]}>
           <ThemedText style={styles.buttonText}>{t('savedGames', 'load')}</ThemedText>
         </Pressable>
         <Pressable onPress={() => handleDeleteGame(index)} style={[styles.button, styles.deleteButton]}>

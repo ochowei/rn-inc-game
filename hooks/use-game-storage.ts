@@ -81,5 +81,11 @@ export function useGameStorage() {
     }
   };
 
-  return { profiles, loading, fetchProfiles, saveProfiles, deleteProfile, addProfile };
+  const updateProfile = async (index: number, profile: GameProfile) => {
+    const newProfiles = [...profiles];
+    newProfiles[index] = profile;
+    await saveProfiles(newProfiles);
+  };
+
+  return { profiles, loading, fetchProfiles, saveProfiles, deleteProfile, addProfile, updateProfile };
 }
