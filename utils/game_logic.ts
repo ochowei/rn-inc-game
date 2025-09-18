@@ -22,6 +22,10 @@ export interface GameProfile {
 export const createNewGameProfile = (): GameProfile => {
   const { initial_resources, engineer_level_1 } = gameSettings;
 
+  const tickIntervalMs = gameSettings.game_tick_interval_sec * 1000;
+  const flooredTimestamp =
+    Math.floor(new Date().getTime() / tickIntervalMs) * tickIntervalMs;
+
   return {
     resources: {
       creativity: 0,
@@ -40,7 +44,7 @@ export const createNewGameProfile = (): GameProfile => {
       },
     ],
     games: [],
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(flooredTimestamp).toISOString(),
   };
 };
 
