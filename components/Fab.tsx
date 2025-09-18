@@ -2,18 +2,33 @@ import * as React from 'react';
 import { Modal, Portal, Button } from 'react-native-paper';
 import { FAB } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import { GameProfile } from '@/utils/game_logic';
 
-const Fab = () => {
+interface FabProps {
+  resources: GameProfile['resources'];
+}
+
+const Fab: React.FC<FabProps> = ({ resources }) => {
   const [visible, setVisible] = React.useState(false);
+  const router = useRouter();
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
+
+  const handleGameDevelopPress = () => {
+    hideModal();
+    router.push({
+      pathname: '/develop-game',
+      params: { resources: JSON.stringify(resources) },
+    });
+  };
 
   return (
     <>
       <Portal>
         <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.modalContainer} testID="fab-modal">
-          <Button onPress={() => console.log('Pressed game develop')}>Game Develop</Button>
+          <Button onPress={handleGameDevelopPress}>Game Develop</Button>
           <Button onPress={() => console.log('Pressed hire employee')}>Hire Employee</Button>
         </Modal>
       </Portal>

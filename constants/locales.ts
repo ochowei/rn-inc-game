@@ -66,6 +66,13 @@ export const locales = {
     },
     games: {
       'Puzzle Game': 'Puzzle Game',
+      'Novel Game': 'Novel Game',
+    },
+    developGame: {
+      title: 'Game Development',
+      backToGame: 'Back to Game',
+      develop: 'Develop',
+      insufficientResources: 'Insufficient resources',
     },
   },
   zh: {
@@ -135,6 +142,13 @@ export const locales = {
     },
     games: {
       'Puzzle Game': '益智遊戲',
+      'Novel Game': '小說遊戲',
+    },
+    developGame: {
+      title: '遊戲開發',
+      backToGame: '返回遊戲',
+      develop: '開發',
+      insufficientResources: '資源不足',
     },
   },
 };
