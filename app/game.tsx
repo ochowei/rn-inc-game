@@ -144,32 +144,6 @@ export default function GameScreen() {
         ))}
       </ThemedView>
 
-      <ThemedView style={styles.sectionContainer}>
-        <ThemedText type="subtitle">{t('game', 'games')}</ThemedText>
-        {games.length === 0 ? (
-          <ThemedText>{t('game', 'noGamesDeveloped')}</ThemedText>
-        ) : (
-          games.map((game, index) => (
-            <ThemedText key={index}>
-              {t('games', game.name as any)}：{game.count}
-            </ThemedText>
-          ))
-        )}
-      </ThemedView>
-
-      <ThemedView style={styles.sectionContainer}>
-        <ThemedText type="subtitle">{t('game', 'producibleGames')}</ThemedText>
-        {producibleGames.map((game, index) => (
-          <ThemedView key={index} style={styles.gameContainer}>
-            <ThemedText type="defaultSemiBold">{t('games', 'miniPuzzleGame')}</ThemedText>
-            <ThemedText>{t('game', 'cost')}：{game.cost} {t('game', 'currencyUnit')}</ThemedText>
-            <ThemedText>{t('game', 'productivity')}：{game.productivity}</ThemedText>
-            <ThemedText>{t('game', 'creativity')}：{game.creativity}</ThemedText>
-            <ThemedText>{t('game', 'timeToComplete')}：{game.timeToComplete} {t('game', 'seconds')}</ThemedText>
-            <ThemedText>{t('game', 'income')}：{t('game', 'per10Seconds')} {game.income} {t('game', 'currencyUnit')}</ThemedText>
-          </ThemedView>
-        ))}
-      </ThemedView>
 
       {isModalVisible && (
         <ThemedView style={styles.confirmationContainer}>
