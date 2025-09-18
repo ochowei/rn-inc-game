@@ -11,6 +11,7 @@
     "creativity_max": 100,
     "productivity_max": 100
   },
+  "gameTickInterval": 5000,
   "developable_games": [
     {
       "name": "Novel Game",
