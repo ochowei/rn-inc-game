@@ -2,13 +2,14 @@ import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { useGameStorage, GameProfile } from './use-game-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { Platform } from 'react-native';
+// Mock react-native with a simple, mutable object to avoid transform errors
+const mockReactNative = {
+  Platform: {
+    OS: 'web',
+  },
+};
+jest.mock('react-native', () => mockReactNative);
 
-jest.mock('react-native', () => ({
-    Platform: {
-      OS: 'web',
-    },
-  }));
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -61,13 +62,11 @@ describe('useGameStorage', () => {
 
     mockLocalStorage.clear();
 
+    // Reset Platform.OS to 'web' before each test
+    mockReactNative.Platform.OS = 'web';
   });
 
   describe('fetchProfiles', () => {
-    afterEach(() => {
-        Object.defineProperty(Platform, 'OS', { value: 'web' });
-    });
-
     it('should fetch and return an empty array when no profiles are stored', async () => {
       getItemSpy = jest.spyOn(window.localStorage, 'getItem').mockReturnValue(null);
       const { result } = renderHook(() => useGameStorage());
@@ -93,7 +92,7 @@ describe('useGameStorage', () => {
     });
 
     it('should handle native platform correctly', async () => {
-        Object.defineProperty(Platform, 'OS', { value: 'ios', configurable: true });
+        mockReactNative.Platform.OS = 'ios';
         const storedProfiles: GameProfile[] = [
           { ...mockProfile, id: '1', createdAt: new Date().toISOString() },
         ];
