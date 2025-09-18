@@ -1,6 +1,6 @@
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
@@ -9,4 +9,6 @@ module.exports = {
       },
     ],
   },
+  collectCoverage: true,
+  coverageReporters: ['json-summary', 'text', 'lcov'],
 };
