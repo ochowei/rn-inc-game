@@ -153,7 +153,7 @@ export default function GameScreen() {
           </ThemedView>
         </ThemedView>
       )}
-      <Fab resources={resources} />
+      <Fab resources={resources} employees={employees} games={games} />
     </ThemedView>
   );
 }

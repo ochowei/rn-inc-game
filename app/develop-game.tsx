@@ -4,9 +4,9 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
-import { GameProfile } from '@/utils/game_logic';
+import { GameProfile, updateGameProfile } from '@/utils/game_logic';
 import gameSettings from '@/game_settings.json';
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, Title, Paragraph, Button } from 'react-native-paper';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
@@ -16,9 +16,22 @@ export default function DevelopGameScreen() {
   const { t } = useLanguage();
   const tintColor = useThemeColor({}, 'tint');
 
-  const resources = useMemo(() => {
-    return params.resources ? JSON.parse(params.resources as string) : null;
-  }, [params.resources]);
+  const [profile, setProfile] = useState<GameProfile | null>(() => {
+    return params.profile ? JSON.parse(params.profile as string) : null;
+  });
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setProfile((prevProfile) => {
+        if (!prevProfile) return null;
+        return updateGameProfile(prevProfile, 1);
+      });
+    }, gameSettings.gameTickInterval);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const resources = profile?.resources;
 
   const canDevelop = (game: any) => {
     if (!resources) return false;

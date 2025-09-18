@@ -7,9 +7,11 @@ import { GameProfile } from '@/utils/game_logic';
 
 interface FabProps {
   resources: GameProfile['resources'];
+  employees: GameProfile['employees'];
+  games: GameProfile['games'];
 }
 
-const Fab: React.FC<FabProps> = ({ resources }) => {
+const Fab: React.FC<FabProps> = ({ resources, employees, games }) => {
   const [visible, setVisible] = React.useState(false);
   const router = useRouter();
 
@@ -18,9 +20,15 @@ const Fab: React.FC<FabProps> = ({ resources }) => {
 
   const handleGameDevelopPress = () => {
     hideModal();
+    const profileData: GameProfile = {
+      resources,
+      employees,
+      games,
+      createdAt: new Date().toISOString(),
+    };
     router.push({
       pathname: '/develop-game',
-      params: { resources: JSON.stringify(resources) },
+      params: { profile: JSON.stringify(profileData) },
     });
   };
 
