@@ -9,6 +9,8 @@ interface Resources {
   creativity: number;
   productivity: number;
   money: number;
+  creativity_max: number;
+  productivity_max: number;
 }
 
 interface ResourceBarProps {
@@ -32,7 +34,9 @@ export function ResourceBar({ resources }: ResourceBarProps) {
         darkColor="transparent"
       >
         <IconSymbol name="lightbulb.fill" size={20} color={iconColor} />
-        <ThemedText style={styles.resourceText}>{t('resources', 'creativity')}: {resources.creativity}</ThemedText>
+        <ThemedText style={styles.resourceText}>
+          {t('resources', 'creativity')}: {resources.creativity} / {resources.creativity_max}
+        </ThemedText>
       </ThemedView>
       <ThemedView
         style={styles.resourceItem}
@@ -40,7 +44,9 @@ export function ResourceBar({ resources }: ResourceBarProps) {
         darkColor="transparent"
       >
         <IconSymbol name="gearshape.fill" size={20} color={iconColor} />
-        <ThemedText style={styles.resourceText}>{t('resources', 'productivity')}: {resources.productivity}</ThemedText>
+        <ThemedText style={styles.resourceText}>
+          {t('resources', 'productivity')}: {resources.productivity} / {resources.productivity_max}
+        </ThemedText>
       </ThemedView>
       <ThemedView
         style={styles.resourceItem}

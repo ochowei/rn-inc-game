@@ -27,7 +27,7 @@ export default function GameScreen() {
     color: tintColor,
   };
 
-  const [resources, setResources] = useState({
+  const [resources, setResources] = useState<GameProfile['resources']>({
     creativity: 10,
     productivity: 10,
     money: 100,
