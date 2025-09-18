@@ -3,12 +3,17 @@ import { useGameStorage, GameProfile } from './use-game-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Mock react-native with a simple, mutable object to avoid transform errors
-const mockReactNative = {
+var mockReactNative = {
   Platform: {
     OS: 'web',
   },
 };
-jest.mock('react-native', () => mockReactNative);
+jest.mock('react-native', () => ({
+  __esModule: true,
+  get Platform() {
+    return mockReactNative.Platform;
+  },
+}));
 
 
 // Mock AsyncStorage
