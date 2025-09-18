@@ -7,7 +7,7 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameStorage } from '@/hooks/use-game-storage';
-import { GameProfile } from '../utils/game_logic';
+import { GameProfile, createNewGameProfile } from '../utils/game_logic';
 import Fab from '@/components/Fab';
 import { useGameContext } from '@/contexts/GameContext';
 
@@ -46,23 +46,8 @@ export default function GameScreen() {
 
     // If it's a new game, create a default profile
     if (params.newGame && !profile) {
-      const defaultProfile: GameProfile = {
-        id: '', // No ID for a new, unsaved game
-        resources: {
-          creativity: 10,
-          productivity: 10,
-          money: 100,
-          creativity_max: 100,
-          productivity_max: 100,
-          creativity_per_tick: 0,
-          productivity_per_tick: 0,
-          money_per_tick: 0,
-        },
-        employees: [{ name: 'engineer', count: 1 }],
-        games: [],
-        createdAt: new Date().toISOString(),
-      };
-      loadProfile(defaultProfile);
+      const newGameProfile = createNewGameProfile();
+      loadProfile(newGameProfile);
     }
   }, [profile, params.newGame, router, loadProfile]);
 
@@ -96,9 +81,10 @@ export default function GameScreen() {
         setIsModalVisible(true);
       } else {
         if (profiles.length < 5) {
-          const newProfile = await addProfile(gameProfileData);
-          if(newProfile) {
-            setSaveId(newProfile.id);
+          const newProfileWithId = await addProfile(gameProfileData);
+          if (newProfileWithId) {
+            setSaveId(newProfileWithId.id);
+            loadProfile(newProfileWithId); // Update context with the profile that has an ID
           }
           setModalContent({ title: t('game', 'gameSaved'), message: t('game', 'gameSavedSuccess') });
           setIsModalVisible(true);
