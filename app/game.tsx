@@ -10,6 +10,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { useGameStorage } from '@/hooks/use-game-storage';
 import { GameProfile, updateGameProfile } from '../utils/game_logic';
 import gameSettings from '../game_settings.json';
+import Fab from '@/components/Fab';
 
 export default function GameScreen() {
   const router = useRouter();
@@ -156,6 +157,7 @@ export default function GameScreen() {
           </ThemedView>
         </ThemedView>
       )}
+      <Fab />
     </ThemedView>
   );
 }
