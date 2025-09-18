@@ -22,9 +22,9 @@ export const locales = {
       productivity: 'Productivity',
       creativity: 'Creativity',
       timeToComplete: 'Time to Complete',
-      seconds: 'seconds',
+      seconds: 'ticks',
       income: 'Income',
-      per10Seconds: 'per 10 seconds',
+      per10Seconds: 'per tick',
       gameSaved: 'Game Saved',
       gameSavedSuccess: 'Your game has been saved successfully.',
       saveLimitReached: 'Save Limit Reached',
@@ -65,7 +65,7 @@ export const locales = {
       money: 'Money',
     },
     games: {
-      miniPuzzleGame: 'Mini Puzzle Game',
+      'Puzzle Game': 'Puzzle Game',
     },
   },
   zh: {
@@ -91,9 +91,9 @@ export const locales = {
       productivity: '生產力',
       creativity: '創意',
       timeToComplete: '完成時間',
-      seconds: '秒',
+      seconds: 'ticks',
       income: '收入',
-      per10Seconds: '每 10 秒',
+      per10Seconds: '每 tick',
       gameSaved: '遊戲已儲存',
       gameSavedSuccess: '您的遊戲已成功儲存。',
       saveLimitReached: '存檔已達上限',
@@ -134,7 +134,7 @@ export const locales = {
       money: '金錢',
     },
     games: {
-      miniPuzzleGame: '迷你益智遊戲',
+      'Puzzle Game': '益智遊戲',
     },
   },
 };

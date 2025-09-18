@@ -8,10 +8,7 @@ describe('createNewGameProfile', () => {
 
     const newProfile: GameProfile = createNewGameProfile();
 
-    const tickIntervalMs = gameSettings.game_tick_interval_sec * 1000;
-    const flooredTimestamp =
-      Math.floor(mockDate.getTime() / tickIntervalMs) * tickIntervalMs;
-    const expectedCreatedAt = new Date(flooredTimestamp).toISOString();
+    const expectedCreatedAt = mockDate.toISOString();
 
     expect(newProfile.resources.money).toBe(gameSettings.initial_resources.money);
     expect(newProfile.employees[0].name).toBe('engineer_level_1');
@@ -43,13 +40,12 @@ describe('updateGameProfile', () => {
   });
 
   it('should not update profile if no ticks have passed', () => {
-    const updatedProfile = updateGameProfile(initialProfile, 1000); // Less than tick interval
+    const updatedProfile = updateGameProfile(initialProfile, 0);
     expect(updatedProfile).toEqual(initialProfile);
   });
 
   it('should increase creativity and productivity based on employees and ticks', () => {
-    const elapsedMilliseconds = gameSettings.game_tick_interval_sec * 1000 * 3; // 3 ticks
-    const updatedProfile = updateGameProfile(initialProfile, elapsedMilliseconds);
+    const updatedProfile = updateGameProfile(initialProfile, 3); // 3 ticks
 
     const engineerSettings = gameSettings.engineer_level_1;
     const expectedCreativity = engineerSettings.creativity_per_tick * 3;
@@ -60,8 +56,7 @@ describe('updateGameProfile', () => {
   });
 
   it('should not exceed max creativity and productivity', () => {
-    const elapsedMilliseconds = gameSettings.game_tick_interval_sec * 1000 * 100; // a lot of ticks
-    const updatedProfile = updateGameProfile(initialProfile, elapsedMilliseconds);
+    const updatedProfile = updateGameProfile(initialProfile, 100); // a lot of ticks
 
     expect(updatedProfile.resources.creativity).toBe(initialProfile.resources.creativity_max);
     expect(updatedProfile.resources.productivity).toBe(initialProfile.resources.productivity_max);
@@ -69,16 +64,12 @@ describe('updateGameProfile', () => {
 
   it('should calculate game income and maintenance correctly', () => {
     initialProfile.games.push({ name: 'Novel Game', status: 'released' });
-    const elapsedMilliseconds = gameSettings.game_tick_interval_sec * 1000 * 2; // 2 ticks
+    const updatedProfile = updateGameProfile(initialProfile, 2); // 2 ticks
 
-    const updatedProfile = updateGameProfile(initialProfile, elapsedMilliseconds);
+    const gameData = (gameSettings.developable_games as any).find((g:any) => g.name === 'Novel Game')!;
+    const expectedIncome = gameData.income_per_tick * 2;
 
-    const gameData = gameSettings.developable_games.find(g => g.name === 'Novel Game')!;
-    const incomePerTick = gameData.income_per_10_sec / (10 / gameSettings.game_tick_interval_sec);
-    const expectedIncome = incomePerTick * 2;
-
-    const maintenancePerTick = gameData.maintenance_cost_per_min.productivity / (60 / gameSettings.game_tick_interval_sec);
-    const expectedMaintenance = maintenancePerTick * 2;
+    const expectedMaintenance = gameData.maintenance_cost_per_tick.productivity * 2;
 
     const engineerSettings = gameSettings.engineer_level_1;
     const expectedProductivity = (engineerSettings.productivity_per_tick * 2) - expectedMaintenance;

@@ -1,6 +1,5 @@
 {
-  "game_tick_interval_sec": 5,
-  "initial_resources": {    
+  "initial_resources": {
     "money": 100,
     "employees": {
       "engineer_level_1": 1
@@ -15,28 +14,28 @@
   "developable_games": [
     {
       "name": "Novel Game",
-      "development_time_sec": 30,
+      "development_time_ticks": 6,
       "development_cost": {
         "productivity": 10,
         "creativity": 5,
         "funding": 20
       },
-      "income_per_10_sec": 1,
-      "maintenance_cost_per_min": {
-        "productivity": 0.5
+      "income_per_tick": 0.5,
+      "maintenance_cost_per_tick": {
+        "productivity": 0.04
       }
     },
     {
       "name": "Puzzle Game",
-      "development_time_sec": 30,
+      "development_time_ticks": 6,
       "development_cost": {
         "productivity": 15,
         "creativity": 10,
         "funding": 30
       },
-      "income_per_10_sec": 1,
-      "maintenance_cost_per_min": {
-        "productivity": 0.5
+      "income_per_tick": 0.5,
+      "maintenance_cost_per_tick": {
+        "productivity": 0.04
       }
     }
   ]
