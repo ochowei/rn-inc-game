@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, Pressable, Platform } from 'react-native';
+import { StyleSheet, Pressable } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -9,11 +8,13 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { producibleGames } from '@/constants/Games';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
+import { useGameStorage } from '@/hooks/use-game-storage';
 
 export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { t } = useLanguage();
+  const { addProfile, updateProfile, profiles } = useGameStorage();
   const tintColor = useThemeColor({}, 'tint');
   const backgroundColor = useThemeColor({}, 'background');
 
@@ -32,6 +33,7 @@ export default function GameScreen() {
   });
   const [employees, setEmployees] = useState([{ name: 'engineer', count: 1 }]);
   const [games, setGames] = useState<{ name: string; count: number }[]>([]);
+  const [saveSlotIndex, setSaveSlotIndex] = useState<number | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState({ title: '', message: '' });
 
@@ -42,7 +44,10 @@ export default function GameScreen() {
       setEmployees(profile.employees);
       setGames(profile.games || []);
     }
-  }, [params.profile]);
+    if (params.saveSlotIndex) {
+      setSaveSlotIndex(parseInt(params.saveSlotIndex as string, 10));
+    }
+  }, [params.profile, params.saveSlotIndex]);
 
   const handleSaveGame = async () => {
     const newGameProfile = {
@@ -53,27 +58,19 @@ export default function GameScreen() {
     };
 
     try {
-      let gameProfiles = [];
-      if (Platform.OS === 'web') {
-        const gameProfilesStr = localStorage.getItem('game_profiles');
-        gameProfiles = gameProfilesStr ? JSON.parse(gameProfilesStr) : [];
-      } else {
-        const gameProfilesStr = await AsyncStorage.getItem('game_profiles');
-        gameProfiles = gameProfilesStr ? JSON.parse(gameProfilesStr) : [];
-      }
-
-      if (gameProfiles.length < 5) {
-        gameProfiles.push(newGameProfile);
-        if (Platform.OS === 'web') {
-          localStorage.setItem('game_profiles', JSON.stringify(gameProfiles));
-        } else {
-          await AsyncStorage.setItem('game_profiles', JSON.stringify(gameProfiles));
-        }
+      if (saveSlotIndex !== null) {
+        await updateProfile(saveSlotIndex, newGameProfile);
         setModalContent({ title: t('game', 'gameSaved'), message: t('game', 'gameSavedSuccess') });
         setIsModalVisible(true);
       } else {
-        setModalContent({ title: t('game', 'saveLimitReached'), message: t('game', 'saveLimitMessage') });
-        setIsModalVisible(true);
+        if (profiles.length < 5) {
+          await addProfile(newGameProfile);
+          setModalContent({ title: t('game', 'gameSaved'), message: t('game', 'gameSavedSuccess') });
+          setIsModalVisible(true);
+        } else {
+          setModalContent({ title: t('game', 'saveLimitReached'), message: t('game', 'saveLimitMessage') });
+          setIsModalVisible(true);
+        }
       }
     } catch (error) {
       console.error('Failed to save game profile', error);
