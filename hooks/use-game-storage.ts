@@ -23,11 +23,14 @@ export interface GameProfile {
   createdAt: string;
 }
 
-async function getStorage() {
-  if (Platform.OS === 'web') {
+function getStorage() {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
     return {
       getItem: (key: string) => Promise.resolve(localStorage.getItem(key)),
-      setItem: (key: string, value: string) => Promise.resolve(localStorage.setItem(key, value)),
+      setItem: (key: string, value: string) => {
+        localStorage.setItem(key, value);
+        return Promise.resolve();
+      },
     };
   }
   return AsyncStorage;
@@ -40,7 +43,7 @@ export function useGameStorage() {
   const fetchProfiles = useCallback(async () => {
     setLoading(true);
     try {
-      const storage = await getStorage();
+      const storage = getStorage();
       const profilesJson = await storage.getItem(PROFILES_KEY);
       if (profilesJson) {
         setProfiles(JSON.parse(profilesJson));
@@ -61,7 +64,7 @@ export function useGameStorage() {
 
   const saveProfiles = async (newProfiles: GameProfile[]) => {
     try {
-      const storage = await getStorage();
+      const storage = getStorage();
       await storage.setItem(PROFILES_KEY, JSON.stringify(newProfiles));
       setProfiles(newProfiles);
     } catch (error) {
