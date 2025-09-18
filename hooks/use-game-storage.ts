@@ -6,6 +6,7 @@ const PROFILES_KEY = 'game_profiles';
 
 // Define the structure of a game profile
 export interface GameProfile {
+  id: string;
   resources: {
     creativity: number;
     productivity: number;
@@ -68,22 +69,24 @@ export function useGameStorage() {
     }
   };
 
-  const deleteProfile = async (index: number) => {
-    const newProfiles = [...profiles];
-    newProfiles.splice(index, 1);
+  const deleteProfile = async (id: string) => {
+    const newProfiles = profiles.filter((p) => p.id !== id);
     await saveProfiles(newProfiles);
   };
 
-  const addProfile = async (profile: GameProfile) => {
+  const addProfile = async (profile: Omit<GameProfile, 'id'>) => {
     if (profiles.length < 5) {
-      const newProfiles = [...profiles, profile];
+      const newProfile = {
+        ...profile,
+        id: new Date().toISOString() + '-' + Math.random().toString(36).substr(2, 9),
+      };
+      const newProfiles = [...profiles, newProfile];
       await saveProfiles(newProfiles);
     }
   };
 
-  const updateProfile = async (index: number, profile: GameProfile) => {
-    const newProfiles = [...profiles];
-    newProfiles[index] = profile;
+  const updateProfile = async (id: string, profile: GameProfile) => {
+    const newProfiles = profiles.map((p) => (p.id === id ? profile : p));
     await saveProfiles(newProfiles);
   };
 

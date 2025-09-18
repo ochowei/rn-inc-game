@@ -15,14 +15,14 @@ export default function SavedGamesScreen() {
   const tintColor = useThemeColor({}, 'tint');
 
   const [isConfirming, setIsConfirming] = useState(false);
-  const [profileToDelete, setProfileToDelete] = useState<number | null>(null);
+  const [profileToDelete, setProfileToDelete] = useState<string | null>(null);
 
-  const handleLoadGame = (gameProfile: GameProfile, index: number) => {
-    router.push({ pathname: '/game', params: { profile: JSON.stringify(gameProfile), saveSlotIndex: index } });
+  const handleLoadGame = (gameProfile: GameProfile) => {
+    router.push({ pathname: '/game', params: { profile: JSON.stringify(gameProfile), saveId: gameProfile.id } });
   };
 
-  const handleDeleteGame = (index: number) => {
-    setProfileToDelete(index);
+  const handleDeleteGame = (id: string) => {
+    setProfileToDelete(id);
     setIsConfirming(true);
   };
 
@@ -44,10 +44,10 @@ export default function SavedGamesScreen() {
       <ThemedText>{t('savedGames', 'saveSlot')} {index + 1}</ThemedText>
       <ThemedText>{new Date(item.createdAt).toLocaleString()}</ThemedText>
       <ThemedView style={styles.buttonsContainer}>
-        <Pressable onPress={() => handleLoadGame(item, index)} style={[styles.button, { borderColor: tintColor }]}>
+        <Pressable onPress={() => handleLoadGame(item)} style={[styles.button, { borderColor: tintColor }]}>
           <ThemedText style={styles.buttonText}>{t('savedGames', 'load')}</ThemedText>
         </Pressable>
-        <Pressable onPress={() => handleDeleteGame(index)} style={[styles.button, styles.deleteButton]}>
+        <Pressable onPress={() => handleDeleteGame(item.id)} style={[styles.button, styles.deleteButton]}>
           <ThemedText style={styles.buttonText}>{t('savedGames', 'delete')}</ThemedText>
         </Pressable>
       </ThemedView>
@@ -68,7 +68,7 @@ export default function SavedGamesScreen() {
       <FlatList
         data={[...profiles].reverse()}
         renderItem={renderItem}
-        keyExtractor={(item) => item.createdAt}
+        keyExtractor={(item) => item.id}
         ListEmptyComponent={<ThemedText>{t('savedGames', 'noSaves')}</ThemedText>}
         extraData={profiles}
       />
