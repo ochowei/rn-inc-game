@@ -52,7 +52,6 @@
     "eslint-config-expo": "~9.2.0",
     "jest": "^30.1.3",
     "jest-environment-jsdom": "^30.1.2",
-    "react-test-renderer": "^19.0.0",
     "ts-jest": "^29.4.2",
     "typescript": "~5.8.3"
   },
