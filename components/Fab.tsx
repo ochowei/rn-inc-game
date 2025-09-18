@@ -37,6 +37,9 @@ const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: 'white',
     padding: 20,
+    position: 'absolute',
+    bottom: 88,
+    right: 16,
   },
 });
 
