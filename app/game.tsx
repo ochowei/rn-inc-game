@@ -39,7 +39,7 @@ export default function GameScreen() {
   });
   const [employees, setEmployees] = useState([{ name: 'engineer', count: 1 }]);
   const [games, setGames] = useState<{ name: string; count: number }[]>([]);
-  const [saveSlotIndex, setSaveSlotIndex] = useState<number | null>(null);
+  const [saveId, setSaveId] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState({ title: '', message: '' });
 
@@ -56,10 +56,10 @@ export default function GameScreen() {
       setEmployees(updatedProfile.employees);
       setGames(updatedProfile.games || []);
     }
-    if (params.saveSlotIndex) {
-      setSaveSlotIndex(parseInt(params.saveSlotIndex as string, 10));
+    if (params.saveId) {
+      setSaveId(params.saveId as string);
     }
-  }, [params.profile, params.saveSlotIndex]);
+  }, [params.profile, params.saveId]);
 
   useEffect(() => {
     const gameTickInterval = gameSettings.game_tick_interval_sec * 1000;
@@ -84,7 +84,7 @@ export default function GameScreen() {
   }, [employees, games]);
 
   const handleSaveGame = async () => {
-    const newGameProfile = {
+    const gameProfileData = {
       resources,
       employees,
       games,
@@ -92,13 +92,17 @@ export default function GameScreen() {
     };
 
     try {
-      if (saveSlotIndex !== null) {
-        await updateProfile(saveSlotIndex, newGameProfile);
+      if (saveId) {
+        const fullProfile: GameProfile = {
+          ...gameProfileData,
+          id: saveId,
+        };
+        await updateProfile(saveId, fullProfile);
         setModalContent({ title: t('game', 'gameSaved'), message: t('game', 'gameSavedSuccess') });
         setIsModalVisible(true);
       } else {
         if (profiles.length < 5) {
-          await addProfile(newGameProfile);
+          await addProfile(gameProfileData);
           setModalContent({ title: t('game', 'gameSaved'), message: t('game', 'gameSavedSuccess') });
           setIsModalVisible(true);
         } else {
