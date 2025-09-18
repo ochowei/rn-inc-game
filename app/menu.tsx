@@ -35,8 +35,14 @@ export default function GameMenuScreen() {
 
     const newGameProfile = createNewGameProfile();
 
-    await addProfile(newGameProfile);
-    router.push('/game');
+    const addedProfile = await addProfile(newGameProfile);
+
+    if (addedProfile) {
+      router.push({
+        pathname: '/game',
+        params: { profile: JSON.stringify(addedProfile), saveId: addedProfile.id },
+      });
+    }
   };
 
   const handleLoadGame = () => {

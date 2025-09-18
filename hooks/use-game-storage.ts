@@ -82,6 +82,7 @@ export function useGameStorage() {
       };
       const newProfiles = [...profiles, newProfile];
       await saveProfiles(newProfiles);
+      return newProfile;
     }
   };
 
