@@ -16,7 +16,7 @@ export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { t } = useLanguage();
-  const { addProfile, updateProfile, profiles } = useGameStorage();
+  const { addProfile, updateProfile, profiles, fetchProfiles } = useGameStorage();
   const tintColor = useThemeColor({}, 'tint');
   const backgroundColor = useThemeColor({}, 'background');
 
@@ -82,16 +82,20 @@ export default function GameScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (saveId) {
-        const currentProfile = profiles.find((p) => p.id === saveId);
-        if (currentProfile) {
-          setResources(currentProfile.resources);
-          setEmployees(currentProfile.employees);
-          setGames(currentProfile.games || []);
-        }
-      }
-    }, [profiles, saveId])
+      fetchProfiles();
+    }, [fetchProfiles])
   );
+
+  useEffect(() => {
+    if (saveId && profiles.length > 0) {
+      const currentProfile = profiles.find((p) => p.id === saveId);
+      if (currentProfile) {
+        setResources(currentProfile.resources);
+        setEmployees(currentProfile.employees);
+        setGames(currentProfile.games || []);
+      }
+    }
+  }, [profiles, saveId]);
 
   const handleSaveGame = async () => {
     const gameProfileData = {
