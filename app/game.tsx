@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, Pressable } from 'react-native';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
@@ -16,7 +16,7 @@ export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { t } = useLanguage();
-  const { addProfile, updateProfile, profiles } = useGameStorage();
+  const { addProfile, updateProfile, profiles, fetchProfiles } = useGameStorage();
   const tintColor = useThemeColor({}, 'tint');
   const backgroundColor = useThemeColor({}, 'background');
 
@@ -79,6 +79,23 @@ export default function GameScreen() {
 
     return () => clearInterval(intervalId);
   }, [employees, games]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfiles();
+    }, [fetchProfiles])
+  );
+
+  useEffect(() => {
+    if (saveId && profiles.length > 0) {
+      const currentProfile = profiles.find((p) => p.id === saveId);
+      if (currentProfile) {
+        setResources(currentProfile.resources);
+        setEmployees(currentProfile.employees);
+        setGames(currentProfile.games || []);
+      }
+    }
+  }, [profiles, saveId]);
 
   const handleSaveGame = async () => {
     const gameProfileData = {
@@ -153,7 +170,7 @@ export default function GameScreen() {
           </ThemedView>
         </ThemedView>
       )}
-      <Fab resources={resources} employees={employees} games={games} />
+      <Fab resources={resources} employees={employees} games={games} saveId={saveId} />
     </ThemedView>
   );
 }

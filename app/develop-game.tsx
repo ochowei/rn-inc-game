@@ -1,9 +1,10 @@
-import { StyleSheet, Pressable, View } from 'react-native';
+import { StyleSheet, Pressable, View, Alert } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
+import { useGameStorage } from '@/hooks/use-game-storage';
 import { GameProfile, updateGameProfile, developGame } from '@/utils/game_logic';
 import gameSettings from '@/game_settings.json';
 import { useState, useEffect } from 'react';
@@ -14,6 +15,7 @@ export default function DevelopGameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { t } = useLanguage();
+  const { updateProfile } = useGameStorage();
   const tintColor = useThemeColor({}, 'tint');
 
   const [profile, setProfile] = useState<GameProfile | null>(() => {
@@ -43,10 +45,12 @@ export default function DevelopGameScreen() {
     );
   };
 
-  const handleDevelopPress = (gameName: string) => {
+  const handleDevelopPress = async (gameName:string) => {
     if (profile) {
       const newProfile = developGame(profile, gameName);
       setProfile(newProfile);
+      await updateProfile(params.id as string, newProfile);
+      Alert.alert(t('developGame', 'saveSuccessTitle'), t('developGame', 'saveSuccessMessage'));
     }
   };
 

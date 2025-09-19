@@ -9,9 +9,10 @@ interface FabProps {
   resources: GameProfile['resources'];
   employees: GameProfile['employees'];
   games: GameProfile['games'];
+  saveId: string | null;
 }
 
-const Fab: React.FC<FabProps> = ({ resources, employees, games }) => {
+const Fab: React.FC<FabProps> = ({ resources, employees, games, saveId }) => {
   const [visible, setVisible] = React.useState(false);
   const router = useRouter();
 
@@ -28,7 +29,7 @@ const Fab: React.FC<FabProps> = ({ resources, employees, games }) => {
     };
     router.push({
       pathname: '/develop-game',
-      params: { profile: JSON.stringify(profileData) },
+      params: { profile: JSON.stringify(profileData), id: saveId },
     });
   };
 
