@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, Pressable } from 'react-native';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
@@ -79,6 +79,19 @@ export default function GameScreen() {
 
     return () => clearInterval(intervalId);
   }, [employees, games]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (saveId) {
+        const currentProfile = profiles.find((p) => p.id === saveId);
+        if (currentProfile) {
+          setResources(currentProfile.resources);
+          setEmployees(currentProfile.employees);
+          setGames(currentProfile.games || []);
+        }
+      }
+    }, [profiles, saveId])
+  );
 
   const handleSaveGame = async () => {
     const gameProfileData = {
