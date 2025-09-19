@@ -48,6 +48,7 @@ export default function DevelopGameScreen() {
   const handleDevelopPress = async (gameName:string) => {
     if (profile) {
       const newProfile = developGame(profile, gameName);
+      console.log(newProfile);
       setProfile(newProfile);
       await updateProfile(params.id as string, newProfile);
       Alert.alert(t('developGame', 'saveSuccessTitle'), t('developGame', 'saveSuccessMessage'));
