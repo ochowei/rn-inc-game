@@ -7,10 +7,12 @@ import { ThemedView } from '@/components/ThemedView';
 import { useGameStorage, GameProfile } from '@/hooks/use-game-storage';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useLanguage } from '@/hooks/use-language';
+import { useGameEngineContext } from '@/contexts/GameEngineContext';
 
 export default function SavedGamesScreen() {
   const router = useRouter();
   const { profiles, loading, deleteProfile } = useGameStorage();
+  const { loadGame } = useGameEngineContext();
   const { t } = useLanguage();
   const tintColor = useThemeColor({}, 'tint');
 
@@ -18,7 +20,8 @@ export default function SavedGamesScreen() {
   const [profileToDelete, setProfileToDelete] = useState<string | null>(null);
 
   const handleLoadGame = (gameProfile: GameProfile) => {
-    router.push({ pathname: '/game', params: { profile: JSON.stringify(gameProfile), saveId: gameProfile.id } });
+    loadGame(gameProfile);
+    router.push('/game');
   };
 
   const handleDeleteGame = (id: string) => {

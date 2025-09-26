@@ -1,59 +1,35 @@
-import { StyleSheet, Pressable, View } from 'react-native';
-import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
+import { StyleSheet, Pressable, View, ActivityIndicator } from 'react-native';
+import { Stack, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
-import { GameProfile, updateGameProfile, developGame } from '@/utils/game_logic';
+import { useGameEngineContext } from '@/contexts/GameEngineContext';
 import gameSettings from '@/game_settings.json';
-import { useState, useEffect } from 'react';
 import { Card, Title, Paragraph, Button } from 'react-native-paper';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
 export default function DevelopGameScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams();
   const { t } = useLanguage();
+  const { profile, developGame } = useGameEngineContext();
   const tintColor = useThemeColor({}, 'tint');
 
-  const [profile, setProfile] = useState<GameProfile | null>(() => {
-    return params.profile ? JSON.parse(params.profile as string) : null;
-  });
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setProfile((prevProfile) => {
-        if (!prevProfile) return null;
-        return updateGameProfile(prevProfile, 1);
-      });
-    }, gameSettings.gameTickInterval);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  const resources = profile?.resources;
-
   const canDevelop = (game: any) => {
-    if (!resources) return false;
+    if (!profile) return false;
     const cost = game.development_cost;
     return (
-      resources.money >= cost.funding &&
-      resources.creativity >= cost.creativity &&
-      resources.productivity >= cost.productivity
+      profile.resources.money >= cost.funding &&
+      profile.resources.creativity >= cost.creativity &&
+      profile.resources.productivity >= cost.productivity
     );
   };
 
-  const handleDevelopPress = (gameName: string) => {
-    if (profile) {
-      const newProfile = developGame(profile, gameName);
-      setProfile(newProfile);
-    }
-  };
-
-  if (!resources) {
+  if (!profile) {
     return (
       <ThemedView style={styles.container}>
-        <ThemedText>Loading...</ThemedText>
+        <ActivityIndicator size="large" />
+        <ThemedText>Loading Game...</ThemedText>
       </ThemedView>
     );
   }
@@ -61,7 +37,7 @@ export default function DevelopGameScreen() {
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ title: t('developGame', 'title'), headerShown: false }} />
-      <ResourceBar resources={resources} />
+      <ResourceBar resources={profile.resources} />
       <ThemedText type="title">{t('developGame', 'title')}</ThemedText>
 
       <Pressable onPress={() => router.back()} style={[styles.backButton, { borderColor: tintColor }]}>
@@ -93,7 +69,7 @@ export default function DevelopGameScreen() {
             <Card.Actions>
               <Button
                 mode="contained"
-                onPress={() => handleDevelopPress(game.name)}
+                onPress={() => developGame(game.name)}
                 disabled={!canDevelop(game)}
               >
                 {t('developGame', 'develop')}

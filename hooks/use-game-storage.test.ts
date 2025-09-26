@@ -46,7 +46,16 @@ Object.defineProperty(window, 'localStorage', {
 });
 
 const mockProfile: Omit<GameProfile, 'id'> = {
-  resources: { creativity: 100, productivity: 100, money: 1000 },
+  resources: {
+    creativity: 100,
+    productivity: 100,
+    money: 1000,
+    creativity_max: 200,
+    productivity_max: 200,
+    creativity_per_tick: 1,
+    productivity_per_tick: 1,
+    money_per_tick: 0,
+  },
   employees: [],
   games: [],
   createdAt: new Date().toISOString(),
@@ -72,7 +81,7 @@ describe('useGameStorage', () => {
   });
 
   describe('fetchProfiles', () => {
-    xit('should fetch and return an empty array when no profiles are stored', async () => {
+    it('should fetch and return an empty array when no profiles are stored', async () => {
       getItemSpy = jest.spyOn(window.localStorage, 'getItem').mockReturnValue(null);
       const { result } = renderHook(() => useGameStorage());
 
@@ -83,7 +92,7 @@ describe('useGameStorage', () => {
       expect(getItemSpy).toHaveBeenCalledWith('game_profiles');
     });
 
-    xit('should fetch and return stored profiles', async () => {
+    it('should fetch and return stored profiles', async () => {
       const storedProfiles: GameProfile[] = [
         { ...mockProfile, id: '1', createdAt: new Date().toISOString() },
       ];
@@ -96,7 +105,7 @@ describe('useGameStorage', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    xit('should handle native platform correctly', async () => {
+    it('should handle native platform correctly', async () => {
         mockReactNative.Platform.OS = 'ios';
         const storedProfiles: GameProfile[] = [
           { ...mockProfile, id: '1', createdAt: new Date().toISOString() },
@@ -114,7 +123,7 @@ describe('useGameStorage', () => {
   });
 
   describe('addProfile', () => {
-    xit('should add a new profile', async () => {
+    it('should add a new profile', async () => {
       setItemSpy = jest.spyOn(window.localStorage, 'setItem');
       const { result } = renderHook(() => useGameStorage());
 
@@ -133,7 +142,7 @@ describe('useGameStorage', () => {
       expect(setItemSpy).toHaveBeenCalled();
     });
 
-    xit('should not add a new profile if the limit is reached', async () => {
+    it('should not add a new profile if the limit is reached', async () => {
         const initialProfiles: GameProfile[] = Array(5)
         .fill(0)
         .map((_, i) => ({
@@ -161,7 +170,7 @@ describe('useGameStorage', () => {
   });
 
   describe('updateProfile', () => {
-    xit('should update an existing profile', async () => {
+    it('should update an existing profile', async () => {
       const initialProfiles: GameProfile[] = [
         { ...mockProfile, id: '1', createdAt: new Date().toISOString() },
       ];
@@ -174,7 +183,12 @@ describe('useGameStorage', () => {
 
       const updatedProfile: GameProfile = {
         ...initialProfiles[0],
-        resources: { creativity: 200, productivity: 200, money: 2000 },
+        resources: {
+            ...initialProfiles[0].resources,
+            creativity: 200,
+            productivity: 200,
+            money: 2000
+        },
       };
 
       await act(async () => {
@@ -189,7 +203,7 @@ describe('useGameStorage', () => {
   });
 
   describe('deleteProfile', () => {
-    xit('should delete a profile', async () => {
+    it('should delete a profile', async () => {
       const initialProfiles: GameProfile[] = [
         { ...mockProfile, id: '1', createdAt: new Date().toISOString() },
         { ...mockProfile, id: '2', createdAt: new Date().toISOString() },
