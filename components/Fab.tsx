@@ -3,34 +3,25 @@ import { Modal, Portal, Button } from 'react-native-paper';
 import { FAB } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { GameProfile } from '@/utils/game_logic';
+import { useGameEngineContext } from '@/contexts/GameEngineContext';
 
-interface FabProps {
-  resources: GameProfile['resources'];
-  employees: GameProfile['employees'];
-  games: GameProfile['games'];
-}
-
-const Fab: React.FC<FabProps> = ({ resources, employees, games }) => {
+const Fab: React.FC = () => {
   const [visible, setVisible] = React.useState(false);
   const router = useRouter();
+  const { profile } = useGameEngineContext();
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
   const handleGameDevelopPress = () => {
     hideModal();
-    const profileData: GameProfile = {
-      resources,
-      employees,
-      games,
-      createdAt: new Date().toISOString(),
-    };
-    router.push({
-      pathname: '/develop-game',
-      params: { profile: JSON.stringify(profileData) },
-    });
+    router.push('/develop-game');
   };
+
+  // Do not render the FAB if there is no active game profile
+  if (!profile) {
+    return null;
+  }
 
   return (
     <>

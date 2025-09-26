@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { PaperProvider } from 'react-native-paper';
 import { ThemeProvider } from '@/hooks/useTheme';
 import { LanguageProvider } from '@/hooks/use-language';
+import { GameEngineProvider } from '@/contexts/GameEngineContext';
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -20,15 +21,17 @@ export default function RootLayout() {
     <LanguageProvider>
       <ThemeProvider>
         <PaperProvider>
-          <Stack>
-            <Stack.Screen name="menu" options={{ headerShown: false }} />
-            <Stack.Screen name="game" options={{ headerShown: false }} />
-            <Stack.Screen name="develop-game" options={{ headerShown: false }} />
-            <Stack.Screen name="saved-games" options={{ title: 'Saved Games' }} />
-            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
+          <GameEngineProvider>
+            <Stack>
+              <Stack.Screen name="menu" options={{ headerShown: false }} />
+              <Stack.Screen name="game" options={{ headerShown: false }} />
+              <Stack.Screen name="develop-game" options={{ headerShown: false }} />
+              <Stack.Screen name="saved-games" options={{ title: 'Saved Games' }} />
+              <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="auto" />
+          </GameEngineProvider>
         </PaperProvider>
       </ThemeProvider>
     </LanguageProvider>
