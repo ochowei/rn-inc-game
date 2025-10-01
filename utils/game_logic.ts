@@ -1,4 +1,4 @@
-import gameSettings from '../game_settings.json';
+import gameSettings from '../settings.json';
 
 export interface Game {
   name: string;

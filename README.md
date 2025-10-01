@@ -74,7 +74,7 @@
 
 ## 遊戲設定
 
-遊戲的所有數值設定都集中在 `game_settings.json` 文件中，方便調整和平衡遊戲內容，無需修改程式碼。
+遊戲的所有數值設定都集中在 `settings.json` 文件中，方便調整和平衡遊戲內容，無需修改程式碼。
 
   * **`initial_resources`**: 定義新遊戲開始時的初始資源和員工。
       * `money`: 100
@@ -135,7 +135,7 @@
 ├── utils
 │   ├── game_logic.ts
 │   └── game_logic.test.ts
-├── game_settings.json
+├── settings.json
 ├── jest.config.js
 ├── package.json
 ├── package-lock.json

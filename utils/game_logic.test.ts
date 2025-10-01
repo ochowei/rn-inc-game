@@ -1,5 +1,5 @@
 import { createNewSaveProfile, updateSaveProfile, developGame, Game, SaveProfile } from './game_logic';
-import gameSettings from '../game_settings.json';
+import gameSettings from '../settings.json';
 
 describe('createNewSaveProfile', () => {
   it('should create a new save profile with correct initial values', () => {

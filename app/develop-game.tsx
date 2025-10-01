@@ -5,7 +5,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
-import gameSettings from '@/game_settings.json';
+import gameSettings from '@/settings.json';
 import { Card, Title, Paragraph, Button } from 'react-native-paper';
 import { useThemeColor } from '@/hooks/useThemeColor';
 

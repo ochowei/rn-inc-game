@@ -6,7 +6,7 @@ import {
   createNewSaveProfile as createNewSaveLogic,
 } from '@/utils/game_logic';
 import { useGameStorage } from './use-game-storage';
-import gameSettings from '@/game_settings.json';
+import gameSettings from '@/settings.json';
 
 // The interface for the SaveProfile used within the engine, which may not have an ID yet.
 export interface FullSaveProfile extends SaveProfile {
