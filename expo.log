@@ -1,3 +1,5 @@
-› Port 8081 is running this app in another window
-  /app (pid 4705)
-› Skipping dev server
+
+> rn-expo-starter@1.0.0 web
+> expo start --web
+
+Starting project at /app

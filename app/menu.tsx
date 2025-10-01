@@ -28,14 +28,14 @@ export default function GameMenuScreen() {
     }, [fetchProfiles])
   );
 
-  const handleNewGame = () => {
-    if (profiles.length >= 5) {
+  const handleNewGame = async () => {
+    const newProfile = await createNewGame();
+    if (newProfile) {
+      router.push('/game');
+    } else {
+      // The modal is shown if creating a new game fails, which indicates the save limit has been reached.
       setIsLimitModalVisible(true);
-      return;
     }
-
-    createNewGame();
-    router.push('/game');
   };
 
   const handleLoadGame = () => {

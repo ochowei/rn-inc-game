@@ -52,13 +52,14 @@ describe('useGameEngine', () => {
     expect(result.current.profile).toBeNull();
   });
 
-  it('should create a new game', () => {
+  it('should create a new game and save it', async () => {
     const { result } = renderHook(() => useGameEngine());
-    act(() => {
-      result.current.createNewGame();
+    await act(async () => {
+      await result.current.createNewGame();
     });
     expect(GameLogic.createNewGameProfile).toHaveBeenCalled();
-    expect(result.current.profile).toEqual({ ...mockInitialProfile, id: undefined });
+    expect(mockAddProfile).toHaveBeenCalled();
+    expect(result.current.profile).toEqual({ ...mockInitialProfile, id: 'new-id' });
   });
 
   it('should load an existing game and calculate offline progress', () => {
@@ -74,10 +75,10 @@ describe('useGameEngine', () => {
     expect(result.current.profile).not.toBeNull();
   });
 
-  it('should unload the current game', () => {
+  it('should unload the current game', async () => {
     const { result } = renderHook(() => useGameEngine());
-    act(() => {
-      result.current.createNewGame();
+    await act(async () => {
+      await result.current.createNewGame();
     });
     expect(result.current.profile).not.toBeNull();
     act(() => {
@@ -86,27 +87,36 @@ describe('useGameEngine', () => {
     expect(result.current.profile).toBeNull();
   });
 
-  it('should develop a game', () => {
+  it('should develop a game', async () => {
     const { result } = renderHook(() => useGameEngine());
-    act(() => {
-      result.current.createNewGame();
+    await act(async () => {
+      await result.current.createNewGame();
     });
     act(() => {
       result.current.developGame('New Super Game');
     });
-    expect(GameLogic.developGame).toHaveBeenCalledWith(expect.any(Object), 'New Super Game');
+    expect(GameLogic.developGame).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'new-id' }),
+      'New Super Game'
+    );
   });
 
-  it('should save a new game', async () => {
+  it('should update a newly created game on save', async () => {
     const { result } = renderHook(() => useGameEngine());
-    act(() => {
-      result.current.createNewGame();
+    await act(async () => {
+      await result.current.createNewGame();
     });
+
+    // createNewGame already calls addProfile once. We clear it to test the next save.
+    mockAddProfile.mockClear();
+
     await act(async () => {
       await result.current.saveGame();
     });
-    expect(mockAddProfile).toHaveBeenCalled();
-    await waitFor(() => expect(result.current.profile?.id).toBe('new-id'));
+
+    // saveGame should now call updateProfile because the profile has an ID.
+    expect(mockAddProfile).not.toHaveBeenCalled();
+    expect(mockUpdateProfile).toHaveBeenCalledWith('new-id', expect.any(Object));
   });
 
   it('should save an existing game', async () => {
