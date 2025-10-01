@@ -1,7 +1,11 @@
 {
-  "initial_resources": {
-    "money": 100,
-    "employees": {
+  "initial": {
+    "resources": {
+      "creativity": 0,
+      "productivity": 0,
+      "money": 100
+    },
+    "assets": {
       "engineer_level_1": 1
     }
   },

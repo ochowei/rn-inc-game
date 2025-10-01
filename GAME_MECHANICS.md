@@ -49,3 +49,11 @@ Method 2: Develop Game
         Novel Game
 
         Puzzle Game
+
+4. Game Settings (settings.json)
+
+All static data for the game, such as initial resources, employee attributes, and developable games, is stored in the settings.json file. This approach allows for easy adjustments to game balance without modifying the source code.
+
+    initial: Defines the initial resources and assets when starting a new game.
+        resources: Contains the core resources of the game, such as money, creativity, and productivity.
+        assets: Contains the assets owned at the start of the game, such as the number of engineer_level_1.

@@ -10,9 +10,9 @@ describe('createNewSaveProfile', () => {
 
     const expectedCreatedAt = mockDate.toISOString();
 
-    expect(newProfile.resources.money).toBe(gameSettings.initial_resources.money);
+    expect(newProfile.resources.money).toBe(gameSettings.initial.resources.money);
     expect(newProfile.employees[0].name).toBe('engineer_level_1');
-    expect(newProfile.employees[0].count).toBe(gameSettings.initial_resources.employees.engineer_level_1);
+    expect(newProfile.employees[0].count).toBe(gameSettings.initial.assets.engineer_level_1);
     expect(newProfile.games).toEqual([]);
 
     // Check resources based on engineer_level_1

@@ -76,9 +76,9 @@
 
 遊戲的所有數值設定都集中在 `settings.json` 文件中，方便調整和平衡遊戲內容，無需修改程式碼。
 
-  * **`initial_resources`**: 定義新遊戲開始時的初始資源和員工。
-      * `money`: 100
-      * `employees.engineer_level_1`: 1
+  * **`initial`**: 定義新遊戲開始時的初始資源和資產。
+      * `resources`: 包含遊戲的核心資源，如 `money`, `creativity`, `productivity`。
+      * `assets`: 包含遊戲開始時擁有的資產，如 `engineer_level_1` 的數量。
   * **`engineer_level_1`**: 定義基礎工程師的產能。
       * `creativity_per_tick`: 10
       * `productivity_per_tick`: 20

@@ -26,15 +26,15 @@ export interface SaveProfile {
 }
 
 export const createNewSaveProfile = (): SaveProfile => {
-  const { initial_resources, engineer_level_1 } = gameSettings;
+  const { initial, engineer_level_1 } = gameSettings;
 
   return {
     resources: {
-      creativity: 0,
-      productivity: 0,
+      creativity: initial.resources.creativity,
+      productivity: initial.resources.productivity,
       creativity_max: engineer_level_1.creativity_max,
       productivity_max: engineer_level_1.productivity_max,
-      money: initial_resources.money,
+      money: initial.resources.money,
       creativity_per_tick: engineer_level_1.creativity_per_tick,
       productivity_per_tick: engineer_level_1.productivity_per_tick,
       money_per_tick: 0,
@@ -42,7 +42,7 @@ export const createNewSaveProfile = (): SaveProfile => {
     employees: [
       {
         name: 'engineer_level_1',
-        count: initial_resources.employees.engineer_level_1,
+        count: initial.assets.engineer_level_1,
       },
     ],
     games: [],
