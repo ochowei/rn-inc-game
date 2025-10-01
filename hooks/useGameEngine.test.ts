@@ -18,8 +18,8 @@ jest.mock('./use-game-storage', () => ({
 // Mock game_logic functions
 jest.mock('@/utils/game_logic', () => ({
   ...jest.requireActual('@/utils/game_logic'),
-  createNewGameProfile: jest.fn(),
-  updateGameProfile: jest.fn((profile, ticks) => ({
+  createNewSaveProfile: jest.fn(),
+  updateSaveProfile: jest.fn((profile, ticks) => ({
     ...profile,
     resources: { ...profile.resources, money: profile.resources.money + (ticks || 0) * 10 },
   })),
@@ -37,8 +37,8 @@ const mockInitialProfile = {
 describe('useGameEngine', () => {
   beforeEach(() => {
     // Clear mocks before each test
-    (GameLogic.createNewGameProfile as jest.Mock).mockClear().mockReturnValue({ ...mockInitialProfile, id: undefined });
-    (GameLogic.updateGameProfile as jest.Mock).mockClear().mockImplementation((profile, ticks) => ({
+    (GameLogic.createNewSaveProfile as jest.Mock).mockClear().mockReturnValue({ ...mockInitialProfile, id: undefined });
+    (GameLogic.updateSaveProfile as jest.Mock).mockClear().mockImplementation((profile, ticks) => ({
         ...profile,
         resources: { ...profile.resources, money: profile.resources.money + (ticks || 0) * 10 },
       }));
@@ -57,7 +57,7 @@ describe('useGameEngine', () => {
     await act(async () => {
       await result.current.createNewGame();
     });
-    expect(GameLogic.createNewGameProfile).toHaveBeenCalled();
+    expect(GameLogic.createNewSaveProfile).toHaveBeenCalled();
     expect(mockAddProfile).toHaveBeenCalled();
     expect(result.current.profile).toEqual({ ...mockInitialProfile, id: 'new-id' });
   });
@@ -71,7 +71,7 @@ describe('useGameEngine', () => {
       result.current.loadGame(profileToLoad);
     });
 
-    expect(GameLogic.updateGameProfile).toHaveBeenCalledWith(profileToLoad, expect.any(Number));
+    expect(GameLogic.updateSaveProfile).toHaveBeenCalledWith(profileToLoad, expect.any(Number));
     expect(result.current.profile).not.toBeNull();
   });
 

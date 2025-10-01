@@ -38,7 +38,7 @@ export default function GameScreen() {
       setModalContent({ title: t('game', 'gameSaved'), message: t('game', 'gameSavedSuccess') });
       setIsModalVisible(true);
     } catch (error) {
-      console.error('Failed to save game profile', error);
+      console.error('Failed to save game', error);
       setModalContent({ title: t('game', 'error'), message: t('game', 'failedToSave') });
       setIsModalVisible(true);
     }

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
-import { GameProfile, useGameStorage } from './use-game-storage';
+import { SaveProfile, useGameStorage } from './use-game-storage';
 
 // Mock react-native with a simple, mutable object to avoid transform errors
 var mockReactNative = {
@@ -45,7 +45,7 @@ Object.defineProperty(window, 'localStorage', {
   value: mockLocalStorage,
 });
 
-const mockProfile: Omit<GameProfile, 'id'> = {
+const mockProfile: Omit<SaveProfile, 'id'> = {
   resources: {
     creativity: 100,
     productivity: 100,
@@ -93,7 +93,7 @@ describe('useGameStorage', () => {
     });
 
     it('should fetch and return stored profiles', async () => {
-      const storedProfiles: GameProfile[] = [
+      const storedProfiles: SaveProfile[] = [
         { ...mockProfile, id: '1', createdAt: new Date().toISOString() },
       ];
       getItemSpy = jest.spyOn(window.localStorage, 'getItem').mockReturnValue(JSON.stringify(storedProfiles));
@@ -107,7 +107,7 @@ describe('useGameStorage', () => {
 
     it('should handle native platform correctly', async () => {
         mockReactNative.Platform.OS = 'ios';
-        const storedProfiles: GameProfile[] = [
+        const storedProfiles: SaveProfile[] = [
           { ...mockProfile, id: '1', createdAt: new Date().toISOString() },
         ];
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(storedProfiles));
@@ -143,7 +143,7 @@ describe('useGameStorage', () => {
     });
 
     it('should not add a new profile if the limit is reached', async () => {
-        const initialProfiles: GameProfile[] = Array(5)
+        const initialProfiles: SaveProfile[] = Array(5)
         .fill(0)
         .map((_, i) => ({
           ...mockProfile,
@@ -171,7 +171,7 @@ describe('useGameStorage', () => {
 
   describe('updateProfile', () => {
     it('should update an existing profile', async () => {
-      const initialProfiles: GameProfile[] = [
+      const initialProfiles: SaveProfile[] = [
         { ...mockProfile, id: '1', createdAt: new Date().toISOString() },
       ];
       getItemSpy = jest.spyOn(window.localStorage, 'getItem').mockReturnValue(JSON.stringify(initialProfiles));
@@ -181,7 +181,7 @@ describe('useGameStorage', () => {
 
       await waitFor(() => expect(result.current.profiles.length).toBe(1));
 
-      const updatedProfile: GameProfile = {
+      const updatedProfile: SaveProfile = {
         ...initialProfiles[0],
         resources: {
             ...initialProfiles[0].resources,
@@ -204,7 +204,7 @@ describe('useGameStorage', () => {
 
   describe('deleteProfile', () => {
     it('should delete a profile', async () => {
-      const initialProfiles: GameProfile[] = [
+      const initialProfiles: SaveProfile[] = [
         { ...mockProfile, id: '1', createdAt: new Date().toISOString() },
         { ...mockProfile, id: '2', createdAt: new Date().toISOString() },
       ];
