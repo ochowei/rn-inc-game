@@ -4,7 +4,7 @@ import { useRouter, Stack } from 'expo-router';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useGameStorage, GameProfile } from '@/hooks/use-game-storage';
+import { useGameStorage, SaveProfile } from '@/hooks/use-game-storage';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
@@ -19,8 +19,8 @@ export default function SavedGamesScreen() {
   const [isConfirming, setIsConfirming] = useState(false);
   const [profileToDelete, setProfileToDelete] = useState<string | null>(null);
 
-  const handleLoadGame = (gameProfile: GameProfile) => {
-    loadGame(gameProfile);
+  const handleLoadGame = (saveProfile: SaveProfile) => {
+    loadGame(saveProfile);
     router.push('/game');
   };
 
@@ -42,7 +42,7 @@ export default function SavedGamesScreen() {
     setProfileToDelete(null);
   };
 
-  const renderItem = ({ item, index }: { item: GameProfile, index: number }) => (
+  const renderItem = ({ item, index }: { item: SaveProfile, index: number }) => (
     <ThemedView style={styles.saveItem}>
       <ThemedText>{t('savedGames', 'saveSlot')} {index + 1}</ThemedText>
       <ThemedText>{new Date(item.createdAt).toLocaleString()}</ThemedText>

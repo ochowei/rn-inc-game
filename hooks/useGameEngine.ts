@@ -1,20 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  GameProfile,
-  updateGameProfile,
+  SaveProfile,
+  updateSaveProfile,
   developGame as developGameLogic,
-  createNewGameProfile as createNewGameLogic,
+  createNewSaveProfile as createNewSaveLogic,
 } from '@/utils/game_logic';
 import { useGameStorage } from './use-game-storage';
 import gameSettings from '@/game_settings.json';
 
-// The interface for the GameProfile used within the engine, which may not have an ID yet.
-interface FullGameProfile extends GameProfile {
+// The interface for the SaveProfile used within the engine, which may not have an ID yet.
+interface FullSaveProfile extends SaveProfile {
   id?: string;
 }
 
 export function useGameEngine() {
-  const [profile, setProfile] = useState<FullGameProfile | null>(null);
+  const [profile, setProfile] = useState<FullSaveProfile | null>(null);
   const { addProfile, updateProfile } = useGameStorage();
 
   // Game Tick Effect
@@ -26,25 +26,25 @@ export function useGameEngine() {
     const intervalId = setInterval(() => {
       setProfile((prevProfile) => {
         if (!prevProfile) return null;
-        return updateGameProfile(prevProfile, 1);
+        return updateSaveProfile(prevProfile, 1);
       });
     }, gameSettings.gameTickInterval);
 
     return () => clearInterval(intervalId);
   }, [profile]); // Effect should only re-run when the game profile changes
 
-  const loadGame = useCallback((profileToLoad: FullGameProfile) => {
+  const loadGame = useCallback((profileToLoad: FullSaveProfile) => {
     const now = new Date();
     const createdAt = new Date(profileToLoad.createdAt);
     const elapsedMilliseconds = now.getTime() - createdAt.getTime();
     const ticks = Math.floor(elapsedMilliseconds / gameSettings.gameTickInterval);
 
-    const updatedProfile = updateGameProfile(profileToLoad, ticks);
+    const updatedProfile = updateSaveProfile(profileToLoad, ticks);
     setProfile(updatedProfile);
   }, []);
 
   const createNewGame = useCallback(async () => {
-    const newProfileData = createNewGameLogic();
+    const newProfileData = createNewSaveLogic();
     const newProfileWithId = await addProfile(newProfileData);
 
     if (newProfileWithId) {
@@ -60,15 +60,15 @@ export function useGameEngine() {
     setProfile(null);
   }, []);
 
-  const saveProfileNow = useCallback(async (profileToSave: FullGameProfile) => {
+  const saveSaveProfileNow = useCallback(async (saveProfileToSave: FullSaveProfile) => {
     // The profile might be null if called in a context where it's not guaranteed to exist.
-    if (!profileToSave) return;
+    if (!saveProfileToSave) return;
 
     // Destructure to separate the id from the rest of the profile data.
-    const { id, ...profileData } = profileToSave;
+    const { id, ...profileData } = saveProfileToSave;
 
     // Always update the `createdAt` timestamp to the current moment of saving.
-    const gameProfileToSave = {
+    const updatedSaveProfile = {
       ...profileData,
       createdAt: new Date().toISOString(),
     };
@@ -76,10 +76,10 @@ export function useGameEngine() {
     try {
       if (id) {
         // If an ID exists, it's an existing game, so we update it.
-        await updateProfile(id, gameProfileToSave);
+        await updateProfile(id, updatedSaveProfile);
       } else {
         // If there's no ID, it's a new game. We add it to the storage.
-        const newProfileWithId = await addProfile(gameProfileToSave);
+        const newProfileWithId = await addProfile(updatedSaveProfile);
         if (newProfileWithId) {
           // After adding, we update the component's state to include the new ID.
           // This is crucial for subsequent saves to be treated as updates.
@@ -88,7 +88,7 @@ export function useGameEngine() {
       }
     } catch (error) {
       // Log any errors that occur during the save process.
-      console.error('Failed to save game profile', error);
+      console.error('Failed to save profile', error);
     }
   }, [addProfile, updateProfile]);
 
@@ -97,16 +97,16 @@ export function useGameEngine() {
       if (!prevProfile) return null;
       const newProfile = developGameLogic(prevProfile, gameName);
       if (newProfile !== prevProfile) {
-        saveProfileNow(newProfile);
+        saveSaveProfileNow(newProfile);
       }
       return newProfile;
     });
-  }, [saveProfileNow]);
+  }, [saveSaveProfileNow]);
 
   const saveGame = useCallback(async () => {
     if (!profile) return;
-    await saveProfileNow(profile);
-  }, [profile, saveProfileNow]);
+    await saveSaveProfileNow(profile);
+  }, [profile, saveSaveProfileNow]);
 
   return {
     profile,

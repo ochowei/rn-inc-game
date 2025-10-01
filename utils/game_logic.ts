@@ -6,7 +6,7 @@ export interface Game {
   development_progress_ticks: number;
 }
 
-export interface GameProfile {
+export interface SaveProfile {
   resources: {
     creativity: number;
     productivity: number;
@@ -25,7 +25,7 @@ export interface GameProfile {
   createdAt: string;
 }
 
-export const createNewGameProfile = (): GameProfile => {
+export const createNewSaveProfile = (): SaveProfile => {
   const { initial_resources, engineer_level_1 } = gameSettings;
 
   return {
@@ -50,10 +50,10 @@ export const createNewGameProfile = (): GameProfile => {
   };
 };
 
-export const updateGameProfile = (
-  currentProfile: GameProfile,
+export const updateSaveProfile = (
+  currentProfile: SaveProfile,
   ticks: number
-): GameProfile => {
+): SaveProfile => {
   const newProfile = JSON.parse(JSON.stringify(currentProfile));
 
   if (ticks <= 0) {
@@ -125,9 +125,9 @@ export const updateGameProfile = (
 };
 
 export const developGame = (
-  currentProfile: GameProfile,
+  currentProfile: SaveProfile,
   gameName: string
-): GameProfile => {
+): SaveProfile => {
   const gameData = gameSettings.developable_games.find(
     (g) => g.name === gameName
   );

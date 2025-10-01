@@ -24,9 +24,9 @@
 
 遊戲的核心邏輯圍繞在幾個關鍵的數據結構和處理流程上：
 
-### 1\. 遊戲狀態 (`GameProfile`)
+### 1\. 遊戲狀態 (`SaveProfile`)
 
-所有遊戲進度都儲存在一個 `GameProfile` 物件中，包含以下主要部分：
+所有遊戲進度都儲存在一個 `SaveProfile` 物件中，包含以下主要部分：
 
   * **`resources`**: 玩家當前擁有的資源。
       * `creativity`: 創意值，用於開發遊戲。
@@ -39,14 +39,14 @@
       * 每個遊戲物件都包含 `name`, `status` (`developing` 或 `completed`) 和 `development_progress_ticks`。
   * **`createdAt`**: 遊戲創建時間，用於計算離線期間的進度。
 
-### 2\. 遊戲進度更新 (`updateGameProfile`)
+### 2\. 遊戲進度更新 (`updateSaveProfile`)
 
-遊戲的核心更新機制是 `updateGameProfile` 函數。這個函數會在以下兩種情況下被呼叫：
+遊戲的核心更新機制是 `updateSaveProfile` 函數。這個函數會在以下兩種情況下被呼叫：
 
   * 遊戲載入時，根據上次儲存時間和當前時間的差值來計算離線收益。
   * 遊戲運行時，每隔一段固定的時間（`gameTickInterval`）會被呼叫，以更新遊戲狀態。
 
-`updateGameProfile` 函數的運作流程如下：
+`updateSaveProfile` 函數的運作流程如下：
 
 1.  **資源產生**：根據 `employees` 陣列中的員工數量和他們的產能，計算每個資源（創意值、生產力）在經過的遊戲刻（ticks）中應增加的總量。
 2.  **上限限制**：新增加的資源量會受到 `creativity_max` 和 `productivity_max` 的限制，確保資源不會無限制地累積。
@@ -62,7 +62,7 @@
 1.  **資源檢查**：檢查玩家當前的資源（金錢、創意值、生產力）是否足以支付該遊戲的 `development_cost`。
 2.  **重複性檢查**：確保玩家沒有重複開發已經擁有或正在開發的遊戲。
 3.  **扣除成本**：如果所有檢查都通過，則從玩家的資源中扣除相應的成本。
-4.  **新增遊戲**：在 `GameProfile` 的 `games` 陣列中新增一個遊戲物件，其狀態被設定為 `developing`，開發進度 `development_progress_ticks` 為 0。
+4.  **新增遊戲**：在 `SaveProfile` 的 `games` 陣列中新增一個遊戲物件，其狀態被設定為 `developing`，開發進度 `development_progress_ticks` 為 0。
 
 ### 4\. 遊戲儲存機制 (`useGameStorage`)
 

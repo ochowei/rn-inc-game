@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GameProfile as AppGameProfile } from '@/utils/game_logic';
+import { SaveProfile as AppSaveProfile } from '@/utils/game_logic';
 
 const PROFILES_KEY = 'game_profiles';
 
-// Define the structure of a game profile for storage, which must include an ID.
-export interface GameProfile extends AppGameProfile {
+// Define the structure of a save profile for storage, which must include an ID.
+export interface SaveProfile extends AppSaveProfile {
   id: string;
 }
 
@@ -21,7 +21,7 @@ async function getStorage() {
 }
 
 export function useGameStorage() {
-  const [profiles, setProfiles] = useState<GameProfile[]>([]);
+  const [profiles, setProfiles] = useState<SaveProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchProfiles = useCallback(async () => {
@@ -35,7 +35,7 @@ export function useGameStorage() {
         setProfiles([]);
       }
     } catch (error) {
-      console.error('Failed to fetch game profiles', error);
+      console.error('Failed to fetch save profiles', error);
       setProfiles([]);
     } finally {
       setLoading(false);
@@ -46,13 +46,13 @@ export function useGameStorage() {
     fetchProfiles();
   }, [fetchProfiles]);
 
-  const saveProfiles = async (newProfiles: GameProfile[]) => {
+  const saveProfiles = async (newProfiles: SaveProfile[]) => {
     try {
       const storage = await getStorage();
       await storage.setItem(PROFILES_KEY, JSON.stringify(newProfiles));
       setProfiles(newProfiles);
     } catch (error) {
-      console.error('Failed to save game profiles', error);
+      console.error('Failed to save save profiles', error);
     }
   };
 
@@ -61,7 +61,7 @@ export function useGameStorage() {
     await saveProfiles(newProfiles);
   };
 
-  const addProfile = async (profile: Omit<GameProfile, 'id'>) => {
+  const addProfile = async (profile: Omit<SaveProfile, 'id'>) => {
     if (profiles.length < 5) {
       const newProfile = {
         ...profile,
@@ -74,7 +74,7 @@ export function useGameStorage() {
     return undefined; // Return undefined if limit is reached
   };
 
-  const updateProfile = async (id: string, profile: AppGameProfile) => {
+  const updateProfile = async (id: string, profile: AppSaveProfile) => {
     const profileWithId = { ...profile, id };
     const newProfiles = profiles.map((p) => (p.id === id ? profileWithId : p));
     await saveProfiles(newProfiles);

@@ -9,9 +9,9 @@
 模型層負責管理應用程式的資料和業務邏輯。它不關心使用者介面，只專注於處理遊戲狀態的變化和資料的持久化。
 
 -   **核心業務邏輯**:
-    -   `utils/game_logic.ts`: 定義了遊戲的核心資料結構 (`GameProfile`) 和所有操作這些資料的純函式，例如：
-        -   `createNewGameProfile()`: 建立一個新的遊戲存檔。
-        -   `updateGameProfile()`: 計算遊戲經過一段時間後的狀態變化（如資源增長、遊戲開發進度）。
+    -   `utils/game_logic.ts`: 定義了遊戲的核心資料結構 (`SaveProfile`) 和所有操作這些資料的純函式，例如：
+        -   `createNewSaveProfile()`: 建立一個新的遊戲存檔。
+        -   `updateSaveProfile()`: 計算遊戲經過一段時間後的狀態變化（如資源增長、遊戲開發進度）。
         -   `developGame()`: 處理開發新遊戲的邏輯。
 
 -   **遊戲設定**:
