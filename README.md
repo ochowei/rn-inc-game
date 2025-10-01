@@ -88,7 +88,7 @@
 ## 待辦事項
 
   * [ ] 實作 `Fab.tsx` 中的「招募員工」功能。
-  * [ ] 擴充 `develop-game.tsx`，使其在點擊「開發」按鈕時實際呼叫 `developGame` 函數。
+  * [x] 擴充 `develop-game.tsx`，使其在點擊「開發」按鈕時實際呼叫 `developGame` 函數。
   * [ ] 實作 `developGame` 頁面中的開發進度顯示。
   * [ ] 新增更多種類的員工和可開發的遊戲，豐富遊戲內容。
   * [ ] 優化手機橫向模式下的 UI 顯示。
@@ -109,6 +109,7 @@
 │   ├── develop-game.tsx
 │   ├── game.tsx
 │   ├── index.tsx
+│   ├── menu.tsx
 │   └── saved-games.tsx
 ├── assets
 │   └── ...
@@ -123,7 +124,6 @@
 │   └── ThemedView.tsx
 ├── constants
 │   ├── Colors.ts
-│   ├── Games.ts
 │   └── locales.ts
 ├── hooks
 │   ├── use-game-storage.ts
