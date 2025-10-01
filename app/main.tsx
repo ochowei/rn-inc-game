@@ -12,7 +12,7 @@ import Fab from '@/components/Fab';
 export default function GameScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { profile, saveGame, unloadGame } = useGameEngineContext();
+  const { profile, saveCurrentProgress, unloadSave } = useGameEngineContext();
   const tintColor = useThemeColor({}, 'tint');
   const backgroundColor = useThemeColor({}, 'background');
 
@@ -28,14 +28,14 @@ export default function GameScreen() {
   };
 
   const handleBackToMenu = () => {
-    unloadGame();
+    unloadSave();
     router.push('/menu');
   };
 
   const handleSavePress = async () => {
     try {
-      await saveGame();
-      setModalContent({ title: t('game', 'gameSaved'), message: t('game', 'gameSavedSuccess') });
+      await saveCurrentProgress();
+      setModalContent({ title: t('game', 'saveSuccessTitle'), message: t('game', 'saveSuccessMessage') });
       setIsModalVisible(true);
     } catch (error) {
       console.error('Failed to save game', error);
@@ -68,7 +68,7 @@ export default function GameScreen() {
       </Pressable>
 
       <Pressable onPress={handleSavePress} style={[styles.saveButton, buttonStyle]}>
-        <ThemedText style={[styles.saveButtonText, buttonTextStyle]}>{t('game', 'saveGame')}</ThemedText>
+        <ThemedText style={[styles.saveButtonText, buttonTextStyle]}>{t('game', 'save')}</ThemedText>
       </Pressable>
 
       <ThemedView style={styles.sectionContainer}>

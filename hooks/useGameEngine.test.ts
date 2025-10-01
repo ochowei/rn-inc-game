@@ -52,37 +52,37 @@ describe('useGameEngine', () => {
     expect(result.current.profile).toBeNull();
   });
 
-  it('should create a new game and save it', async () => {
+  it('should create a new save and save it', async () => {
     const { result } = renderHook(() => useGameEngine());
     await act(async () => {
-      await result.current.createNewGame();
+      await result.current.createNewSave();
     });
     expect(GameLogic.createNewSaveProfile).toHaveBeenCalled();
     expect(mockAddProfile).toHaveBeenCalled();
     expect(result.current.profile).toEqual({ ...mockInitialProfile, id: 'new-id' });
   });
 
-  it('should load an existing game and calculate offline progress', () => {
+  it('should load an existing save and calculate offline progress', () => {
     const pastDate = new Date(Date.now() - 1000 * 60).toISOString(); // 1 minute ago
     const profileToLoad = { ...mockInitialProfile, createdAt: pastDate };
 
     const { result } = renderHook(() => useGameEngine());
     act(() => {
-      result.current.loadGame(profileToLoad);
+      result.current.loadSave(profileToLoad);
     });
 
     expect(GameLogic.updateSaveProfile).toHaveBeenCalledWith(profileToLoad, expect.any(Number));
     expect(result.current.profile).not.toBeNull();
   });
 
-  it('should unload the current game', async () => {
+  it('should unload the current save', async () => {
     const { result } = renderHook(() => useGameEngine());
     await act(async () => {
-      await result.current.createNewGame();
+      await result.current.createNewSave();
     });
     expect(result.current.profile).not.toBeNull();
     act(() => {
-      result.current.unloadGame();
+      result.current.unloadSave();
     });
     expect(result.current.profile).toBeNull();
   });
@@ -90,7 +90,7 @@ describe('useGameEngine', () => {
   it('should develop a game', async () => {
     const { result } = renderHook(() => useGameEngine());
     await act(async () => {
-      await result.current.createNewGame();
+      await result.current.createNewSave();
     });
     act(() => {
       result.current.developGame('New Super Game');
@@ -101,31 +101,31 @@ describe('useGameEngine', () => {
     );
   });
 
-  it('should update a newly created game on save', async () => {
+  it('should update a newly created save on save', async () => {
     const { result } = renderHook(() => useGameEngine());
     await act(async () => {
-      await result.current.createNewGame();
+      await result.current.createNewSave();
     });
 
-    // createNewGame already calls addProfile once. We clear it to test the next save.
+    // createNewSave already calls addProfile once. We clear it to test the next save.
     mockAddProfile.mockClear();
 
     await act(async () => {
-      await result.current.saveGame();
+      await result.current.saveCurrentProgress();
     });
 
-    // saveGame should now call updateProfile because the profile has an ID.
+    // saveCurrentProgress should now call updateProfile because the profile has an ID.
     expect(mockAddProfile).not.toHaveBeenCalled();
     expect(mockUpdateProfile).toHaveBeenCalledWith('new-id', expect.any(Object));
   });
 
-  it('should save an existing game', async () => {
+  it('should save an existing save', async () => {
     const { result } = renderHook(() => useGameEngine());
     act(() => {
-      result.current.loadGame(mockInitialProfile);
+      result.current.loadSave(mockInitialProfile);
     });
     await act(async () => {
-      await result.current.saveGame();
+      await result.current.saveCurrentProgress();
     });
     expect(mockUpdateProfile).toHaveBeenCalledWith('1', expect.any(Object));
   });
@@ -138,7 +138,7 @@ describe('useGameEngine', () => {
     const { result } = renderHook(() => useGameEngine());
 
     act(() => {
-      result.current.createNewGame();
+      result.current.createNewSave();
     });
 
     expect(result.current.profile?.resources.money).toBe(1000);

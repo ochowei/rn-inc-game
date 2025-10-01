@@ -12,15 +12,15 @@ import { useGameEngineContext } from '@/contexts/GameEngineContext';
 export default function SavedGamesScreen() {
   const router = useRouter();
   const { profiles, loading, deleteProfile } = useGameStorage();
-  const { loadGame } = useGameEngineContext();
+  const { loadSave } = useGameEngineContext();
   const { t } = useLanguage();
   const tintColor = useThemeColor({}, 'tint');
 
   const [isConfirming, setIsConfirming] = useState(false);
   const [profileToDelete, setProfileToDelete] = useState<string | null>(null);
 
-  const handleLoadGame = (saveProfile: SaveProfile) => {
-    loadGame(saveProfile);
+  const handleLoadSave = (saveProfile: SaveProfile) => {
+    loadSave(saveProfile);
     router.push('/main');
   };
 
@@ -47,7 +47,7 @@ export default function SavedGamesScreen() {
       <ThemedText>{t('savedGames', 'saveSlot')} {index + 1}</ThemedText>
       <ThemedText>{new Date(item.createdAt).toLocaleString()}</ThemedText>
       <ThemedView style={styles.buttonsContainer}>
-        <Pressable onPress={() => handleLoadGame(item)} style={[styles.button, { borderColor: tintColor }]}>
+        <Pressable onPress={() => handleLoadSave(item)} style={[styles.button, { borderColor: tintColor }]}>
           <ThemedText style={styles.buttonText}>{t('savedGames', 'load')}</ThemedText>
         </Pressable>
         <Pressable onPress={() => handleDeleteGame(item.id)} style={[styles.button, styles.deleteButton]}>

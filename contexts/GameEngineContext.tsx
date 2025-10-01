@@ -1,11 +1,8 @@
 import { createContext, useContext, ReactNode } from 'react';
-import { useGameEngine } from '@/hooks/useGameEngine';
+import { useGameEngine, GameEngineHook } from '@/hooks/useGameEngine';
 
-// Define the shape of the context value
-type GameEngineContextType = ReturnType<typeof useGameEngine>;
-
-// Create the context with a default value
-const GameEngineContext = createContext<GameEngineContextType | undefined>(undefined);
+// Define the shape of the context value, using the explicit interface
+const GameEngineContext = createContext<GameEngineHook | undefined>(undefined);
 
 // Create a provider component that no longer requires initialProfile
 export function GameEngineProvider({ children }: { children: ReactNode }) {
