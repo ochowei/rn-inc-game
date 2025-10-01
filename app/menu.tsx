@@ -31,7 +31,7 @@ export default function GameMenuScreen() {
   const handleNewGame = async () => {
     const newProfile = await createNewGame();
     if (newProfile) {
-      router.push('/game');
+      router.push('/main');
     } else {
       // The modal is shown if creating a new game fails, which indicates the save limit has been reached.
       setIsLimitModalVisible(true);
