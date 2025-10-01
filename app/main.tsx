@@ -68,7 +68,7 @@ export default function GameScreen() {
       </Pressable>
 
       <Pressable onPress={handleSavePress} style={[styles.saveButton, buttonStyle]}>
-        <ThemedText style={[styles.saveButtonText, buttonTextStyle]}>{t('game', 'save')}</TheThemedText>
+        <ThemedText style={[styles.saveButtonText, buttonTextStyle]}>{t('game', 'save')}</ThemedText>
       </Pressable>
 
       <ThemedView style={styles.sectionContainer}>
