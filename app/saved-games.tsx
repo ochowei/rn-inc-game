@@ -21,7 +21,7 @@ export default function SavedGamesScreen() {
 
   const handleLoadGame = (saveProfile: SaveProfile) => {
     loadGame(saveProfile);
-    router.push('/game');
+    router.push('/main');
   };
 
   const handleDeleteGame = (id: string) => {

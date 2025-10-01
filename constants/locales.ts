@@ -1,9 +1,9 @@
 export const locales = {
   en: {
     menu: {
-      title: 'Game Menu',
-      newGame: 'New Game',
-      savedGame: 'Saved Game',
+      title: 'Main Menu',
+      newGame: 'New Save',
+      savedGame: 'Load Save',
       saveLimitReached: 'Save limit reached',
       saveLimitMessage: 'Please delete unnecessary saves, you can only have up to 5 saves.',
       close: 'Close',
@@ -33,7 +33,7 @@ export const locales = {
       failedToSave: 'Failed to save the game.',
     },
     savedGames: {
-      title: 'Saved Games',
+      title: 'Saved Files',
       saveSlot: 'Save Slot',
       load: 'Load',
       delete: 'Delete',
@@ -77,8 +77,8 @@ export const locales = {
   },
   zh: {
     menu: {
-      title: '遊戲主選單',
-      newGame: '新遊戲',
+      title: '主選單',
+      newGame: '新存檔',
       savedGame: '讀取存檔',
       saveLimitReached: '存檔已達上限',
       saveLimitMessage: '請先刪除多餘的存檔，最多只能有 5 個存檔。',
@@ -109,7 +109,7 @@ export const locales = {
       failedToSave: '儲存遊戲失敗。',
     },
     savedGames: {
-      title: '已存檔的遊戲',
+      title: '已存檔的檔案',
       saveSlot: '存檔位置',
       load: '讀取',
       delete: '刪除',
