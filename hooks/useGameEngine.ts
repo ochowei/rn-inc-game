@@ -43,10 +43,18 @@ export function useGameEngine() {
     setProfile(updatedProfile);
   }, []);
 
-  const createNewGame = useCallback(() => {
-    const newProfile = createNewGameLogic();
-    setProfile(newProfile);
-  }, []);
+  const createNewGame = useCallback(async () => {
+    const newProfileData = createNewGameLogic();
+    const newProfileWithId = await addProfile(newProfileData);
+
+    if (newProfileWithId) {
+      // Update the state with the profile that includes the new ID from storage.
+      setProfile(newProfileWithId);
+    }
+
+    // Return the newly created profile, or undefined if the operation failed (e.g., storage limit reached).
+    return newProfileWithId;
+  }, [addProfile]);
 
   const unloadGame = useCallback(() => {
     setProfile(null);
