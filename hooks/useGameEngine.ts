@@ -9,11 +9,20 @@ import { useGameStorage } from './use-game-storage';
 import gameSettings from '@/game_settings.json';
 
 // The interface for the SaveProfile used within the engine, which may not have an ID yet.
-interface FullSaveProfile extends SaveProfile {
+export interface FullSaveProfile extends SaveProfile {
   id?: string;
 }
 
-export function useGameEngine() {
+export interface GameEngineHook {
+  profile: FullSaveProfile | null;
+  loadSave: (profileToLoad: FullSaveProfile) => void;
+  createNewSave: () => Promise<FullSaveProfile | undefined>;
+  unloadSave: () => void;
+  developGame: (gameName: string) => void;
+  saveCurrentProgress: () => Promise<void>;
+}
+
+export function useGameEngine(): GameEngineHook {
   const [profile, setProfile] = useState<FullSaveProfile | null>(null);
   const { addProfile, updateProfile } = useGameStorage();
 
@@ -33,7 +42,7 @@ export function useGameEngine() {
     return () => clearInterval(intervalId);
   }, [profile]); // Effect should only re-run when the game profile changes
 
-  const loadGame = useCallback((profileToLoad: FullSaveProfile) => {
+  const loadSave = useCallback((profileToLoad: FullSaveProfile) => {
     const now = new Date();
     const createdAt = new Date(profileToLoad.createdAt);
     const elapsedMilliseconds = now.getTime() - createdAt.getTime();
@@ -43,7 +52,7 @@ export function useGameEngine() {
     setProfile(updatedProfile);
   }, []);
 
-  const createNewGame = useCallback(async () => {
+  const createNewSave = useCallback(async () => {
     const newProfileData = createNewSaveLogic();
     const newProfileWithId = await addProfile(newProfileData);
 
@@ -56,11 +65,11 @@ export function useGameEngine() {
     return newProfileWithId;
   }, [addProfile]);
 
-  const unloadGame = useCallback(() => {
+  const unloadSave = useCallback(() => {
     setProfile(null);
   }, []);
 
-  const saveSaveProfileNow = useCallback(async (saveProfileToSave: FullSaveProfile) => {
+  const saveProfileNow = useCallback(async (saveProfileToSave: FullSaveProfile) => {
     // The profile might be null if called in a context where it's not guaranteed to exist.
     if (!saveProfileToSave) return;
 
@@ -97,23 +106,23 @@ export function useGameEngine() {
       if (!prevProfile) return null;
       const newProfile = developGameLogic(prevProfile, gameName);
       if (newProfile !== prevProfile) {
-        saveSaveProfileNow(newProfile);
+        saveProfileNow(newProfile);
       }
       return newProfile;
     });
-  }, [saveSaveProfileNow]);
+  }, [saveProfileNow]);
 
-  const saveGame = useCallback(async () => {
+  const saveCurrentProgress = useCallback(async () => {
     if (!profile) return;
-    await saveSaveProfileNow(profile);
-  }, [profile, saveSaveProfileNow]);
+    await saveProfileNow(profile);
+  }, [profile, saveProfileNow]);
 
   return {
     profile,
-    loadGame,
-    createNewGame,
-    unloadGame,
+    loadSave,
+    createNewSave,
+    unloadSave,
     developGame,
-    saveGame,
+    saveCurrentProgress,
   };
 }

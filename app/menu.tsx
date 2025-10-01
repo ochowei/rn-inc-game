@@ -12,7 +12,7 @@ import { useGameEngineContext } from '@/contexts/GameEngineContext';
 export default function GameMenuScreen() {
   const router = useRouter();
   const { profiles, fetchProfiles } = useGameStorage();
-  const { createNewGame } = useGameEngineContext();
+  const { createNewSave } = useGameEngineContext();
   const { language, setLanguage, t } = useLanguage();
   const hasSavedGames = profiles.length > 0;
   const tintColor = useThemeColor({}, 'tint');
@@ -29,7 +29,7 @@ export default function GameMenuScreen() {
   );
 
   const handleNewGame = async () => {
-    const newProfile = await createNewGame();
+    const newProfile = await createNewSave();
     if (newProfile) {
       router.push('/main');
     } else {
