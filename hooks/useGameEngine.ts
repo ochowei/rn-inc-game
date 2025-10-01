@@ -31,7 +31,7 @@ export function useGameEngine() {
     }, gameSettings.gameTickInterval);
 
     return () => clearInterval(intervalId);
-  }, [profile?.id]); // Effect should only re-run when the game profile changes
+  }, [profile]); // Effect should only re-run when the game profile changes
 
   const loadGame = useCallback((profileToLoad: FullGameProfile) => {
     const now = new Date();
