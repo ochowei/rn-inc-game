@@ -52,19 +52,14 @@ export function useGameEngine() {
     setProfile(null);
   }, []);
 
-  const developGame = useCallback((gameName: string) => {
-    setProfile((prevProfile) => {
-      if (!prevProfile) return null;
-      return developGameLogic(prevProfile, gameName);
-    });
-  }, []);
+  const saveProfileNow = useCallback(async (profileToSave: FullGameProfile) => {
+    // The profile might be null if called in a context where it's not guaranteed to exist.
+    if (!profileToSave) return;
 
-  const saveGame = useCallback(async () => {
-    if (!profile) return;
+    // Destructure to separate the id from the rest of the profile data.
+    const { id, ...profileData } = profileToSave;
 
-    // Destructure to separate the id from the rest of the profile data
-    const { id, ...profileData } = profile;
-
+    // Always update the `createdAt` timestamp to the current moment of saving.
     const gameProfileToSave = {
       ...profileData,
       createdAt: new Date().toISOString(),
@@ -72,20 +67,38 @@ export function useGameEngine() {
 
     try {
       if (id) {
-        // Existing game, update it
+        // If an ID exists, it's an existing game, so we update it.
         await updateProfile(id, gameProfileToSave);
       } else {
-        // New game, add it and get the new profile with an ID
+        // If there's no ID, it's a new game. We add it to the storage.
         const newProfileWithId = await addProfile(gameProfileToSave);
         if (newProfileWithId) {
-          // Update the state to include the new ID for future saves
+          // After adding, we update the component's state to include the new ID.
+          // This is crucial for subsequent saves to be treated as updates.
           setProfile(newProfileWithId);
         }
       }
     } catch (error) {
+      // Log any errors that occur during the save process.
       console.error('Failed to save game profile', error);
     }
-  }, [profile, addProfile, updateProfile]);
+  }, [addProfile, updateProfile]);
+
+  const developGame = useCallback((gameName: string) => {
+    setProfile((prevProfile) => {
+      if (!prevProfile) return null;
+      const newProfile = developGameLogic(prevProfile, gameName);
+      if (newProfile !== prevProfile) {
+        saveProfileNow(newProfile);
+      }
+      return newProfile;
+    });
+  }, [saveProfileNow]);
+
+  const saveGame = useCallback(async () => {
+    if (!profile) return;
+    await saveProfileNow(profile);
+  }, [profile, saveProfileNow]);
 
   return {
     profile,
