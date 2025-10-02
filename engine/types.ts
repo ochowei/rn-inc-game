@@ -1,7 +1,7 @@
 export interface GameSettings {
   initial: {
     resources: {
-      creativity: number;
+      resource_1: number;
       productivity: number;
       money: number;
     };
@@ -16,7 +16,7 @@ export interface GameSettings {
     development_time_ticks: number;
     development_cost: {
       productivity: number;
-      creativity: number;
+      resource_1: number;
       funding: number;
     };
     income_per_tick: number;
@@ -34,12 +34,12 @@ export interface Game {
 
 export interface SaveProfile {
   resources: {
-    creativity: number;
+    resource_1: number;
     productivity: number;
-    creativity_max: number;
+    resource_1_max: number;
     productivity_max: number;
     money: number;
-    creativity_per_tick: number;
+    resource_1_per_tick: number;
     productivity_per_tick: number;
     money_per_tick: number;
   };
