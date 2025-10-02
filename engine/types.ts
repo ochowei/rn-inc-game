@@ -3,7 +3,7 @@ export interface GameSettings {
     resources: {
       resource_1: number;
       resource_2: number;
-      money: number;
+      resource_3: number;
     };
     assets: {
       [key: string]: number;
@@ -17,7 +17,7 @@ export interface GameSettings {
     development_cost: {
       resource_2: number;
       resource_1: number;
-      funding: number;
+      resource_3: number;
     };
     income_per_tick: number;
     maintenance_cost_per_tick: {
@@ -38,10 +38,10 @@ export interface SaveProfile {
     resource_2: number;
     resource_1_max: number;
     resource_2_max: number;
-    money: number;
+    resource_3: number;
     resource_1_per_tick: number;
     resource_2_per_tick: number;
-    money_per_tick: number;
+    resource_3_per_tick: number;
   };
   employees: {
     name: string;

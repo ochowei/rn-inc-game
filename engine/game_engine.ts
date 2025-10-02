@@ -9,10 +9,10 @@ export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
       resource_2: initial.resources.resource_2,
       resource_1_max: engineer_level_1.resource_1_max,
       resource_2_max: engineer_level_1.resource_2_max,
-      money: initial.resources.money,
+      resource_3: initial.resources.resource_3,
       resource_1_per_tick: engineer_level_1.resource_1_per_tick,
       resource_2_per_tick: engineer_level_1.resource_2_per_tick,
-      money_per_tick: 0,
+      resource_3_per_tick: 0,
     },
     employees: [
       {
@@ -91,7 +91,7 @@ export const updateSaveProfile = (
     }
   });
 
-  newProfile.resources.money += totalIncome;
+  newProfile.resources.resource_3 += totalIncome;
   newProfile.resources.resource_2 = Math.max(
     0,
     newProfile.resources.resource_2 - totalMaintenanceCost
@@ -126,7 +126,7 @@ export const developGame = (
 
   // 3. Check for sufficient resources
   if (
-    currentResources.money < development_cost.funding ||
+    currentResources.resource_3 < development_cost.resource_3 ||
     currentResources.resource_2 < development_cost.resource_2 ||
     currentResources.resource_1 < development_cost.resource_1
   ) {
@@ -137,7 +137,7 @@ export const developGame = (
   // 4. Deduct costs and add the new game in development
   const newProfile = JSON.parse(JSON.stringify(currentProfile));
 
-  newProfile.resources.money -= development_cost.funding;
+  newProfile.resources.resource_3 -= development_cost.resource_3;
   newProfile.resources.resource_2 -= development_cost.resource_2;
   newProfile.resources.resource_1 -= development_cost.resource_1;
 

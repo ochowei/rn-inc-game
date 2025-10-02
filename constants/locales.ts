@@ -61,7 +61,7 @@ export const locales = {
     resources: {
       resource_1: 'Creativity',
       resource_2: 'Productivity',
-      money: 'Money',
+      resource_3: 'Money',
     },
     games: {
       'Puzzle Game': 'Puzzle Game',
@@ -136,7 +136,7 @@ export const locales = {
     resources: {
       resource_1: '創意',
       resource_2: '生產力',
-      money: '金錢',
+      resource_3: '金錢',
     },
     games: {
       'Puzzle Game': '益智遊戲',
