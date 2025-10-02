@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react-native';
 import { useGameEngine, FullSaveProfile } from './useGameEngine';
 import * as GameLogic from '@/engine/game_engine';
 import { useGameStorage } from './use-game-storage';
-import { GameSettings } from '@/engine/types';
+import { GameSettings, ResourceGroup } from '@/engine/types';
 import gameSettings from '@/settings.json';
 
 // Define mock functions that can be manipulated in tests
@@ -21,22 +21,36 @@ jest.mock('./use-game-storage', () => ({
 jest.mock('@/engine/game_engine', () => ({
   __esModule: true,
   ...jest.requireActual('@/engine/game_engine'),
-  createNewSaveProfile: jest.fn((settings) => ({
-    resources: { resource_3: settings.initial.resources.resource_3, resource_1: 0, resource_2: 0, resource_1_max: 100, resource_2_max: 100, resource_1_per_tick: 0, resource_2_per_tick: 0, resource_3_per_tick: 0 },
+  createNewSaveProfile: jest.fn((settings: GameSettings) => ({
+    resources: {
+      current: { ...settings.initial.resources },
+      max: { ...settings.engineer_level_1.resource_max },
+      per_tick: { ...settings.engineer_level_1.resource_per_tick },
+    },
     employees: [{ name: 'engineer_level_1', count: settings.initial.assets.engineer_level_1 }],
     games: [],
     createdAt: new Date().toISOString(),
   })),
   updateSaveProfile: jest.fn((profile, ticks, settings) => ({
     ...profile,
-    resources: { ...profile.resources, resource_3: profile.resources.resource_3 + (ticks || 0) * 10 },
+    resources: {
+      ...profile.resources,
+      current: {
+        ...profile.resources.current,
+        resource_3: profile.resources.current.resource_3 + (ticks || 0) * 10,
+      },
+    },
   })),
   developGame: jest.fn((profile, gameName, settings) => profile),
 }));
 
 const mockInitialProfile: FullSaveProfile = {
   id: '1',
-  resources: { resource_3: 1000, resource_1: 100, resource_2: 100, resource_1_max: 200, resource_2_max: 200, resource_1_per_tick: 1, resource_2_per_tick: 1, resource_3_per_tick: 0 },
+  resources: {
+    current: { resource_1: 100, resource_2: 100, resource_3: 1000 },
+    max: { resource_1: 200, resource_2: 200, resource_3: 0 },
+    per_tick: { resource_1: 1, resource_2: 1, resource_3: 0 },
+  },
   employees: [],
   games: [],
   createdAt: new Date().toISOString(),
@@ -47,9 +61,15 @@ describe('useGameEngine', () => {
     // Clear mocks before each test
     (GameLogic.createNewSaveProfile as jest.Mock).mockClear().mockImplementation((settings) => ({ ...mockInitialProfile, id: undefined, createdAt: new Date().toISOString() }));
     (GameLogic.updateSaveProfile as jest.Mock).mockClear().mockImplementation((profile, ticks, settings) => ({
-        ...profile,
-        resources: { ...profile.resources, resource_3: profile.resources.resource_3 + (ticks || 0) * 10 },
-      }));
+      ...profile,
+      resources: {
+        ...profile.resources,
+        current: {
+          ...profile.resources.current,
+          resource_3: profile.resources.current.resource_3 + (ticks || 0) * 10,
+        },
+      },
+    }));
     (GameLogic.developGame as jest.Mock).mockClear().mockImplementation((profile, gameName, settings) => profile);
     mockAddProfile.mockClear().mockResolvedValue({ ...mockInitialProfile, id: 'new-id' });
     mockUpdateProfile.mockClear();
@@ -150,14 +170,14 @@ describe('useGameEngine', () => {
       await result.current.createNewSave();
     });
 
-    expect(result.current.profile?.resources.resource_3).toBe(1000);
+    expect(result.current.profile?.resources.current.resource_3).toBe(1000);
 
     // Run the pending timer and the subsequent state update
     act(() => {
       jest.runOnlyPendingTimers();
     });
 
-    expect(result.current.profile?.resources.resource_3).toBe(1010);
+    expect(result.current.profile?.resources.current.resource_3).toBe(1010);
 
     jest.useRealTimers();
   });
