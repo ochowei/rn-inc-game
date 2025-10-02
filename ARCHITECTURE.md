@@ -16,6 +16,7 @@
 
 -   **遊戲設定**:
     -   `settings.json`: 包含所有遊戲的靜態設定資料，如初始資源、各種遊戲的成本與收益等。將設定與邏輯分離，方便進行遊戲平衡性調整。
+        -   `initial`: 定義新遊戲開始時的初始資源和資產，分為 `resources` 和 `assets`。
 
 -   **資料儲存**:
     -   `hooks/use-game-storage.ts`: 負責遊戲進度的儲存和讀取。它會根據不同平台（Web 使用 `localStorage`，原生平台使用 `AsyncStorage`）進行操作，實現資料持久化。
