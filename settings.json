@@ -22,44 +22,47 @@
     }
   },
   "gameTickInterval": 5000,
-  "developable_games": [
-    {
-      "name": "Novel Game",
-      "development_time_ticks": 6,
-      "development_cost": {
-        "resource_1": 5,
-        "resource_2": 10,
-        "resource_3": 20
+  "assets_increasing_method_1": {
+    "name": "game_development",
+    "assets": [
+      {
+        "name": "Novel Game",
+        "development_time_ticks": 6,
+        "development_cost": {
+          "resource_1": 5,
+          "resource_2": 10,
+          "resource_3": 20
+        },
+        "income_per_tick": {
+          "resource_1": 0,
+          "resource_2": 0,
+          "resource_3": 0.5
+        },
+        "maintenance_cost_per_tick": {
+          "resource_1": 0,
+          "resource_2": 0.04,
+          "resource_3": 0
+        }
       },
-      "income_per_tick": {
-        "resource_1": 0,
-        "resource_2": 0,
-        "resource_3": 0.5
-      },
-      "maintenance_cost_per_tick": {
-        "resource_1": 0,
-        "resource_2": 0.04,
-        "resource_3": 0
+      {
+        "name": "Puzzle Game",
+        "development_time_ticks": 6,
+        "development_cost": {
+          "resource_1": 10,
+          "resource_2": 15,
+          "resource_3": 30
+        },
+        "income_per_tick": {
+          "resource_1": 0,
+          "resource_2": 0,
+          "resource_3": 0.5
+        },
+        "maintenance_cost_per_tick": {
+          "resource_1": 0,
+          "resource_2": 0.04,
+          "resource_3": 0
+        }
       }
-    },
-    {
-      "name": "Puzzle Game",
-      "development_time_ticks": 6,
-      "development_cost": {
-        "resource_1": 10,
-        "resource_2": 15,
-        "resource_3": 30
-      },
-      "income_per_tick": {
-        "resource_1": 0,
-        "resource_2": 0,
-        "resource_3": 0.5
-      },
-      "maintenance_cost_per_tick": {
-        "resource_1": 0,
-        "resource_2": 0.04,
-        "resource_3": 0
-      }
-    }
-  ]
+    ]
+  }
 }
