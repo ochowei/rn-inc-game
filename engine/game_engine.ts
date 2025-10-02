@@ -1,32 +1,7 @@
-import gameSettings from '../settings.json';
+import { GameSettings, Game, SaveProfile } from './types';
 
-export interface Game {
-  name: string;
-  status: 'developing' | 'completed';
-  development_progress_ticks: number;
-}
-
-export interface SaveProfile {
-  resources: {
-    creativity: number;
-    productivity: number;
-    creativity_max: number;
-    productivity_max: number;
-    money: number;
-    creativity_per_tick: number;
-    productivity_per_tick: number;
-    money_per_tick: number;
-  };
-  employees: {
-    name: string;
-    count: number;
-  }[];
-  games: Game[];
-  createdAt: string;
-}
-
-export const createNewSaveProfile = (): SaveProfile => {
-  const { initial, engineer_level_1 } = gameSettings;
+export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
+  const { initial, engineer_level_1 } = settings;
 
   return {
     resources: {
@@ -52,7 +27,8 @@ export const createNewSaveProfile = (): SaveProfile => {
 
 export const updateSaveProfile = (
   currentProfile: SaveProfile,
-  ticks: number
+  ticks: number,
+  settings: GameSettings
 ): SaveProfile => {
   const newProfile = JSON.parse(JSON.stringify(currentProfile));
 
@@ -65,7 +41,7 @@ export const updateSaveProfile = (
   let totalProductivityPerTick = 0;
 
   newProfile.employees.forEach((employee: { name: string; count: number }) => {
-    const employeeSettings = (gameSettings as any)[employee.name];
+    const employeeSettings = (settings as any)[employee.name];
     if (employeeSettings) {
       totalCreativityPerTick +=
         employee.count * employeeSettings.creativity_per_tick;
@@ -89,7 +65,7 @@ export const updateSaveProfile = (
   let totalMaintenanceCost = 0;
 
   newProfile.games.forEach((game: Game) => {
-    const gameData = gameSettings.developable_games.find(
+    const gameData = settings.developable_games.find(
       (g) => g.name === game.name
     );
 
@@ -126,9 +102,10 @@ export const updateSaveProfile = (
 
 export const developGame = (
   currentProfile: SaveProfile,
-  gameName: string
+  gameName: string,
+  settings: GameSettings
 ): SaveProfile => {
-  const gameData = gameSettings.developable_games.find(
+  const gameData = settings.developable_games.find(
     (g) => g.name === gameName
   );
 
