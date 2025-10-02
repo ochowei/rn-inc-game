@@ -4,6 +4,19 @@
 
 在 React 和 Hooks 的生態系中，我們透過自定義 Hooks 和 Context API 來實現這種模式。
 
+## 分層設計：遊戲引擎與實現 (Layered Design: Engine vs. Implementation)
+
+### 遊戲引擎 (Engine)
+
+`engine/game_engine.ts` 的職責是提供通用的、與具體遊戲內容無關的核心邏輯。它包含了處理遊戲狀態變化的所有核心演算法。這個引擎的設計是純粹的，意味著它的所有函式都只依賴於傳入的參數來計算結果，不依賴任何外部狀態或全域變數。這種設計使得邏輯本身變得高度可測試、可重用且易於理解。
+
+### 遊戲實現 (Implementation)
+
+相對於通用的引擎，遊戲實現層提供了所有具體的遊戲內容。這些內容透過設定檔來定義，使得遊戲的平衡性調整、內容擴充和在地化變得非常方便，而無需修改核心的引擎程式碼。
+
+-   **`settings.json`**: 這個檔案定義了遊戲的所有數值，例如初始資源、遊戲開發的成本與效益、升級項目的效果等。它是遊戲平衡性的主要控制中心。
+-   **`constants/locales.ts`**: 這個檔案負責提供所有在地化的文字內容，例如遊戲名稱、描述、UI 上的按鈕文字等。透過這個檔案，可以輕鬆地為遊戲新增多語言支援。
+
 ## Model (模型)
 
 模型層負責管理應用程式的資料和業務邏輯。它不關心使用者介面，只專注於處理遊戲狀態的變化和資料的持久化。
@@ -36,7 +49,7 @@
 控制器是模型和視圖之間的橋樑。它接收使用者的輸入，呼叫模型來更新狀態，然後將更新後的狀態提供給視圖進行渲染。
 
 -   **遊戲引擎核心 Hook**:
-    -   `hooks/useGameEngine.ts`: 這是主要的控制器。它透過 `useState` 管理當前的遊戲狀態 (`profile`)，並使用 `useEffect` 來處理遊戲時間的推進 (Game Tick)。它封裝了對 Model 層函式的呼叫，並向 View 層提供一組簡單的 API 來操作遊戲，例如 `createNewGame`, `loadGame`, `saveGame` 等。
+    -   `hooks/useGameEngine.ts`: 這是主要的控制器，扮演著整合**遊戲引擎**與**遊戲實現**的關鍵角色。它負責從 `settings.json` 讀取遊戲設定，並將這些設定注入到 `engine/game_engine.ts` 的純函式中。同時，它管理著遊戲的即時狀態 (`profile`)，並透過 `useEffect` 來處理遊戲時間的推進 (Game Tick)，最後向 View 層提供一組操作遊戲的 API（如 `createNewGame`, `loadGame`, `developNewGame` 等）。
 
 -   **狀態提供者 (Context Provider)**:
     -   `contexts/GameEngineContext.tsx`: 使用 React Context 將 `useGameEngine` 提供的狀態和方法注入到元件樹中，讓任何需要存取遊戲狀態的 View 元件都能輕易地獲取。
