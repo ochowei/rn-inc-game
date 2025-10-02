@@ -2,7 +2,7 @@
   "initial": {
     "resources": {
       "resource_1": 0,
-      "productivity": 0,
+      "resource_2": 0,
       "money": 100
     },
     "assets": {
@@ -11,9 +11,9 @@
   },
   "engineer_level_1": {
     "resource_1_per_tick": 10,
-    "productivity_per_tick": 20,
+    "resource_2_per_tick": 20,
     "resource_1_max": 100,
-    "productivity_max": 100
+    "resource_2_max": 100
   },
   "gameTickInterval": 5000,
   "developable_games": [
@@ -21,26 +21,26 @@
       "name": "Novel Game",
       "development_time_ticks": 6,
       "development_cost": {
-        "productivity": 10,
+        "resource_2": 10,
         "resource_1": 5,
         "funding": 20
       },
       "income_per_tick": 0.5,
       "maintenance_cost_per_tick": {
-        "productivity": 0.04
+        "resource_2": 0.04
       }
     },
     {
       "name": "Puzzle Game",
       "development_time_ticks": 6,
       "development_cost": {
-        "productivity": 15,
+        "resource_2": 15,
         "resource_1": 10,
         "funding": 30
       },
       "income_per_tick": 0.5,
       "maintenance_cost_per_tick": {
-        "productivity": 0.04
+        "resource_2": 0.04
       }
     }
   ]

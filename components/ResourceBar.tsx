@@ -7,10 +7,10 @@ import { useLanguage } from '@/hooks/use-language';
 
 interface Resources {
   resource_1: number;
-  productivity: number;
+  resource_2: number;
   money: number;
   resource_1_max: number;
-  productivity_max: number;
+  resource_2_max: number;
 }
 
 interface ResourceBarProps {
@@ -45,7 +45,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
       >
         <IconSymbol name="gearshape.fill" size={20} color={iconColor} />
         <ThemedText style={styles.resourceText}>
-          {t('resources', 'productivity')}: {resources.productivity} / {resources.productivity_max}
+          {t('resources', 'resource_2')}: {resources.resource_2} / {resources.resource_2_max}
         </ThemedText>
       </ThemedView>
       <ThemedView

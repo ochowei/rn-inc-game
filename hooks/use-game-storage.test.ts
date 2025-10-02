@@ -49,12 +49,12 @@ Object.defineProperty(window, 'localStorage', {
 const mockProfile: EngineSaveProfile = {
   resources: {
     resource_1: 100,
-    productivity: 100,
+    resource_2: 100,
     money: 1000,
     resource_1_max: 200,
-    productivity_max: 200,
+    resource_2_max: 200,
     resource_1_per_tick: 1,
-    productivity_per_tick: 1,
+    resource_2_per_tick: 1,
     money_per_tick: 0,
   },
   employees: [],
@@ -187,7 +187,7 @@ describe('useGameStorage', () => {
         resources: {
             ...initialProfiles[0].resources,
             resource_1: 200,
-            productivity: 200,
+            resource_2: 200,
             money: 2000
         },
       };

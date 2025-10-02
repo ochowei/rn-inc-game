@@ -22,7 +22,7 @@ jest.mock('@/engine/game_engine', () => ({
   __esModule: true,
   ...jest.requireActual('@/engine/game_engine'),
   createNewSaveProfile: jest.fn((settings) => ({
-    resources: { money: settings.initial.resources.money, resource_1: 0, productivity: 0, resource_1_max: 100, productivity_max: 100, resource_1_per_tick: 0, productivity_per_tick: 0, money_per_tick: 0 },
+    resources: { money: settings.initial.resources.money, resource_1: 0, resource_2: 0, resource_1_max: 100, resource_2_max: 100, resource_1_per_tick: 0, resource_2_per_tick: 0, money_per_tick: 0 },
     employees: [{ name: 'engineer_level_1', count: settings.initial.assets.engineer_level_1 }],
     games: [],
     createdAt: new Date().toISOString(),
@@ -36,7 +36,7 @@ jest.mock('@/engine/game_engine', () => ({
 
 const mockInitialProfile: FullSaveProfile = {
   id: '1',
-  resources: { money: 1000, resource_1: 100, productivity: 100, resource_1_max: 200, productivity_max: 200, resource_1_per_tick: 1, productivity_per_tick: 1, money_per_tick: 0 },
+  resources: { money: 1000, resource_1: 100, resource_2: 100, resource_1_max: 200, resource_2_max: 200, resource_1_per_tick: 1, resource_2_per_tick: 1, money_per_tick: 0 },
   employees: [],
   games: [],
   createdAt: new Date().toISOString(),

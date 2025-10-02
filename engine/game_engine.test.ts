@@ -19,11 +19,11 @@ describe('createNewSaveProfile', () => {
     // Check resources based on engineer_level_1
     const engineerSettings = gameSettings.engineer_level_1;
     expect(newProfile.resources.resource_1).toBe(0);
-    expect(newProfile.resources.productivity).toBe(0);
+    expect(newProfile.resources.resource_2).toBe(0);
     expect(newProfile.resources.resource_1_max).toBe(engineerSettings.resource_1_max);
-    expect(newProfile.resources.productivity_max).toBe(engineerSettings.productivity_max);
+    expect(newProfile.resources.resource_2_max).toBe(engineerSettings.resource_2_max);
     expect(newProfile.resources.resource_1_per_tick).toBe(engineerSettings.resource_1_per_tick);
-    expect(newProfile.resources.productivity_per_tick).toBe(engineerSettings.productivity_per_tick);
+    expect(newProfile.resources.resource_2_per_tick).toBe(engineerSettings.resource_2_per_tick);
     expect(newProfile.resources.money_per_tick).toBe(0);
 
     // Check createdAt timestamp
@@ -45,22 +45,22 @@ describe('updateSaveProfile', () => {
     expect(updatedProfile).toEqual(initialProfile);
   });
 
-  it('should increase resource_1 and productivity based on employees and ticks', () => {
+  it('should increase resource_1 and resource_2 based on employees and ticks', () => {
     const updatedProfile = updateSaveProfile(initialProfile, 3, gameSettings as GameSettings); // 3 ticks
 
     const engineerSettings = gameSettings.engineer_level_1;
     const expectedResource1 = engineerSettings.resource_1_per_tick * 3;
-    const expectedProductivity = engineerSettings.productivity_per_tick * 3;
+    const expectedResource2 = engineerSettings.resource_2_per_tick * 3;
 
     expect(updatedProfile.resources.resource_1).toBe(expectedResource1);
-    expect(updatedProfile.resources.productivity).toBe(expectedProductivity);
+    expect(updatedProfile.resources.resource_2).toBe(expectedResource2);
   });
 
-  it('should not exceed max resource_1 and productivity', () => {
+  it('should not exceed max resource_1 and resource_2', () => {
     const updatedProfile = updateSaveProfile(initialProfile, 100, gameSettings as GameSettings); // a lot of ticks
 
     expect(updatedProfile.resources.resource_1).toBe(initialProfile.resources.resource_1_max);
-    expect(updatedProfile.resources.productivity).toBe(initialProfile.resources.productivity_max);
+    expect(updatedProfile.resources.resource_2).toBe(initialProfile.resources.resource_2_max);
   });
 
   it('should calculate game income and maintenance correctly for completed games', () => {
@@ -70,13 +70,13 @@ describe('updateSaveProfile', () => {
     const gameData = gameSettings.developable_games.find((g) => g.name === 'Novel Game')!;
     const expectedIncome = gameData.income_per_tick * 2;
 
-    const expectedMaintenance = gameData.maintenance_cost_per_tick.productivity * 2;
+    const expectedMaintenance = gameData.maintenance_cost_per_tick.resource_2 * 2;
 
     const engineerSettings = gameSettings.engineer_level_1;
-    const expectedProductivity = (engineerSettings.productivity_per_tick * 2) - expectedMaintenance;
+    const expectedResource2 = (engineerSettings.resource_2_per_tick * 2) - expectedMaintenance;
 
     expect(updatedProfile.resources.money).toBe(initialProfile.resources.money + expectedIncome);
-    expect(updatedProfile.resources.productivity).toBe(expectedProductivity);
+    expect(updatedProfile.resources.resource_2).toBe(expectedResource2);
   });
 });
 
@@ -88,7 +88,7 @@ describe('developGame', () => {
     // Give player enough resources for testing
     initialProfile.resources.money = 100;
     initialProfile.resources.resource_1 = 100;
-    initialProfile.resources.productivity = 100;
+    initialProfile.resources.resource_2 = 100;
   });
 
   it('should start developing a game if resources are sufficient', () => {
@@ -98,7 +98,7 @@ describe('developGame', () => {
     // Check if costs are deducted
     expect(updatedProfile.resources.money).toBe(initialProfile.resources.money - gameToDevelop.development_cost.funding);
     expect(updatedProfile.resources.resource_1).toBe(initialProfile.resources.resource_1 - gameToDevelop.development_cost.resource_1);
-    expect(updatedProfile.resources.productivity).toBe(initialProfile.resources.productivity - gameToDevelop.development_cost.productivity);
+    expect(updatedProfile.resources.resource_2).toBe(initialProfile.resources.resource_2 - gameToDevelop.development_cost.resource_2);
 
     // Check if game is added to profile with 'developing' status
     expect(updatedProfile.games.length).toBe(1);
@@ -156,20 +156,20 @@ describe('developGame', () => {
     const profileAfterCompletion = updateSaveProfile(profile, 1, gameSettings as GameSettings);
 
     const moneyBeforeIncome = profile.resources.money;
-    const productivityBeforeIncome = profile.resources.productivity;
+    const resource2BeforeIncome = profile.resources.resource_2;
 
-    // Recalculate expected income and productivity changes
+    // Recalculate expected income and resource_2 changes
     const expectedIncome = gameToDevelop.income_per_tick * 1;
-    const expectedMaintenance = gameToDevelop.maintenance_cost_per_tick.productivity * 1;
+    const expectedMaintenance = gameToDevelop.maintenance_cost_per_tick.resource_2 * 1;
     const engineerSettings = gameSettings.engineer_level_1;
-    const productivityFromEmployees = engineerSettings.productivity_per_tick * 1;
+    const resource2FromEmployees = engineerSettings.resource_2_per_tick * 1;
 
-    const expectedProductivity = Math.min(profile.resources.productivity_max, productivityBeforeIncome + productivityFromEmployees) - expectedMaintenance;
+    const expectedResource2 = Math.min(profile.resources.resource_2_max, resource2BeforeIncome + resource2FromEmployees) - expectedMaintenance;
 
     // Check for income
     expect(profileAfterCompletion.resources.money).toBe(moneyBeforeIncome + expectedIncome);
-    // Check for productivity change
-    expect(profileAfterCompletion.resources.productivity).toBe(expectedProductivity);
+    // Check for resource_2 change
+    expect(profileAfterCompletion.resources.resource_2).toBe(expectedResource2);
   });
 
   it('should correctly handle income for completed games only', () => {

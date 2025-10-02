@@ -6,12 +6,12 @@ export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
   return {
     resources: {
       resource_1: initial.resources.resource_1,
-      productivity: initial.resources.productivity,
+      resource_2: initial.resources.resource_2,
       resource_1_max: engineer_level_1.resource_1_max,
-      productivity_max: engineer_level_1.productivity_max,
+      resource_2_max: engineer_level_1.resource_2_max,
       money: initial.resources.money,
       resource_1_per_tick: engineer_level_1.resource_1_per_tick,
-      productivity_per_tick: engineer_level_1.productivity_per_tick,
+      resource_2_per_tick: engineer_level_1.resource_2_per_tick,
       money_per_tick: 0,
     },
     employees: [
@@ -38,15 +38,15 @@ export const updateSaveProfile = (
 
   // 1. Employee resource generation
   let totalResource1PerTick = 0;
-  let totalProductivityPerTick = 0;
+  let totalResource2PerTick = 0;
 
   newProfile.employees.forEach((employee: { name: string; count: number }) => {
     const employeeSettings = (settings as any)[employee.name];
     if (employeeSettings) {
       totalResource1PerTick +=
         employee.count * employeeSettings.resource_1_per_tick;
-      totalProductivityPerTick +=
-        employee.count * employeeSettings.productivity_per_tick;
+      totalResource2PerTick +=
+        employee.count * employeeSettings.resource_2_per_tick;
     }
   });
 
@@ -55,9 +55,9 @@ export const updateSaveProfile = (
     newProfile.resources.resource_1 + totalResource1PerTick * ticks
   );
 
-  newProfile.resources.productivity = Math.min(
-    newProfile.resources.productivity_max,
-    newProfile.resources.productivity + totalProductivityPerTick * ticks
+  newProfile.resources.resource_2 = Math.min(
+    newProfile.resources.resource_2_max,
+    newProfile.resources.resource_2 + totalResource2PerTick * ticks
   );
 
   // 2. Game income and maintenance
@@ -87,14 +87,14 @@ export const updateSaveProfile = (
     if (game.status === 'completed') {
       totalIncome += gameData.income_per_tick * ticks;
       totalMaintenanceCost +=
-        gameData.maintenance_cost_per_tick.productivity * ticks;
+        gameData.maintenance_cost_per_tick.resource_2 * ticks;
     }
   });
 
   newProfile.resources.money += totalIncome;
-  newProfile.resources.productivity = Math.max(
+  newProfile.resources.resource_2 = Math.max(
     0,
-    newProfile.resources.productivity - totalMaintenanceCost
+    newProfile.resources.resource_2 - totalMaintenanceCost
   );
 
   return newProfile;
@@ -127,7 +127,7 @@ export const developGame = (
   // 3. Check for sufficient resources
   if (
     currentResources.money < development_cost.funding ||
-    currentResources.productivity < development_cost.productivity ||
+    currentResources.resource_2 < development_cost.resource_2 ||
     currentResources.resource_1 < development_cost.resource_1
   ) {
     console.log(`Insufficient resources to develop "${gameName}".`);
@@ -138,7 +138,7 @@ export const developGame = (
   const newProfile = JSON.parse(JSON.stringify(currentProfile));
 
   newProfile.resources.money -= development_cost.funding;
-  newProfile.resources.productivity -= development_cost.productivity;
+  newProfile.resources.resource_2 -= development_cost.resource_2;
   newProfile.resources.resource_1 -= development_cost.resource_1;
 
   const newGame: Game = {
