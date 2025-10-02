@@ -1,18 +1,25 @@
-import { GameSettings, Game, SaveProfile } from './types';
+import { GameSettings, Game, SaveProfile, ResourceGroup } from './types';
 
 export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
   const { initial, engineer_level_1 } = settings;
 
   return {
     resources: {
-      resource_1: initial.resources.resource_1,
-      resource_2: initial.resources.resource_2,
-      resource_1_max: engineer_level_1.resource_1_max,
-      resource_2_max: engineer_level_1.resource_2_max,
-      resource_3: initial.resources.resource_3,
-      resource_1_per_tick: engineer_level_1.resource_1_per_tick,
-      resource_2_per_tick: engineer_level_1.resource_2_per_tick,
-      resource_3_per_tick: 0,
+      current: {
+        resource_1: initial.resources.resource_1,
+        resource_2: initial.resources.resource_2,
+        resource_3: initial.resources.resource_3,
+      },
+      max: {
+        resource_1: engineer_level_1.resource_max.resource_1,
+        resource_2: engineer_level_1.resource_max.resource_2,
+        resource_3: engineer_level_1.resource_max.resource_3,
+      },
+      per_tick: {
+        resource_1: engineer_level_1.resource_per_tick.resource_1,
+        resource_2: engineer_level_1.resource_per_tick.resource_2,
+        resource_3: engineer_level_1.resource_per_tick.resource_3,
+      },
     },
     employees: [
       {
@@ -37,65 +44,69 @@ export const updateSaveProfile = (
   }
 
   // 1. Employee resource generation
-  let totalResource1PerTick = 0;
-  let totalResource2PerTick = 0;
+  const totalResourcePerTick: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
 
   newProfile.employees.forEach((employee: { name: string; count: number }) => {
     const employeeSettings = (settings as any)[employee.name];
-    if (employeeSettings) {
-      totalResource1PerTick +=
-        employee.count * employeeSettings.resource_1_per_tick;
-      totalResource2PerTick +=
-        employee.count * employeeSettings.resource_2_per_tick;
+    if (employeeSettings && employeeSettings.resource_per_tick) {
+      totalResourcePerTick.resource_1 += employee.count * employeeSettings.resource_per_tick.resource_1;
+      totalResourcePerTick.resource_2 += employee.count * employeeSettings.resource_per_tick.resource_2;
+      totalResourcePerTick.resource_3 += employee.count * employeeSettings.resource_per_tick.resource_3;
     }
   });
 
-  newProfile.resources.resource_1 = Math.min(
-    newProfile.resources.resource_1_max,
-    newProfile.resources.resource_1 + totalResource1PerTick * ticks
+  newProfile.resources.current.resource_1 = Math.min(
+    newProfile.resources.max.resource_1,
+    newProfile.resources.current.resource_1 + totalResourcePerTick.resource_1 * ticks
   );
 
-  newProfile.resources.resource_2 = Math.min(
-    newProfile.resources.resource_2_max,
-    newProfile.resources.resource_2 + totalResource2PerTick * ticks
+  newProfile.resources.current.resource_2 = Math.min(
+    newProfile.resources.max.resource_2,
+    newProfile.resources.current.resource_2 + totalResourcePerTick.resource_2 * ticks
+  );
+
+  newProfile.resources.current.resource_3 = Math.min(
+    newProfile.resources.max.resource_3 || Infinity, // Assuming resource_3 might not have a max
+    newProfile.resources.current.resource_3 + totalResourcePerTick.resource_3 * ticks
   );
 
   // 2. Game income and maintenance
-  let totalIncome = 0;
-  let totalMaintenanceCost = 0;
+  const totalIncome: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
+  const totalMaintenance: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
 
   newProfile.games.forEach((game: Game) => {
-    const gameData = settings.developable_games.find(
-      (g) => g.name === game.name
-    );
+    const gameData = settings.developable_games.find((g) => g.name === game.name);
 
     if (!gameData) return;
 
-    // If the game is in development, update its progress.
     if (game.status === 'developing') {
       game.development_progress_ticks += ticks;
-
-      // If development is complete, change its status.
       if (game.development_progress_ticks >= gameData.development_time_ticks) {
         game.status = 'completed';
-        // Optional: Log completion
         console.log(`Game "${game.name}" has been completed!`);
       }
     }
 
-    // If the game is completed, calculate income and maintenance.
     if (game.status === 'completed') {
-      totalIncome += gameData.income_per_tick * ticks;
-      totalMaintenanceCost +=
-        gameData.maintenance_cost_per_tick.resource_2 * ticks;
+      totalIncome.resource_1 += gameData.income_per_tick.resource_1 * ticks;
+      totalIncome.resource_2 += gameData.income_per_tick.resource_2 * ticks;
+      totalIncome.resource_3 += gameData.income_per_tick.resource_3 * ticks;
+
+      totalMaintenance.resource_1 += gameData.maintenance_cost_per_tick.resource_1 * ticks;
+      totalMaintenance.resource_2 += gameData.maintenance_cost_per_tick.resource_2 * ticks;
+      totalMaintenance.resource_3 += gameData.maintenance_cost_per_tick.resource_3 * ticks;
     }
   });
 
-  newProfile.resources.resource_3 += totalIncome;
-  newProfile.resources.resource_2 = Math.max(
-    0,
-    newProfile.resources.resource_2 - totalMaintenanceCost
-  );
+  // Apply income
+  newProfile.resources.current.resource_1 += totalIncome.resource_1;
+  newProfile.resources.current.resource_2 += totalIncome.resource_2;
+  newProfile.resources.current.resource_3 += totalIncome.resource_3;
+
+  // Apply maintenance
+  newProfile.resources.current.resource_1 = Math.max(0, newProfile.resources.current.resource_1 - totalMaintenance.resource_1);
+  newProfile.resources.current.resource_2 = Math.max(0, newProfile.resources.current.resource_2 - totalMaintenance.resource_2);
+  newProfile.resources.current.resource_3 = Math.max(0, newProfile.resources.current.resource_3 - totalMaintenance.resource_3);
 
   return newProfile;
 };
@@ -105,41 +116,35 @@ export const developGame = (
   gameName: string,
   settings: GameSettings
 ): SaveProfile => {
-  const gameData = settings.developable_games.find(
-    (g) => g.name === gameName
-  );
+  const gameData = settings.developable_games.find((g) => g.name === gameName);
 
-  // 1. Game not found in settings
   if (!gameData) {
     console.log(`Game "${gameName}" not found in settings.`);
     return currentProfile;
   }
 
-  // 2. Game already exists (either completed or in development)
   if (currentProfile.games.some((g) => g.name === gameName)) {
     console.log(`Game "${gameName}" is already owned or in development.`);
     return currentProfile;
   }
 
   const { development_cost } = gameData;
-  const currentResources = currentProfile.resources;
+  const { current: currentResources } = currentProfile.resources;
 
-  // 3. Check for sufficient resources
   if (
-    currentResources.resource_3 < development_cost.resource_3 ||
+    currentResources.resource_1 < development_cost.resource_1 ||
     currentResources.resource_2 < development_cost.resource_2 ||
-    currentResources.resource_1 < development_cost.resource_1
+    currentResources.resource_3 < development_cost.resource_3
   ) {
     console.log(`Insufficient resources to develop "${gameName}".`);
     return currentProfile;
   }
 
-  // 4. Deduct costs and add the new game in development
   const newProfile = JSON.parse(JSON.stringify(currentProfile));
 
-  newProfile.resources.resource_3 -= development_cost.resource_3;
-  newProfile.resources.resource_2 -= development_cost.resource_2;
-  newProfile.resources.resource_1 -= development_cost.resource_1;
+  newProfile.resources.current.resource_1 -= development_cost.resource_1;
+  newProfile.resources.current.resource_2 -= development_cost.resource_2;
+  newProfile.resources.current.resource_3 -= development_cost.resource_3;
 
   const newGame: Game = {
     name: gameName,

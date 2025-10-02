@@ -8,6 +8,9 @@ import { useGameEngineContext } from '@/contexts/GameEngineContext';
 import gameSettings from '@/settings.json';
 import { Card, Title, Paragraph, Button } from 'react-native-paper';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { GameSettings } from '@/engine/types';
+
+const settings = gameSettings as GameSettings;
 
 export default function DevelopGameScreen() {
   const router = useRouter();
@@ -15,13 +18,13 @@ export default function DevelopGameScreen() {
   const { profile, developGame } = useGameEngineContext();
   const tintColor = useThemeColor({}, 'tint');
 
-  const canDevelop = (game: any) => {
+  const canDevelop = (game: (typeof settings.developable_games)[0]) => {
     if (!profile) return false;
     const cost = game.development_cost;
     return (
-      profile.resources.resource_3 >= cost.resource_3 &&
-      profile.resources.resource_1 >= cost.resource_1 &&
-      profile.resources.resource_2 >= cost.resource_2
+      profile.resources.current.resource_3 >= cost.resource_3 &&
+      profile.resources.current.resource_1 >= cost.resource_1 &&
+      profile.resources.current.resource_2 >= cost.resource_2
     );
   };
 
@@ -45,7 +48,7 @@ export default function DevelopGameScreen() {
       </Pressable>
 
       <View style={styles.gameList}>
-        {gameSettings.developable_games.map((game, index) => (
+        {settings.developable_games.map((game, index) => (
           <Card key={index} style={styles.card}>
             <Card.Content>
               <Title>{t('games', game.name as any)}</Title>
@@ -63,7 +66,7 @@ export default function DevelopGameScreen() {
                 {t('game', 'timeToComplete')}: {game.development_time_ticks} {t('game', 'seconds')}
               </Paragraph>
               <Paragraph>
-                {t('game', 'income')}: {game.income_per_tick} {t('game', 'per10Seconds')}
+                {t('game', 'income')}: {game.income_per_tick.resource_3} ({t('resources', 'resource_3')}) {t('game', 'per10Seconds')}
               </Paragraph>
             </Card.Content>
             <Card.Actions>

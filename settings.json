@@ -10,10 +10,16 @@
     }
   },
   "engineer_level_1": {
-    "resource_1_per_tick": 10,
-    "resource_2_per_tick": 20,
-    "resource_1_max": 100,
-    "resource_2_max": 100
+    "resource_per_tick": {
+      "resource_1": 10,
+      "resource_2": 20,
+      "resource_3": 0
+    },
+    "resource_max": {
+      "resource_1": 100,
+      "resource_2": 100,
+      "resource_3": 0
+    }
   },
   "gameTickInterval": 5000,
   "developable_games": [
@@ -21,26 +27,38 @@
       "name": "Novel Game",
       "development_time_ticks": 6,
       "development_cost": {
-        "resource_2": 10,
         "resource_1": 5,
+        "resource_2": 10,
         "resource_3": 20
       },
-      "income_per_tick": 0.5,
+      "income_per_tick": {
+        "resource_1": 0,
+        "resource_2": 0,
+        "resource_3": 0.5
+      },
       "maintenance_cost_per_tick": {
-        "resource_2": 0.04
+        "resource_1": 0,
+        "resource_2": 0.04,
+        "resource_3": 0
       }
     },
     {
       "name": "Puzzle Game",
       "development_time_ticks": 6,
       "development_cost": {
-        "resource_2": 15,
         "resource_1": 10,
+        "resource_2": 15,
         "resource_3": 30
       },
-      "income_per_tick": 0.5,
+      "income_per_tick": {
+        "resource_1": 0,
+        "resource_2": 0,
+        "resource_3": 0.5
+      },
       "maintenance_cost_per_tick": {
-        "resource_2": 0.04
+        "resource_1": 0,
+        "resource_2": 0.04,
+        "resource_3": 0
       }
     }
   ]

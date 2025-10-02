@@ -1,29 +1,29 @@
+export interface ResourceGroup {
+  resource_1: number;
+  resource_2: number;
+  resource_3: number;
+}
+
 export interface GameSettings {
   initial: {
-    resources: {
-      resource_1: number;
-      resource_2: number;
-      resource_3: number;
-    };
+    resources: ResourceGroup;
     assets: {
       [key: string]: number;
     };
   };
-  [key: string]: any; // Allow for dynamic employee levels
+  engineer_level_1: {
+    resource_per_tick: ResourceGroup;
+    resource_max: ResourceGroup;
+  };
   gameTickInterval: number;
   developable_games: {
     name: string;
     development_time_ticks: number;
-    development_cost: {
-      resource_2: number;
-      resource_1: number;
-      resource_3: number;
-    };
-    income_per_tick: number;
-    maintenance_cost_per_tick: {
-      resource_2: number;
-    };
+    development_cost: ResourceGroup;
+    income_per_tick: ResourceGroup;
+    maintenance_cost_per_tick: ResourceGroup;
   }[];
+  [key: string]: any; // Allow for other dynamic properties
 }
 
 export interface Game {
@@ -34,14 +34,9 @@ export interface Game {
 
 export interface SaveProfile {
   resources: {
-    resource_1: number;
-    resource_2: number;
-    resource_1_max: number;
-    resource_2_max: number;
-    resource_3: number;
-    resource_1_per_tick: number;
-    resource_2_per_tick: number;
-    resource_3_per_tick: number;
+    current: ResourceGroup;
+    max: ResourceGroup;
+    per_tick: ResourceGroup;
   };
   employees: {
     name: string;

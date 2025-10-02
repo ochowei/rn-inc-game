@@ -4,17 +4,12 @@ import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useLanguage } from '@/hooks/use-language';
+import { SaveProfile } from '@/engine/types';
 
-interface Resources {
-  resource_1: number;
-  resource_2: number;
-  resource_3: number;
-  resource_1_max: number;
-  resource_2_max: number;
-}
+type ResourcesProps = SaveProfile['resources'];
 
 interface ResourceBarProps {
-  resources: Resources;
+  resources: ResourcesProps;
 }
 
 export function ResourceBar({ resources }: ResourceBarProps) {
@@ -35,7 +30,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
       >
         <IconSymbol name="lightbulb.fill" size={20} color={iconColor} />
         <ThemedText style={styles.resourceText}>
-          {t('resources', 'resource_1')}: {resources.resource_1} / {resources.resource_1_max}
+          {t('resources', 'resource_1')}: {resources.current.resource_1} / {resources.max.resource_1}
         </ThemedText>
       </ThemedView>
       <ThemedView
@@ -45,7 +40,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
       >
         <IconSymbol name="gearshape.fill" size={20} color={iconColor} />
         <ThemedText style={styles.resourceText}>
-          {t('resources', 'resource_2')}: {resources.resource_2} / {resources.resource_2_max}
+          {t('resources', 'resource_2')}: {resources.current.resource_2} / {resources.max.resource_2}
         </ThemedText>
       </ThemedView>
       <ThemedView
@@ -54,7 +49,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
         darkColor="transparent"
       >
         <IconSymbol name="dollarsign.circle.fill" size={20} color={iconColor} />
-        <ThemedText style={styles.resourceText}>{t('resources', 'resource_3')}: {resources.resource_3}</ThemedText>
+        <ThemedText style={styles.resourceText}>{t('resources', 'resource_3')}: {resources.current.resource_3}</ThemedText>
       </ThemedView>
     </ThemedView>
   );
