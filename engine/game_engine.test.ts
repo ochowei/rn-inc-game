@@ -18,11 +18,11 @@ describe('createNewSaveProfile', () => {
 
     // Check resources based on engineer_level_1
     const engineerSettings = gameSettings.engineer_level_1;
-    expect(newProfile.resources.creativity).toBe(0);
+    expect(newProfile.resources.resource_1).toBe(0);
     expect(newProfile.resources.productivity).toBe(0);
-    expect(newProfile.resources.creativity_max).toBe(engineerSettings.creativity_max);
+    expect(newProfile.resources.resource_1_max).toBe(engineerSettings.resource_1_max);
     expect(newProfile.resources.productivity_max).toBe(engineerSettings.productivity_max);
-    expect(newProfile.resources.creativity_per_tick).toBe(engineerSettings.creativity_per_tick);
+    expect(newProfile.resources.resource_1_per_tick).toBe(engineerSettings.resource_1_per_tick);
     expect(newProfile.resources.productivity_per_tick).toBe(engineerSettings.productivity_per_tick);
     expect(newProfile.resources.money_per_tick).toBe(0);
 
@@ -45,21 +45,21 @@ describe('updateSaveProfile', () => {
     expect(updatedProfile).toEqual(initialProfile);
   });
 
-  it('should increase creativity and productivity based on employees and ticks', () => {
+  it('should increase resource_1 and productivity based on employees and ticks', () => {
     const updatedProfile = updateSaveProfile(initialProfile, 3, gameSettings as GameSettings); // 3 ticks
 
     const engineerSettings = gameSettings.engineer_level_1;
-    const expectedCreativity = engineerSettings.creativity_per_tick * 3;
+    const expectedResource1 = engineerSettings.resource_1_per_tick * 3;
     const expectedProductivity = engineerSettings.productivity_per_tick * 3;
 
-    expect(updatedProfile.resources.creativity).toBe(expectedCreativity);
+    expect(updatedProfile.resources.resource_1).toBe(expectedResource1);
     expect(updatedProfile.resources.productivity).toBe(expectedProductivity);
   });
 
-  it('should not exceed max creativity and productivity', () => {
+  it('should not exceed max resource_1 and productivity', () => {
     const updatedProfile = updateSaveProfile(initialProfile, 100, gameSettings as GameSettings); // a lot of ticks
 
-    expect(updatedProfile.resources.creativity).toBe(initialProfile.resources.creativity_max);
+    expect(updatedProfile.resources.resource_1).toBe(initialProfile.resources.resource_1_max);
     expect(updatedProfile.resources.productivity).toBe(initialProfile.resources.productivity_max);
   });
 
@@ -87,7 +87,7 @@ describe('developGame', () => {
     initialProfile = createNewSaveProfile(gameSettings as GameSettings);
     // Give player enough resources for testing
     initialProfile.resources.money = 100;
-    initialProfile.resources.creativity = 100;
+    initialProfile.resources.resource_1 = 100;
     initialProfile.resources.productivity = 100;
   });
 
@@ -97,7 +97,7 @@ describe('developGame', () => {
 
     // Check if costs are deducted
     expect(updatedProfile.resources.money).toBe(initialProfile.resources.money - gameToDevelop.development_cost.funding);
-    expect(updatedProfile.resources.creativity).toBe(initialProfile.resources.creativity - gameToDevelop.development_cost.creativity);
+    expect(updatedProfile.resources.resource_1).toBe(initialProfile.resources.resource_1 - gameToDevelop.development_cost.resource_1);
     expect(updatedProfile.resources.productivity).toBe(initialProfile.resources.productivity - gameToDevelop.development_cost.productivity);
 
     // Check if game is added to profile with 'developing' status

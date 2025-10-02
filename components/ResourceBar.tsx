@@ -6,10 +6,10 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { useLanguage } from '@/hooks/use-language';
 
 interface Resources {
-  creativity: number;
+  resource_1: number;
   productivity: number;
   money: number;
-  creativity_max: number;
+  resource_1_max: number;
   productivity_max: number;
 }
 
@@ -35,7 +35,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
       >
         <IconSymbol name="lightbulb.fill" size={20} color={iconColor} />
         <ThemedText style={styles.resourceText}>
-          {t('resources', 'creativity')}: {resources.creativity} / {resources.creativity_max}
+          {t('resources', 'resource_1')}: {resources.resource_1} / {resources.resource_1_max}
         </ThemedText>
       </ThemedView>
       <ThemedView

@@ -1,7 +1,7 @@
 {
   "initial": {
     "resources": {
-      "creativity": 0,
+      "resource_1": 0,
       "productivity": 0,
       "money": 100
     },
@@ -10,9 +10,9 @@
     }
   },
   "engineer_level_1": {
-    "creativity_per_tick": 10,
+    "resource_1_per_tick": 10,
     "productivity_per_tick": 20,
-    "creativity_max": 100,
+    "resource_1_max": 100,
     "productivity_max": 100
   },
   "gameTickInterval": 5000,
@@ -22,7 +22,7 @@
       "development_time_ticks": 6,
       "development_cost": {
         "productivity": 10,
-        "creativity": 5,
+        "resource_1": 5,
         "funding": 20
       },
       "income_per_tick": 0.5,
@@ -35,7 +35,7 @@
       "development_time_ticks": 6,
       "development_cost": {
         "productivity": 15,
-        "creativity": 10,
+        "resource_1": 10,
         "funding": 30
       },
       "income_per_tick": 0.5,

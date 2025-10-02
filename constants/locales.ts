@@ -20,7 +20,6 @@ export const locales = {
       cost: 'Cost',
       currencyUnit: 'dollars',
       productivity: 'Productivity',
-      creativity: 'Creativity',
       timeToComplete: 'Time to Complete',
       seconds: 'ticks',
       income: 'Income',
@@ -60,7 +59,7 @@ export const locales = {
       login: 'Login',
     },
     resources: {
-      creativity: 'Creativity',
+      resource_1: 'Creativity',
       productivity: 'Productivity',
       money: 'Money',
     },
@@ -96,7 +95,6 @@ export const locales = {
       cost: '成本',
       currencyUnit: '元',
       productivity: '生產力',
-      creativity: '創意',
       timeToComplete: '完成時間',
       seconds: 'ticks',
       income: '收入',
@@ -136,7 +134,7 @@ export const locales = {
       login: '登入',
     },
     resources: {
-      creativity: '創意',
+      resource_1: '創意',
       productivity: '生產力',
       money: '金錢',
     },

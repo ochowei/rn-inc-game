@@ -5,12 +5,12 @@ export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
 
   return {
     resources: {
-      creativity: initial.resources.creativity,
+      resource_1: initial.resources.resource_1,
       productivity: initial.resources.productivity,
-      creativity_max: engineer_level_1.creativity_max,
+      resource_1_max: engineer_level_1.resource_1_max,
       productivity_max: engineer_level_1.productivity_max,
       money: initial.resources.money,
-      creativity_per_tick: engineer_level_1.creativity_per_tick,
+      resource_1_per_tick: engineer_level_1.resource_1_per_tick,
       productivity_per_tick: engineer_level_1.productivity_per_tick,
       money_per_tick: 0,
     },
@@ -37,22 +37,22 @@ export const updateSaveProfile = (
   }
 
   // 1. Employee resource generation
-  let totalCreativityPerTick = 0;
+  let totalResource1PerTick = 0;
   let totalProductivityPerTick = 0;
 
   newProfile.employees.forEach((employee: { name: string; count: number }) => {
     const employeeSettings = (settings as any)[employee.name];
     if (employeeSettings) {
-      totalCreativityPerTick +=
-        employee.count * employeeSettings.creativity_per_tick;
+      totalResource1PerTick +=
+        employee.count * employeeSettings.resource_1_per_tick;
       totalProductivityPerTick +=
         employee.count * employeeSettings.productivity_per_tick;
     }
   });
 
-  newProfile.resources.creativity = Math.min(
-    newProfile.resources.creativity_max,
-    newProfile.resources.creativity + totalCreativityPerTick * ticks
+  newProfile.resources.resource_1 = Math.min(
+    newProfile.resources.resource_1_max,
+    newProfile.resources.resource_1 + totalResource1PerTick * ticks
   );
 
   newProfile.resources.productivity = Math.min(
@@ -128,7 +128,7 @@ export const developGame = (
   if (
     currentResources.money < development_cost.funding ||
     currentResources.productivity < development_cost.productivity ||
-    currentResources.creativity < development_cost.creativity
+    currentResources.resource_1 < development_cost.resource_1
   ) {
     console.log(`Insufficient resources to develop "${gameName}".`);
     return currentProfile;
@@ -139,7 +139,7 @@ export const developGame = (
 
   newProfile.resources.money -= development_cost.funding;
   newProfile.resources.productivity -= development_cost.productivity;
-  newProfile.resources.creativity -= development_cost.creativity;
+  newProfile.resources.resource_1 -= development_cost.resource_1;
 
   const newGame: Game = {
     name: gameName,
