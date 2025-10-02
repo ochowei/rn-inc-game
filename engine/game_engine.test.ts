@@ -1,4 +1,4 @@
-import { createNewSaveProfile, updateSaveProfile, developGame, Game, SaveProfile } from './game_logic';
+import { createNewSaveProfile, updateSaveProfile, developGame, SaveProfile, GameSettings } from './game_engine';
 import gameSettings from '../settings.json';
 
 describe('createNewSaveProfile', () => {
@@ -6,7 +6,7 @@ describe('createNewSaveProfile', () => {
     const mockDate = new Date(1672531200000); // 2023-01-01T00:00:00.000Z
     const dateSpy = jest.spyOn(global, 'Date').mockImplementation(() => mockDate as any);
 
-    const newProfile: SaveProfile = createNewSaveProfile();
+    const newProfile: SaveProfile = createNewSaveProfile(gameSettings as GameSettings);
 
     const expectedCreatedAt = mockDate.toISOString();
 
@@ -36,16 +36,16 @@ describe('updateSaveProfile', () => {
   let initialProfile: SaveProfile;
 
   beforeEach(() => {
-    initialProfile = createNewSaveProfile();
+    initialProfile = createNewSaveProfile(gameSettings as GameSettings);
   });
 
   it('should not update profile if no ticks have passed', () => {
-    const updatedProfile = updateSaveProfile(initialProfile, 0);
+    const updatedProfile = updateSaveProfile(initialProfile, 0, gameSettings as GameSettings);
     expect(updatedProfile).toEqual(initialProfile);
   });
 
   it('should increase creativity and productivity based on employees and ticks', () => {
-    const updatedProfile = updateSaveProfile(initialProfile, 3); // 3 ticks
+    const updatedProfile = updateSaveProfile(initialProfile, 3, gameSettings as GameSettings); // 3 ticks
 
     const engineerSettings = gameSettings.engineer_level_1;
     const expectedCreativity = engineerSettings.creativity_per_tick * 3;
@@ -56,7 +56,7 @@ describe('updateSaveProfile', () => {
   });
 
   it('should not exceed max creativity and productivity', () => {
-    const updatedProfile = updateSaveProfile(initialProfile, 100); // a lot of ticks
+    const updatedProfile = updateSaveProfile(initialProfile, 100, gameSettings as GameSettings); // a lot of ticks
 
     expect(updatedProfile.resources.creativity).toBe(initialProfile.resources.creativity_max);
     expect(updatedProfile.resources.productivity).toBe(initialProfile.resources.productivity_max);
@@ -64,7 +64,7 @@ describe('updateSaveProfile', () => {
 
   it('should calculate game income and maintenance correctly for completed games', () => {
     initialProfile.games.push({ name: 'Novel Game', status: 'completed', development_progress_ticks: 6 });
-    const updatedProfile = updateSaveProfile(initialProfile, 2); // 2 ticks
+    const updatedProfile = updateSaveProfile(initialProfile, 2, gameSettings as GameSettings); // 2 ticks
 
     const gameData = gameSettings.developable_games.find((g) => g.name === 'Novel Game')!;
     const expectedIncome = gameData.income_per_tick * 2;
@@ -83,7 +83,7 @@ describe('developGame', () => {
   let initialProfile: SaveProfile;
 
   beforeEach(() => {
-    initialProfile = createNewSaveProfile();
+    initialProfile = createNewSaveProfile(gameSettings as GameSettings);
     // Give player enough resources for testing
     initialProfile.resources.money = 100;
     initialProfile.resources.creativity = 100;
@@ -92,7 +92,7 @@ describe('developGame', () => {
 
   it('should start developing a game if resources are sufficient', () => {
     const gameToDevelop = gameSettings.developable_games[0];
-    const updatedProfile = developGame(initialProfile, gameToDevelop.name);
+    const updatedProfile = developGame(initialProfile, gameToDevelop.name, gameSettings as GameSettings);
 
     // Check if costs are deducted
     expect(updatedProfile.resources.money).toBe(initialProfile.resources.money - gameToDevelop.development_cost.funding);
@@ -109,7 +109,7 @@ describe('developGame', () => {
   it('should not develop a game if resources are insufficient', () => {
     initialProfile.resources.money = 0; // Not enough money
     const gameToDevelop = gameSettings.developable_games[0];
-    const updatedProfile = developGame(initialProfile, gameToDevelop.name);
+    const updatedProfile = developGame(initialProfile, gameToDevelop.name, gameSettings as GameSettings);
 
     // Profile should not change
     expect(updatedProfile).toEqual(initialProfile);
@@ -118,9 +118,9 @@ describe('developGame', () => {
   it('should not develop a game that is already owned or in development', () => {
     const gameToDevelop = gameSettings.developable_games[0];
     // First, successfully start development
-    const profileWithGame = developGame(initialProfile, gameToDevelop.name);
+    const profileWithGame = developGame(initialProfile, gameToDevelop.name, gameSettings as GameSettings);
     // Then, try to develop it again
-    const updatedProfile = developGame(profileWithGame, gameToDevelop.name);
+    const updatedProfile = developGame(profileWithGame, gameToDevelop.name, gameSettings as GameSettings);
 
     // Profile should not change
     expect(updatedProfile).toEqual(profileWithGame);
@@ -128,10 +128,10 @@ describe('developGame', () => {
 
   it('should progress game development over ticks', () => {
     const gameToDevelop = gameSettings.developable_games[0];
-    let profile = developGame(initialProfile, gameToDevelop.name);
+    let profile = developGame(initialProfile, gameToDevelop.name, gameSettings as GameSettings);
 
     // Update profile by a few ticks
-    profile = updateSaveProfile(profile, 2);
+    profile = updateSaveProfile(profile, 2, gameSettings as GameSettings);
 
     expect(profile.games[0].status).toBe('developing');
     expect(profile.games[0].development_progress_ticks).toBe(2);
@@ -139,20 +139,20 @@ describe('developGame', () => {
 
   it('should complete game development and start generating income', () => {
     const gameToDevelop = gameSettings.developable_games[0];
-    let profile = developGame(initialProfile, gameToDevelop.name);
+    let profile = developGame(initialProfile, gameToDevelop.name, gameSettings as GameSettings);
 
     const developmentTime = gameToDevelop.development_time_ticks;
     const initialMoney = profile.resources.money;
 
     // Update profile until the game is developed
-    profile = updateSaveProfile(profile, developmentTime);
+    profile = updateSaveProfile(profile, developmentTime, gameSettings as GameSettings);
 
     // Check if game is completed
     expect(profile.games[0].status).toBe('completed');
     expect(profile.games[0].development_progress_ticks).toBe(developmentTime);
 
     // Now, update profile by one more tick to see if income is generated
-    const profileAfterCompletion = updateSaveProfile(profile, 1);
+    const profileAfterCompletion = updateSaveProfile(profile, 1, gameSettings as GameSettings);
 
     const moneyBeforeIncome = profile.resources.money;
     const productivityBeforeIncome = profile.resources.productivity;
@@ -173,11 +173,11 @@ describe('developGame', () => {
 
   it('should correctly handle income for completed games only', () => {
       const gameToDevelop = gameSettings.developable_games[0];
-      let profile = developGame(initialProfile, gameToDevelop.name);
+      let profile = developGame(initialProfile, gameToDevelop.name, gameSettings as GameSettings);
       const moneyBeforeUpdate = profile.resources.money;
 
       // Game is developing, not completed. Update by 1 tick.
-      const profileWhileDeveloping = updateSaveProfile(profile, 1);
+      const profileWhileDeveloping = updateSaveProfile(profile, 1, gameSettings as GameSettings);
 
       // Money should NOT have changed from income.
       // The only change should be from employee generation, which is 0 for money.
