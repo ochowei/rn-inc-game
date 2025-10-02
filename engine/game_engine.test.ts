@@ -180,7 +180,6 @@ describe('developGame', () => {
       // Game is developing, not completed. Update by 1 tick.
       const profileWhileDeveloping = updateSaveProfile(profile, 1, gameSettings as GameSettings);
 
-      // Money should NOT have changed from income.
       // The only change should be from employee generation, which is 0 for money.
       expect(profileWhileDeveloping.resources.money).toBe(moneyBeforeUpdate);
   });
