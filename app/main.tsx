@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { StyleSheet, Pressable, ActivityIndicator, ImageBackground } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -58,51 +58,63 @@ export default function GameScreen() {
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <Stack.Screen options={{ title: t('game', 'newGameTitle'), headerShown: false }} />
-      <ResourceBar resources={profile.resources} />
-      <ThemedText type="title">{t('game', 'newGameTitle')}</ThemedText>
+    <ImageBackground
+      source={require('@/assets/images/background.png')}
+      style={styles.background}
+      resizeMode="cover">
+      <ThemedView style={styles.container}>
+        <Stack.Screen options={{ title: t('game', 'newGameTitle'), headerShown: false }} />
+        <ResourceBar resources={profile.resources} />
+        <ThemedText type="title">{t('game', 'newGameTitle')}</ThemedText>
 
-      <Pressable onPress={handleBackToMenu} style={[styles.backButton, buttonStyle]}>
-        <ThemedText style={[styles.backButtonText, buttonTextStyle]}>{t('game', 'backToMenu')}</ThemedText>
-      </Pressable>
+        <Pressable onPress={handleBackToMenu} style={[styles.backButton, buttonStyle]}>
+          <ThemedText style={[styles.backButtonText, buttonTextStyle]}>{t('game', 'backToMenu')}</ThemedText>
+        </Pressable>
 
-      <Pressable onPress={handleSavePress} style={[styles.saveButton, buttonStyle]}>
-        <ThemedText style={[styles.saveButtonText, buttonTextStyle]}>{t('game', 'save')}</ThemedText>
-      </Pressable>
+        <Pressable onPress={handleSavePress} style={[styles.saveButton, buttonStyle]}>
+          <ThemedText style={[styles.saveButtonText, buttonTextStyle]}>{t('game', 'save')}</ThemedText>
+        </Pressable>
 
-      <ThemedView style={styles.sectionContainer}>
-        <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
-        {profile.employees.map((employee, index) => (
-          <ThemedText key={index}>
-            {t('game', employee.name as any)}：{employee.count} {t('game', 'peopleClassifier')}
-          </ThemedText>
-        ))}
-      </ThemedView>
-
-      {isModalVisible && (
-        <ThemedView style={styles.confirmationContainer}>
-          <ThemedView style={styles.confirmationBox}>
-            <ThemedText type="subtitle">{modalContent.title}</ThemedText>
-            <ThemedText>{modalContent.message}</ThemedText>
-            <Pressable onPress={handleCloseModal} style={[styles.button, { borderColor: tintColor }]}>
-              <ThemedText style={styles.buttonText}>{t('game', 'close')}</ThemedText>
-            </Pressable>
-          </ThemedView>
+        <ThemedView style={styles.sectionContainer}>
+          <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
+          {profile.employees.map((employee, index) => (
+            <ThemedText key={index}>
+              {t('game', employee.name as any)}：{employee.count} {t('game', 'peopleClassifier')}
+            </ThemedText>
+          ))}
         </ThemedView>
-      )}
-      <Fab />
-    </ThemedView>
+
+        {isModalVisible && (
+          <ThemedView style={styles.confirmationContainer}>
+            <ThemedView
+              style={styles.confirmationBox}
+              lightColor="rgba(255, 255, 255, 0.9)"
+              darkColor="rgba(21, 23, 24, 0.9)">
+              <ThemedText type="subtitle">{modalContent.title}</ThemedText>
+              <ThemedText>{modalContent.message}</ThemedText>
+              <Pressable onPress={handleCloseModal} style={[styles.button, { borderColor: tintColor }]}>
+                <ThemedText style={styles.buttonText}>{t('game', 'close')}</ThemedText>
+              </Pressable>
+            </ThemedView>
+          </ThemedView>
+        )}
+        <Fab />
+      </ThemedView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
     paddingTop: 60,
+    backgroundColor: 'transparent',
   },
   sectionContainer: {
     marginTop: 16,
@@ -112,6 +124,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     width: '80%',
     alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.2)',
   },
   saveButton: {
     position: 'absolute',
