@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
+import { SaveProfile as EngineSaveProfile } from '@/engine/types';
 import { SaveProfile, useGameStorage } from './use-game-storage';
 
 // Mock react-native with a simple, mutable object to avoid transform errors
@@ -45,7 +46,7 @@ Object.defineProperty(window, 'localStorage', {
   value: mockLocalStorage,
 });
 
-const mockProfile: Omit<SaveProfile, 'id'> = {
+const mockProfile: EngineSaveProfile = {
   resources: {
     creativity: 100,
     productivity: 100,
@@ -192,7 +193,8 @@ describe('useGameStorage', () => {
       };
 
       await act(async () => {
-        await result.current.updateProfile('1', updatedProfile);
+        const { id, ...profileData } = updatedProfile;
+        await result.current.updateProfile('1', profileData);
       });
 
       await waitFor(() => {

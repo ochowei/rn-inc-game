@@ -1,7 +1,9 @@
-import { act, renderHook, waitFor } from '@testing-library/react-native';
-import { useGameEngine } from './useGameEngine';
-import * as GameLogic from '@/utils/game_logic';
+import { act, renderHook } from '@testing-library/react-native';
+import { useGameEngine, FullSaveProfile } from './useGameEngine';
+import * as GameLogic from '@/engine/game_engine';
 import { useGameStorage } from './use-game-storage';
+import { GameSettings } from '@/engine/types';
+import gameSettings from '@/settings.json';
 
 // Define mock functions that can be manipulated in tests
 const mockAddProfile = jest.fn();
@@ -16,8 +18,9 @@ jest.mock('./use-game-storage', () => ({
 }));
 
 // Mock game_logic functions
-jest.mock('@/utils/game_logic', () => ({
-  ...jest.requireActual('@/utils/game_logic'),
+jest.mock('@/engine/game_engine', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/engine/game_engine'),
   createNewSaveProfile: jest.fn(),
   updateSaveProfile: jest.fn((profile, ticks) => ({
     ...profile,
@@ -26,7 +29,7 @@ jest.mock('@/utils/game_logic', () => ({
   developGame: jest.fn((profile) => profile),
 }));
 
-const mockInitialProfile = {
+const mockInitialProfile: FullSaveProfile = {
   id: '1',
   resources: { money: 1000, creativity: 100, productivity: 100, creativity_max: 200, productivity_max: 200, creativity_per_tick: 1, productivity_per_tick: 1, money_per_tick: 0 },
   employees: [],
@@ -57,7 +60,7 @@ describe('useGameEngine', () => {
     await act(async () => {
       await result.current.createNewSave();
     });
-    expect(GameLogic.createNewSaveProfile).toHaveBeenCalled();
+    expect(GameLogic.createNewSaveProfile).toHaveBeenCalledWith(gameSettings as GameSettings);
     expect(mockAddProfile).toHaveBeenCalled();
     expect(result.current.profile).toEqual({ ...mockInitialProfile, id: 'new-id' });
   });
@@ -71,7 +74,7 @@ describe('useGameEngine', () => {
       result.current.loadSave(profileToLoad);
     });
 
-    expect(GameLogic.updateSaveProfile).toHaveBeenCalledWith(profileToLoad, expect.any(Number));
+    expect(GameLogic.updateSaveProfile).toHaveBeenCalledWith(profileToLoad, expect.any(Number), gameSettings as GameSettings);
     expect(result.current.profile).not.toBeNull();
   });
 
@@ -97,7 +100,8 @@ describe('useGameEngine', () => {
     });
     expect(GameLogic.developGame).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'new-id' }),
-      'New Super Game'
+      'New Super Game',
+      gameSettings as GameSettings
     );
   });
 
@@ -133,12 +137,12 @@ describe('useGameEngine', () => {
   // This test is skipped because of a persistent issue with Jest's fake timers
   // and the React Native testing environment. The timer callback does not reliably
   // update the state within the test, leading to timeouts or incorrect assertions.
-  it.skip('should update profile on game tick', () => {
+  it.skip('should update profile on game tick', async () => {
     jest.useFakeTimers();
     const { result } = renderHook(() => useGameEngine());
 
-    act(() => {
-      result.current.createNewSave();
+    await act(async () => {
+      await result.current.createNewSave();
     });
 
     expect(result.current.profile?.resources.money).toBe(1000);

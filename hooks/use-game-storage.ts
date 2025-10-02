@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SaveProfile as AppSaveProfile } from '@/utils/game_logic';
+import { SaveProfile as EngineSaveProfile } from '@/engine/types';
 
 const PROFILES_KEY = 'game_profiles';
 
 // Define the structure of a save profile for storage, which must include an ID.
-export interface SaveProfile extends AppSaveProfile {
+export interface SaveProfile extends EngineSaveProfile {
   id: string;
 }
 
@@ -61,7 +61,7 @@ export function useGameStorage() {
     await saveProfiles(newProfiles);
   };
 
-  const addProfile = async (profile: Omit<SaveProfile, 'id'>) => {
+  const addProfile = async (profile: EngineSaveProfile) => {
     if (profiles.length < 5) {
       const newProfile = {
         ...profile,
@@ -74,7 +74,7 @@ export function useGameStorage() {
     return undefined; // Return undefined if limit is reached
   };
 
-  const updateProfile = async (id: string, profile: AppSaveProfile) => {
+  const updateProfile = async (id:string, profile: EngineSaveProfile) => {
     const profileWithId = { ...profile, id };
     const newProfiles = profiles.map((p) => (p.id === id ? profileWithId : p));
     await saveProfiles(newProfiles);

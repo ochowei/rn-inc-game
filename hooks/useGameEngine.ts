@@ -1,17 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  SaveProfile,
   updateSaveProfile,
   developGame as developGameLogic,
   createNewSaveProfile as createNewSaveLogic,
-} from '@/utils/game_logic';
-import { useGameStorage } from './use-game-storage';
+} from '@/engine/game_engine';
+import { SaveProfile as EngineSaveProfile, GameSettings } from '@/engine/types';
+import { useGameStorage, SaveProfile as StoredSaveProfile } from './use-game-storage';
 import gameSettings from '@/settings.json';
 
 // The interface for the SaveProfile used within the engine, which may not have an ID yet.
-export interface FullSaveProfile extends SaveProfile {
-  id?: string;
-}
+export type FullSaveProfile = StoredSaveProfile;
 
 export interface GameEngineHook {
   profile: FullSaveProfile | null;
@@ -35,7 +33,8 @@ export function useGameEngine(): GameEngineHook {
     const intervalId = setInterval(() => {
       setProfile((prevProfile) => {
         if (!prevProfile) return null;
-        return updateSaveProfile(prevProfile, 1);
+        const updatedCoreProfile = updateSaveProfile(prevProfile, 1, gameSettings as GameSettings);
+        return { ...updatedCoreProfile, id: prevProfile.id };
       });
     }, gameSettings.gameTickInterval);
 
@@ -48,12 +47,12 @@ export function useGameEngine(): GameEngineHook {
     const elapsedMilliseconds = now.getTime() - createdAt.getTime();
     const ticks = Math.floor(elapsedMilliseconds / gameSettings.gameTickInterval);
 
-    const updatedProfile = updateSaveProfile(profileToLoad, ticks);
-    setProfile(updatedProfile);
+    const updatedCoreProfile = updateSaveProfile(profileToLoad, ticks, gameSettings as GameSettings);
+    setProfile({ ...updatedCoreProfile, id: profileToLoad.id });
   }, []);
 
   const createNewSave = useCallback(async () => {
-    const newProfileData = createNewSaveLogic();
+    const newProfileData = createNewSaveLogic(gameSettings as GameSettings);
     const newProfileWithId = await addProfile(newProfileData);
 
     if (newProfileWithId) {
@@ -77,7 +76,7 @@ export function useGameEngine(): GameEngineHook {
     const { id, ...profileData } = saveProfileToSave;
 
     // Always update the `createdAt` timestamp to the current moment of saving.
-    const updatedSaveProfile = {
+    const updatedSaveProfile: EngineSaveProfile = {
       ...profileData,
       createdAt: new Date().toISOString(),
     };
@@ -104,8 +103,11 @@ export function useGameEngine(): GameEngineHook {
   const developGame = useCallback((gameName: string) => {
     setProfile((prevProfile) => {
       if (!prevProfile) return null;
-      const newProfile = developGameLogic(prevProfile, gameName);
-      if (newProfile !== prevProfile) {
+      const newCoreProfile = developGameLogic(prevProfile, gameName, gameSettings as GameSettings);
+
+      const newProfile = { ...newCoreProfile, id: prevProfile.id };
+
+      if (newCoreProfile !== prevProfile) {
         saveProfileNow(newProfile);
       }
       return newProfile;

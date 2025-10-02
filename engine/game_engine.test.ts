@@ -1,4 +1,5 @@
-import { createNewSaveProfile, updateSaveProfile, developGame, SaveProfile, GameSettings } from './game_engine';
+import { createNewSaveProfile, updateSaveProfile, developGame } from './game_engine';
+import { SaveProfile, GameSettings } from './types';
 import gameSettings from '../settings.json';
 
 describe('createNewSaveProfile', () => {
