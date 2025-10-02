@@ -21,12 +21,17 @@ jest.mock('./use-game-storage', () => ({
 jest.mock('@/engine/game_engine', () => ({
   __esModule: true,
   ...jest.requireActual('@/engine/game_engine'),
-  createNewSaveProfile: jest.fn(),
-  updateSaveProfile: jest.fn((profile, ticks) => ({
+  createNewSaveProfile: jest.fn((settings) => ({
+    resources: { money: settings.initial.resources.money, creativity: 0, productivity: 0, creativity_max: 100, productivity_max: 100, creativity_per_tick: 0, productivity_per_tick: 0, money_per_tick: 0 },
+    employees: [{ name: 'engineer_level_1', count: settings.initial.assets.engineer_level_1 }],
+    games: [],
+    createdAt: new Date().toISOString(),
+  })),
+  updateSaveProfile: jest.fn((profile, ticks, settings) => ({
     ...profile,
     resources: { ...profile.resources, money: profile.resources.money + (ticks || 0) * 10 },
   })),
-  developGame: jest.fn((profile) => profile),
+  developGame: jest.fn((profile, gameName, settings) => profile),
 }));
 
 const mockInitialProfile: FullSaveProfile = {
@@ -40,12 +45,12 @@ const mockInitialProfile: FullSaveProfile = {
 describe('useGameEngine', () => {
   beforeEach(() => {
     // Clear mocks before each test
-    (GameLogic.createNewSaveProfile as jest.Mock).mockClear().mockReturnValue({ ...mockInitialProfile, id: undefined });
-    (GameLogic.updateSaveProfile as jest.Mock).mockClear().mockImplementation((profile, ticks) => ({
+    (GameLogic.createNewSaveProfile as jest.Mock).mockClear().mockImplementation((settings) => ({ ...mockInitialProfile, id: undefined, createdAt: new Date().toISOString() }));
+    (GameLogic.updateSaveProfile as jest.Mock).mockClear().mockImplementation((profile, ticks, settings) => ({
         ...profile,
         resources: { ...profile.resources, money: profile.resources.money + (ticks || 0) * 10 },
       }));
-    (GameLogic.developGame as jest.Mock).mockClear().mockImplementation(profile => profile);
+    (GameLogic.developGame as jest.Mock).mockClear().mockImplementation((profile, gameName, settings) => profile);
     mockAddProfile.mockClear().mockResolvedValue({ ...mockInitialProfile, id: 'new-id' });
     mockUpdateProfile.mockClear();
   });
