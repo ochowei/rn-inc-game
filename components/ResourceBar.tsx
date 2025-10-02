@@ -8,7 +8,7 @@ import { useLanguage } from '@/hooks/use-language';
 interface Resources {
   resource_1: number;
   resource_2: number;
-  money: number;
+  resource_3: number;
   resource_1_max: number;
   resource_2_max: number;
 }
@@ -54,7 +54,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
         darkColor="transparent"
       >
         <IconSymbol name="dollarsign.circle.fill" size={20} color={iconColor} />
-        <ThemedText style={styles.resourceText}>{t('resources', 'money')}: {resources.money}</ThemedText>
+        <ThemedText style={styles.resourceText}>{t('resources', 'resource_3')}: {resources.resource_3}</ThemedText>
       </ThemedView>
     </ThemedView>
   );

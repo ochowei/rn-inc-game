@@ -19,7 +19,7 @@ export default function DevelopGameScreen() {
     if (!profile) return false;
     const cost = game.development_cost;
     return (
-      profile.resources.money >= cost.funding &&
+      profile.resources.resource_3 >= cost.resource_3 &&
       profile.resources.resource_1 >= cost.resource_1 &&
       profile.resources.resource_2 >= cost.resource_2
     );
@@ -51,7 +51,7 @@ export default function DevelopGameScreen() {
               <Title>{t('games', game.name as any)}</Title>
               <Paragraph>{t('game', 'cost')}:</Paragraph>
               <Paragraph>
-                - {t('resources', 'money')}: {game.development_cost.funding}
+                - {t('resources', 'resource_3')}: {game.development_cost.resource_3}
               </Paragraph>
               <Paragraph>
                 - {t('resources', 'resource_1')}: {game.development_cost.resource_1}

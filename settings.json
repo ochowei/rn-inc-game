@@ -3,7 +3,7 @@
     "resources": {
       "resource_1": 0,
       "resource_2": 0,
-      "money": 100
+      "resource_3": 100
     },
     "assets": {
       "engineer_level_1": 1
@@ -23,7 +23,7 @@
       "development_cost": {
         "resource_2": 10,
         "resource_1": 5,
-        "funding": 20
+        "resource_3": 20
       },
       "income_per_tick": 0.5,
       "maintenance_cost_per_tick": {
@@ -36,7 +36,7 @@
       "development_cost": {
         "resource_2": 15,
         "resource_1": 10,
-        "funding": 30
+        "resource_3": 30
       },
       "income_per_tick": 0.5,
       "maintenance_cost_per_tick": {

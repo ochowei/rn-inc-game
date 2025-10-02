@@ -22,21 +22,21 @@ jest.mock('@/engine/game_engine', () => ({
   __esModule: true,
   ...jest.requireActual('@/engine/game_engine'),
   createNewSaveProfile: jest.fn((settings) => ({
-    resources: { money: settings.initial.resources.money, resource_1: 0, resource_2: 0, resource_1_max: 100, resource_2_max: 100, resource_1_per_tick: 0, resource_2_per_tick: 0, money_per_tick: 0 },
+    resources: { resource_3: settings.initial.resources.resource_3, resource_1: 0, resource_2: 0, resource_1_max: 100, resource_2_max: 100, resource_1_per_tick: 0, resource_2_per_tick: 0, resource_3_per_tick: 0 },
     employees: [{ name: 'engineer_level_1', count: settings.initial.assets.engineer_level_1 }],
     games: [],
     createdAt: new Date().toISOString(),
   })),
   updateSaveProfile: jest.fn((profile, ticks, settings) => ({
     ...profile,
-    resources: { ...profile.resources, money: profile.resources.money + (ticks || 0) * 10 },
+    resources: { ...profile.resources, resource_3: profile.resources.resource_3 + (ticks || 0) * 10 },
   })),
   developGame: jest.fn((profile, gameName, settings) => profile),
 }));
 
 const mockInitialProfile: FullSaveProfile = {
   id: '1',
-  resources: { money: 1000, resource_1: 100, resource_2: 100, resource_1_max: 200, resource_2_max: 200, resource_1_per_tick: 1, resource_2_per_tick: 1, money_per_tick: 0 },
+  resources: { resource_3: 1000, resource_1: 100, resource_2: 100, resource_1_max: 200, resource_2_max: 200, resource_1_per_tick: 1, resource_2_per_tick: 1, resource_3_per_tick: 0 },
   employees: [],
   games: [],
   createdAt: new Date().toISOString(),
@@ -48,7 +48,7 @@ describe('useGameEngine', () => {
     (GameLogic.createNewSaveProfile as jest.Mock).mockClear().mockImplementation((settings) => ({ ...mockInitialProfile, id: undefined, createdAt: new Date().toISOString() }));
     (GameLogic.updateSaveProfile as jest.Mock).mockClear().mockImplementation((profile, ticks, settings) => ({
         ...profile,
-        resources: { ...profile.resources, money: profile.resources.money + (ticks || 0) * 10 },
+        resources: { ...profile.resources, resource_3: profile.resources.resource_3 + (ticks || 0) * 10 },
       }));
     (GameLogic.developGame as jest.Mock).mockClear().mockImplementation((profile, gameName, settings) => profile);
     mockAddProfile.mockClear().mockResolvedValue({ ...mockInitialProfile, id: 'new-id' });
@@ -150,14 +150,14 @@ describe('useGameEngine', () => {
       await result.current.createNewSave();
     });
 
-    expect(result.current.profile?.resources.money).toBe(1000);
+    expect(result.current.profile?.resources.resource_3).toBe(1000);
 
     // Run the pending timer and the subsequent state update
     act(() => {
       jest.runOnlyPendingTimers();
     });
 
-    expect(result.current.profile?.resources.money).toBe(1010);
+    expect(result.current.profile?.resources.resource_3).toBe(1010);
 
     jest.useRealTimers();
   });

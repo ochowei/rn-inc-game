@@ -50,12 +50,12 @@ const mockProfile: EngineSaveProfile = {
   resources: {
     resource_1: 100,
     resource_2: 100,
-    money: 1000,
+    resource_3: 1000,
     resource_1_max: 200,
     resource_2_max: 200,
     resource_1_per_tick: 1,
     resource_2_per_tick: 1,
-    money_per_tick: 0,
+    resource_3_per_tick: 0,
   },
   employees: [],
   games: [],
@@ -188,7 +188,7 @@ describe('useGameStorage', () => {
             ...initialProfiles[0].resources,
             resource_1: 200,
             resource_2: 200,
-            money: 2000
+            resource_3: 2000
         },
       };
 
@@ -198,7 +198,7 @@ describe('useGameStorage', () => {
       });
 
       await waitFor(() => {
-        expect(result.current.profiles[0].resources.money).toBe(2000);
+        expect(result.current.profiles[0].resources.resource_3).toBe(2000);
       });
       expect(setItemSpy).toHaveBeenCalled();
     });

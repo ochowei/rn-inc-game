@@ -11,7 +11,7 @@ describe('createNewSaveProfile', () => {
 
     const expectedCreatedAt = mockDate.toISOString();
 
-    expect(newProfile.resources.money).toBe(gameSettings.initial.resources.money);
+    expect(newProfile.resources.resource_3).toBe(gameSettings.initial.resources.resource_3);
     expect(newProfile.employees[0].name).toBe('engineer_level_1');
     expect(newProfile.employees[0].count).toBe(gameSettings.initial.assets.engineer_level_1);
     expect(newProfile.games).toEqual([]);
@@ -24,7 +24,7 @@ describe('createNewSaveProfile', () => {
     expect(newProfile.resources.resource_2_max).toBe(engineerSettings.resource_2_max);
     expect(newProfile.resources.resource_1_per_tick).toBe(engineerSettings.resource_1_per_tick);
     expect(newProfile.resources.resource_2_per_tick).toBe(engineerSettings.resource_2_per_tick);
-    expect(newProfile.resources.money_per_tick).toBe(0);
+    expect(newProfile.resources.resource_3_per_tick).toBe(0);
 
     // Check createdAt timestamp
     expect(newProfile.createdAt).toBe(expectedCreatedAt);
@@ -75,7 +75,7 @@ describe('updateSaveProfile', () => {
     const engineerSettings = gameSettings.engineer_level_1;
     const expectedResource2 = (engineerSettings.resource_2_per_tick * 2) - expectedMaintenance;
 
-    expect(updatedProfile.resources.money).toBe(initialProfile.resources.money + expectedIncome);
+    expect(updatedProfile.resources.resource_3).toBe(initialProfile.resources.resource_3 + expectedIncome);
     expect(updatedProfile.resources.resource_2).toBe(expectedResource2);
   });
 });
@@ -86,7 +86,7 @@ describe('developGame', () => {
   beforeEach(() => {
     initialProfile = createNewSaveProfile(gameSettings as GameSettings);
     // Give player enough resources for testing
-    initialProfile.resources.money = 100;
+    initialProfile.resources.resource_3 = 100;
     initialProfile.resources.resource_1 = 100;
     initialProfile.resources.resource_2 = 100;
   });
@@ -96,7 +96,7 @@ describe('developGame', () => {
     const updatedProfile = developGame(initialProfile, gameToDevelop.name, gameSettings as GameSettings);
 
     // Check if costs are deducted
-    expect(updatedProfile.resources.money).toBe(initialProfile.resources.money - gameToDevelop.development_cost.funding);
+    expect(updatedProfile.resources.resource_3).toBe(initialProfile.resources.resource_3 - gameToDevelop.development_cost.resource_3);
     expect(updatedProfile.resources.resource_1).toBe(initialProfile.resources.resource_1 - gameToDevelop.development_cost.resource_1);
     expect(updatedProfile.resources.resource_2).toBe(initialProfile.resources.resource_2 - gameToDevelop.development_cost.resource_2);
 
@@ -108,7 +108,7 @@ describe('developGame', () => {
   });
 
   it('should not develop a game if resources are insufficient', () => {
-    initialProfile.resources.money = 0; // Not enough money
+    initialProfile.resources.resource_3 = 0; // Not enough money
     const gameToDevelop = gameSettings.developable_games[0];
     const updatedProfile = developGame(initialProfile, gameToDevelop.name, gameSettings as GameSettings);
 
@@ -143,7 +143,7 @@ describe('developGame', () => {
     let profile = developGame(initialProfile, gameToDevelop.name, gameSettings as GameSettings);
 
     const developmentTime = gameToDevelop.development_time_ticks;
-    const initialMoney = profile.resources.money;
+    const initialMoney = profile.resources.resource_3;
 
     // Update profile until the game is developed
     profile = updateSaveProfile(profile, developmentTime, gameSettings as GameSettings);
@@ -155,7 +155,7 @@ describe('developGame', () => {
     // Now, update profile by one more tick to see if income is generated
     const profileAfterCompletion = updateSaveProfile(profile, 1, gameSettings as GameSettings);
 
-    const moneyBeforeIncome = profile.resources.money;
+    const resource3BeforeIncome = profile.resources.resource_3;
     const resource2BeforeIncome = profile.resources.resource_2;
 
     // Recalculate expected income and resource_2 changes
@@ -167,7 +167,7 @@ describe('developGame', () => {
     const expectedResource2 = Math.min(profile.resources.resource_2_max, resource2BeforeIncome + resource2FromEmployees) - expectedMaintenance;
 
     // Check for income
-    expect(profileAfterCompletion.resources.money).toBe(moneyBeforeIncome + expectedIncome);
+    expect(profileAfterCompletion.resources.resource_3).toBe(resource3BeforeIncome + expectedIncome);
     // Check for resource_2 change
     expect(profileAfterCompletion.resources.resource_2).toBe(expectedResource2);
   });
@@ -175,12 +175,12 @@ describe('developGame', () => {
   it('should correctly handle income for completed games only', () => {
       const gameToDevelop = gameSettings.developable_games[0];
       let profile = developGame(initialProfile, gameToDevelop.name, gameSettings as GameSettings);
-      const moneyBeforeUpdate = profile.resources.money;
+      const resource3BeforeUpdate = profile.resources.resource_3;
 
       // Game is developing, not completed. Update by 1 tick.
       const profileWhileDeveloping = updateSaveProfile(profile, 1, gameSettings as GameSettings);
 
       // The only change should be from employee generation, which is 0 for money.
-      expect(profileWhileDeveloping.resources.money).toBe(moneyBeforeUpdate);
+      expect(profileWhileDeveloping.resources.resource_3).toBe(resource3BeforeUpdate);
   });
 });
