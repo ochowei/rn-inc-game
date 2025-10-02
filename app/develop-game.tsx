@@ -18,7 +18,7 @@ export default function DevelopGameScreen() {
   const { profile, developGame } = useGameEngineContext();
   const tintColor = useThemeColor({}, 'tint');
 
-  const canDevelop = (game: (typeof settings.developable_games)[0]) => {
+  const canDevelop = (game: (typeof settings.assets_increasing_method_1.assets)[0]) => {
     if (!profile) return false;
     const cost = game.development_cost;
     return (
@@ -48,7 +48,7 @@ export default function DevelopGameScreen() {
       </Pressable>
 
       <View style={styles.gameList}>
-        {settings.developable_games.map((game, index) => (
+        {settings.assets_increasing_method_1.assets.map((game, index) => (
           <Card key={index} style={styles.card}>
             <Card.Content>
               <Title>{t('games', game.name as any)}</Title>

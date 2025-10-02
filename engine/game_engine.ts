@@ -75,7 +75,7 @@ export const updateSaveProfile = (
   const totalMaintenance: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
 
   newProfile.games.forEach((game: Game) => {
-    const gameData = settings.developable_games.find((g) => g.name === game.name);
+    const gameData = settings.assets_increasing_method_1.assets.find((g) => g.name === game.name);
 
     if (!gameData) return;
 
@@ -116,7 +116,7 @@ export const developGame = (
   gameName: string,
   settings: GameSettings
 ): SaveProfile => {
-  const gameData = settings.developable_games.find((g) => g.name === gameName);
+  const gameData = settings.assets_increasing_method_1.assets.find((g) => g.name === gameName);
 
   if (!gameData) {
     console.log(`Game "${gameName}" not found in settings.`);

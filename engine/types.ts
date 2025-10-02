@@ -16,13 +16,16 @@ export interface GameSettings {
     resource_max: ResourceGroup;
   };
   gameTickInterval: number;
-  developable_games: {
+  assets_increasing_method_1: {
     name: string;
-    development_time_ticks: number;
-    development_cost: ResourceGroup;
-    income_per_tick: ResourceGroup;
-    maintenance_cost_per_tick: ResourceGroup;
-  }[];
+    assets: {
+      name: string;
+      development_time_ticks: number;
+      development_cost: ResourceGroup;
+      income_per_tick: ResourceGroup;
+      maintenance_cost_per_tick: ResourceGroup;
+    }[];
+  };
   [key: string]: any; // Allow for other dynamic properties
 }
 
