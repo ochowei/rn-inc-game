@@ -149,7 +149,7 @@ export const hireEmployee = (
   newProfile.resources.current.resource_3 -= cost.resource_3;
 
   const employeeAsset = newProfile.assets.find(
-    (a) => a.type === 'employee' && a.id === employeeId
+    (a: AcquiredAsset) => a.type === 'employee' && a.id === employeeId
   );
 
   if (employeeAsset && employeeAsset.type === 'employee') {
