@@ -11,10 +11,6 @@ export interface GameSettings {
       [key: string]: number;
     };
   };
-  engineer_level_1: {
-    resource_per_tick: ResourceGroup;
-    resource_max: ResourceGroup;
-  };
   gameTickInterval: number;
   assets_group_1: {
     name: string;
@@ -31,6 +27,8 @@ export interface GameSettings {
     assets: {
       name: string;
       hiring_cost: ResourceGroup;
+      resource_per_tick?: ResourceGroup;
+      resource_max?: ResourceGroup;
     }[];
   };
   [key: string]: any; // Allow for other dynamic properties

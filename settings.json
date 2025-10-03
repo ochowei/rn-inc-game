@@ -9,18 +9,6 @@
       "engineer_level_1": 1
     }
   },
-  "engineer_level_1": {
-    "resource_per_tick": {
-      "resource_1": 10,
-      "resource_2": 20,
-      "resource_3": 0
-    },
-    "resource_max": {
-      "resource_1": 100,
-      "resource_2": 100,
-      "resource_3": 0
-    }
-  },
   "gameTickInterval": 5000,
   "assets_group_1": {
     "name": "game_development",
@@ -74,6 +62,16 @@
           "resource_1": 0,
           "resource_2": 0,
           "resource_3": 100
+        },
+        "resource_per_tick": {
+          "resource_1": 10,
+          "resource_2": 20,
+          "resource_3": 0
+        },
+        "resource_max": {
+          "resource_1": 100,
+          "resource_2": 100,
+          "resource_3": 0
         }
       }
     ]

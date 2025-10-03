@@ -1,7 +1,31 @@
 import { GameSettings, Game, SaveProfile, ResourceGroup } from './types';
 
 export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
-  const { initial, engineer_level_1 } = settings;
+  const { initial } = settings;
+
+  const max_resources: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
+  const per_tick_resources: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
+  const employees: { name: string; count: number }[] = [];
+
+  for (const employeeName in initial.assets) {
+    const count = initial.assets[employeeName];
+    if (count > 0) {
+      const employeeData = settings.assets_group_2.assets.find((e) => e.name === employeeName);
+      if (employeeData) {
+        if (employeeData.resource_max) {
+          max_resources.resource_1 += (employeeData.resource_max.resource_1 || 0) * count;
+          max_resources.resource_2 += (employeeData.resource_max.resource_2 || 0) * count;
+          max_resources.resource_3 += (employeeData.resource_max.resource_3 || 0) * count;
+        }
+        if (employeeData.resource_per_tick) {
+          per_tick_resources.resource_1 += (employeeData.resource_per_tick.resource_1 || 0) * count;
+          per_tick_resources.resource_2 += (employeeData.resource_per_tick.resource_2 || 0) * count;
+          per_tick_resources.resource_3 += (employeeData.resource_per_tick.resource_3 || 0) * count;
+        }
+        employees.push({ name: employeeName, count });
+      }
+    }
+  }
 
   return {
     resources: {
@@ -10,23 +34,10 @@ export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
         resource_2: initial.resources.resource_2,
         resource_3: initial.resources.resource_3,
       },
-      max: {
-        resource_1: engineer_level_1.resource_max.resource_1,
-        resource_2: engineer_level_1.resource_max.resource_2,
-        resource_3: engineer_level_1.resource_max.resource_3,
-      },
-      per_tick: {
-        resource_1: engineer_level_1.resource_per_tick.resource_1,
-        resource_2: engineer_level_1.resource_per_tick.resource_2,
-        resource_3: engineer_level_1.resource_per_tick.resource_3,
-      },
+      max: max_resources,
+      per_tick: per_tick_resources,
     },
-    employees: [
-      {
-        name: 'engineer_level_1',
-        count: initial.assets.engineer_level_1,
-      },
-    ],
+    employees,
     games: [],
     createdAt: new Date().toISOString(),
   };
@@ -47,11 +58,11 @@ export const updateSaveProfile = (
   const totalResourcePerTick: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
 
   newProfile.employees.forEach((employee: { name: string; count: number }) => {
-    const employeeSettings = (settings as any)[employee.name];
+    const employeeSettings = settings.assets_group_2.assets.find((e) => e.name === employee.name);
     if (employeeSettings && employeeSettings.resource_per_tick) {
-      totalResourcePerTick.resource_1 += employee.count * employeeSettings.resource_per_tick.resource_1;
-      totalResourcePerTick.resource_2 += employee.count * employeeSettings.resource_per_tick.resource_2;
-      totalResourcePerTick.resource_3 += employee.count * employeeSettings.resource_per_tick.resource_3;
+      totalResourcePerTick.resource_1 += employee.count * (employeeSettings.resource_per_tick.resource_1 || 0);
+      totalResourcePerTick.resource_2 += employee.count * (employeeSettings.resource_per_tick.resource_2 || 0);
+      totalResourcePerTick.resource_3 += employee.count * (employeeSettings.resource_per_tick.resource_3 || 0);
     }
   });
 
@@ -151,6 +162,17 @@ export const hireEmployee = (
     newProfile.employees[employeeIndex].count += 1;
   } else {
     newProfile.employees.push({ name: employeeName, count: 1 });
+  }
+
+  if (employeeData.resource_per_tick) {
+    newProfile.resources.per_tick.resource_1 += employeeData.resource_per_tick.resource_1;
+    newProfile.resources.per_tick.resource_2 += employeeData.resource_per_tick.resource_2;
+    newProfile.resources.per_tick.resource_3 += employeeData.resource_per_tick.resource_3;
+  }
+  if (employeeData.resource_max) {
+    newProfile.resources.max.resource_1 += employeeData.resource_max.resource_1;
+    newProfile.resources.max.resource_2 += employeeData.resource_max.resource_2;
+    newProfile.resources.max.resource_3 += employeeData.resource_max.resource_3;
   }
 
   return newProfile;
