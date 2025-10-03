@@ -15,7 +15,7 @@ export default function HireEmployeeScreen() {
 
   const canHire = (employee: (typeof settings.assets_group_2.assets)[0]) => {
     if (!profile) return false;
-    const cost = employee.hiring_cost;
+    const cost = employee.cost;
     return (
       profile.resources.current.resource_1 >= cost.resource_1 &&
       profile.resources.current.resource_2 >= cost.resource_2 &&
@@ -42,19 +42,19 @@ export default function HireEmployeeScreen() {
                 <Title>{t('employees', employee.name as any)}</Title>
                 <Paragraph>{t('employee', 'cost')}:</Paragraph>
                 <Paragraph>
-                  - {t('resources', 'resource_1')}: {employee.hiring_cost.resource_1}
+                  - {t('resources', 'resource_1')}: {employee.cost.resource_1}
                 </Paragraph>
                 <Paragraph>
-                  - {t('resources', 'resource_2')}: {employee.hiring_cost.resource_2}
+                  - {t('resources', 'resource_2')}: {employee.cost.resource_2}
                 </Paragraph>
                 <Paragraph>
-                  - {t('resources', 'resource_3')}: {employee.hiring_cost.resource_3}
+                  - {t('resources', 'resource_3')}: {employee.cost.resource_3}
                 </Paragraph>
               </Card.Content>
               <Card.Actions>
                 <Button
                   mode="contained"
-                  onPress={() => hireEmployee(employee.name)}
+                  onPress={() => hireEmployee(employee.id)}
                   disabled={!canHire(employee)}
                 >
                   {t('hireEmployee', 'hire')}

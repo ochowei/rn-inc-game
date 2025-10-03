@@ -17,10 +17,10 @@ export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
           max_resources.resource_2 += (employeeData.resource_max.resource_2 || 0) * count;
           max_resources.resource_3 += (employeeData.resource_max.resource_3 || 0) * count;
         }
-        if (employeeData.resource_per_tick) {
-          per_tick_resources.resource_1 += (employeeData.resource_per_tick.resource_1 || 0) * count;
-          per_tick_resources.resource_2 += (employeeData.resource_per_tick.resource_2 || 0) * count;
-          per_tick_resources.resource_3 += (employeeData.resource_per_tick.resource_3 || 0) * count;
+        if (employeeData.income_per_tick) {
+          per_tick_resources.resource_1 += (employeeData.income_per_tick.resource_1 || 0) * count;
+          per_tick_resources.resource_2 += (employeeData.income_per_tick.resource_2 || 0) * count;
+          per_tick_resources.resource_3 += (employeeData.income_per_tick.resource_3 || 0) * count;
         }
         employees.push({ name: employeeName, count });
       }
@@ -58,11 +58,11 @@ export const updateSaveProfile = (
   const totalResourcePerTick: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
 
   newProfile.employees.forEach((employee: { name: string; count: number }) => {
-    const employeeSettings = settings.assets_group_2.assets.find((e) => e.name === employee.name);
-    if (employeeSettings && employeeSettings.resource_per_tick) {
-      totalResourcePerTick.resource_1 += employee.count * (employeeSettings.resource_per_tick.resource_1 || 0);
-      totalResourcePerTick.resource_2 += employee.count * (employeeSettings.resource_per_tick.resource_2 || 0);
-      totalResourcePerTick.resource_3 += employee.count * (employeeSettings.resource_per_tick.resource_3 || 0);
+    const employeeSettings = settings.assets_group_2.assets.find((e) => e.id === employee.name);
+    if (employeeSettings && employeeSettings.income_per_tick) {
+      totalResourcePerTick.resource_1 += employee.count * (employeeSettings.income_per_tick.resource_1 || 0);
+      totalResourcePerTick.resource_2 += employee.count * (employeeSettings.income_per_tick.resource_2 || 0);
+      totalResourcePerTick.resource_3 += employee.count * (employeeSettings.income_per_tick.resource_3 || 0);
     }
   });
 
@@ -92,7 +92,7 @@ export const updateSaveProfile = (
 
     if (game.status === 'developing') {
       game.development_progress_ticks += ticks;
-      if (game.development_progress_ticks >= gameData.development_time_ticks) {
+      if (game.development_progress_ticks >= gameData.time_cost_ticks) {
         game.status = 'completed';
         console.log(`Game "${game.name}" has been completed!`);
       }
@@ -103,9 +103,11 @@ export const updateSaveProfile = (
       totalIncome.resource_2 += gameData.income_per_tick.resource_2 * ticks;
       totalIncome.resource_3 += gameData.income_per_tick.resource_3 * ticks;
 
-      totalMaintenance.resource_1 += gameData.maintenance_cost_per_tick.resource_1 * ticks;
-      totalMaintenance.resource_2 += gameData.maintenance_cost_per_tick.resource_2 * ticks;
-      totalMaintenance.resource_3 += gameData.maintenance_cost_per_tick.resource_3 * ticks;
+      if (gameData.maintenance_cost_per_tick) {
+        totalMaintenance.resource_1 += gameData.maintenance_cost_per_tick.resource_1 * ticks;
+        totalMaintenance.resource_2 += gameData.maintenance_cost_per_tick.resource_2 * ticks;
+        totalMaintenance.resource_3 += gameData.maintenance_cost_per_tick.resource_3 * ticks;
+      }
     }
   });
 
@@ -124,50 +126,50 @@ export const updateSaveProfile = (
 
 export const hireEmployee = (
   currentProfile: SaveProfile,
-  employeeName: string,
+  employeeId: string,
   settings: GameSettings
 ): SaveProfile => {
   const employeeData = settings.assets_group_2.assets.find(
-    (e: { name: string }) => e.name === employeeName
+    (e: { id: string }) => e.id === employeeId
   );
 
   if (!employeeData) {
-    console.log(`Employee "${employeeName}" not found in settings.`);
+    console.log(`Employee "${employeeId}" not found in settings.`);
     return currentProfile;
   }
 
-  const { hiring_cost } = employeeData;
+  const { cost } = employeeData;
   const { current: currentResources } = currentProfile.resources;
 
   if (
-    currentResources.resource_1 < hiring_cost.resource_1 ||
-    currentResources.resource_2 < hiring_cost.resource_2 ||
-    currentResources.resource_3 < hiring_cost.resource_3
+    currentResources.resource_1 < cost.resource_1 ||
+    currentResources.resource_2 < cost.resource_2 ||
+    currentResources.resource_3 < cost.resource_3
   ) {
-    console.log(`Insufficient resources to hire "${employeeName}".`);
+    console.log(`Insufficient resources to hire "${employeeId}".`);
     return currentProfile;
   }
 
   const newProfile = JSON.parse(JSON.stringify(currentProfile));
 
-  newProfile.resources.current.resource_1 -= hiring_cost.resource_1;
-  newProfile.resources.current.resource_2 -= hiring_cost.resource_2;
-  newProfile.resources.current.resource_3 -= hiring_cost.resource_3;
+  newProfile.resources.current.resource_1 -= cost.resource_1;
+  newProfile.resources.current.resource_2 -= cost.resource_2;
+  newProfile.resources.current.resource_3 -= cost.resource_3;
 
   const employeeIndex = newProfile.employees.findIndex(
-    (e: { name: string }) => e.name === employeeName
+    (e: { name: string }) => e.name === employeeId
   );
 
   if (employeeIndex > -1) {
     newProfile.employees[employeeIndex].count += 1;
   } else {
-    newProfile.employees.push({ name: employeeName, count: 1 });
+    newProfile.employees.push({ name: employeeId, count: 1 });
   }
 
-  if (employeeData.resource_per_tick) {
-    newProfile.resources.per_tick.resource_1 += employeeData.resource_per_tick.resource_1;
-    newProfile.resources.per_tick.resource_2 += employeeData.resource_per_tick.resource_2;
-    newProfile.resources.per_tick.resource_3 += employeeData.resource_per_tick.resource_3;
+  if (employeeData.income_per_tick) {
+    newProfile.resources.per_tick.resource_1 += employeeData.income_per_tick.resource_1;
+    newProfile.resources.per_tick.resource_2 += employeeData.income_per_tick.resource_2;
+    newProfile.resources.per_tick.resource_3 += employeeData.income_per_tick.resource_3;
   }
   if (employeeData.resource_max) {
     newProfile.resources.max.resource_1 += employeeData.resource_max.resource_1;
@@ -195,13 +197,13 @@ export const developGame = (
     return currentProfile;
   }
 
-  const { development_cost } = gameData;
+  const { cost } = gameData;
   const { current: currentResources } = currentProfile.resources;
 
   if (
-    currentResources.resource_1 < development_cost.resource_1 ||
-    currentResources.resource_2 < development_cost.resource_2 ||
-    currentResources.resource_3 < development_cost.resource_3
+    currentResources.resource_1 < cost.resource_1 ||
+    currentResources.resource_2 < cost.resource_2 ||
+    currentResources.resource_3 < cost.resource_3
   ) {
     console.log(`Insufficient resources to develop "${gameName}".`);
     return currentProfile;
@@ -209,9 +211,9 @@ export const developGame = (
 
   const newProfile = JSON.parse(JSON.stringify(currentProfile));
 
-  newProfile.resources.current.resource_1 -= development_cost.resource_1;
-  newProfile.resources.current.resource_2 -= development_cost.resource_2;
-  newProfile.resources.current.resource_3 -= development_cost.resource_3;
+  newProfile.resources.current.resource_1 -= cost.resource_1;
+  newProfile.resources.current.resource_2 -= cost.resource_2;
+  newProfile.resources.current.resource_3 -= cost.resource_3;
 
   const newGame: Game = {
     name: gameName,
