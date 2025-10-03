@@ -1,52 +1,15 @@
-import { useState } from 'react';
-import { StyleSheet, Pressable, ActivityIndicator, ImageBackground } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { StyleSheet, ActivityIndicator, ImageBackground } from 'react-native';
+import { Stack } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useThemeColor } from '@/hooks/useThemeColor';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
 import Fab from '@/components/Fab';
 
 export default function GameScreen() {
-  const router = useRouter();
   const { t } = useLanguage();
-  const { profile, saveCurrentProgress, unloadSave } = useGameEngineContext();
-  const tintColor = useThemeColor({}, 'tint');
-  const backgroundColor = useThemeColor({}, 'background');
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalContent, setModalContent] = useState({ title: '', message: '' });
-
-  const buttonStyle = {
-    borderColor: tintColor,
-    backgroundColor: backgroundColor,
-  };
-  const buttonTextStyle = {
-    color: tintColor,
-  };
-
-  const handleBackToMenu = () => {
-    unloadSave();
-    router.push('/menu');
-  };
-
-  const handleSavePress = async () => {
-    try {
-      await saveCurrentProgress();
-      setModalContent({ title: t('game', 'saveSuccessTitle'), message: t('game', 'saveSuccessMessage') });
-      setIsModalVisible(true);
-    } catch (error) {
-      console.error('Failed to save game', error);
-      setModalContent({ title: t('game', 'error'), message: t('game', 'failedToSave') });
-      setIsModalVisible(true);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalVisible(false);
-  };
+  const { profile } = useGameEngineContext();
 
   if (!profile) {
     return (
@@ -67,14 +30,6 @@ export default function GameScreen() {
         <ResourceBar resources={profile.resources} />
         <ThemedText type="title">{t('game', 'newGameTitle')}</ThemedText>
 
-        <Pressable onPress={handleBackToMenu} style={[styles.backButton, buttonStyle]}>
-          <ThemedText style={[styles.backButtonText, buttonTextStyle]}>{t('game', 'backToMenu')}</ThemedText>
-        </Pressable>
-
-        <Pressable onPress={handleSavePress} style={[styles.saveButton, buttonStyle]}>
-          <ThemedText style={[styles.saveButtonText, buttonTextStyle]}>{t('game', 'save')}</ThemedText>
-        </Pressable>
-
         <ThemedView style={styles.sectionContainer}>
           <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
           {profile.employees.map((employee, index) => (
@@ -84,20 +39,6 @@ export default function GameScreen() {
           ))}
         </ThemedView>
 
-        {isModalVisible && (
-          <ThemedView style={styles.confirmationContainer}>
-            <ThemedView
-              style={styles.confirmationBox}
-              lightColor="rgba(255, 255, 255, 0.9)"
-              darkColor="rgba(21, 23, 24, 0.9)">
-              <ThemedText type="subtitle">{modalContent.title}</ThemedText>
-              <ThemedText>{modalContent.message}</ThemedText>
-              <Pressable onPress={handleCloseModal} style={[styles.button, { borderColor: tintColor }]}>
-                <ThemedText style={styles.buttonText}>{t('game', 'close')}</ThemedText>
-              </Pressable>
-            </ThemedView>
-          </ThemedView>
-        )}
         <Fab />
       </ThemedView>
     </ImageBackground>
@@ -125,56 +66,5 @@ const styles = StyleSheet.create({
     width: '80%',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.2)',
-  },
-  saveButton: {
-    position: 'absolute',
-    top: 100,
-    right: 16,
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 100,
-    left: 16,
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  button: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 120,
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  confirmationContainer: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  confirmationBox: {
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    alignItems: 'center',
-    gap: 15,
   },
 });
