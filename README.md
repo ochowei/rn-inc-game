@@ -110,7 +110,7 @@
 │   ├── game.tsx
 │   ├── index.tsx
 │   ├── menu.tsx
-│   └── saved-games.tsx
+│   └── saved-profiles.tsx
 ├── assets
 │   └── ...
 ├── components
