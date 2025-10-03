@@ -75,7 +75,7 @@ export const updateSaveProfile = (
   const totalMaintenance: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
 
   newProfile.games.forEach((game: Game) => {
-    const gameData = settings.assets_increasing_method_1.assets.find((g) => g.name === game.name);
+    const gameData = settings.assets_group_1.assets.find((g) => g.name === game.name);
 
     if (!gameData) return;
 
@@ -116,7 +116,7 @@ export const hireEmployee = (
   employeeName: string,
   settings: GameSettings
 ): SaveProfile => {
-  const employeeData = settings.assets_increasing_method_2.assets.find(
+  const employeeData = settings.assets_group_2.assets.find(
     (e: { name: string }) => e.name === employeeName
   );
 
@@ -161,7 +161,7 @@ export const developGame = (
   gameName: string,
   settings: GameSettings
 ): SaveProfile => {
-  const gameData = settings.assets_increasing_method_1.assets.find((g) => g.name === gameName);
+  const gameData = settings.assets_group_1.assets.find((g) => g.name === gameName);
 
   if (!gameData) {
     console.log(`Game "${gameName}" not found in settings.`);

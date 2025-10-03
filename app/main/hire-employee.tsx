@@ -13,7 +13,7 @@ export default function HireEmployeeScreen() {
   const { t } = useLanguage();
   const { profile, hireEmployee } = useGameEngineContext();
 
-  const canHire = (employee: (typeof settings.assets_increasing_method_2.assets)[0]) => {
+  const canHire = (employee: (typeof settings.assets_group_2.assets)[0]) => {
     if (!profile) return false;
     const cost = employee.hiring_cost;
     return (
@@ -36,7 +36,7 @@ export default function HireEmployeeScreen() {
     <ThemedView style={styles.container}>
       <ScrollView>
         <View style={styles.employeeList}>
-          {settings.assets_increasing_method_2.assets.map((employee, index) => (
+          {settings.assets_group_2.assets.map((employee, index) => (
             <Card key={index} style={styles.card}>
               <Card.Content>
                 <Title>{t('employees', employee.name as any)}</Title>

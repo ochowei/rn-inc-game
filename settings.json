@@ -22,7 +22,7 @@
     }
   },
   "gameTickInterval": 5000,
-  "assets_increasing_method_1": {
+  "assets_group_1": {
     "name": "game_development",
     "assets": [
       {
@@ -65,7 +65,7 @@
       }
     ]
   },
-  "assets_increasing_method_2": {
+  "assets_group_2": {
     "name": "hire employee",
     "assets": [
       {
