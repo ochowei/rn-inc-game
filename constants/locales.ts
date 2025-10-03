@@ -73,6 +73,10 @@ export const locales = {
       develop: 'Develop',
       insufficientResources: 'Insufficient resources',
     },
+    fab: {
+      developGame: 'Develop Game',
+      hireEmployee: 'Hire Employee',
+    },
   },
   zh: {
     menu: {
@@ -147,6 +151,10 @@ export const locales = {
       backToGame: '返回遊戲',
       develop: '開發',
       insufficientResources: '資源不足',
+    },
+    fab: {
+      developGame: '遊戲開發',
+      hireEmployee: '僱用員工',
     },
   },
 };
