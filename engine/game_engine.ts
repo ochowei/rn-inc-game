@@ -22,7 +22,13 @@ export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
           per_tick_resources.resource_2 += (employeeData.income_per_tick.resource_2 || 0) * count;
           per_tick_resources.resource_3 += (employeeData.income_per_tick.resource_3 || 0) * count;
         }
-        assets.push({ type: 'employee', id: assetId, count });
+        assets.push({
+          type: 'asset_group_2',
+          id: assetId,
+          count,
+          status: 'completed',
+          development_progress_ticks: 0,
+        });
       }
     }
   }
@@ -58,18 +64,18 @@ export const updateSaveProfile = (
   const gameMaintenance: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
 
   newProfile.assets.forEach((asset) => {
-    if (asset.type === 'employee') {
+    if (asset.type === 'asset_group_2') {
       const employeeSettings = settings.assets_group_2.assets.find((e) => e.id === asset.id);
       if (employeeSettings && employeeSettings.income_per_tick) {
         employeeResourcePerTick.resource_1 += asset.count * (employeeSettings.income_per_tick.resource_1 || 0);
         employeeResourcePerTick.resource_2 += asset.count * (employeeSettings.income_per_tick.resource_2 || 0);
         employeeResourcePerTick.resource_3 += asset.count * (employeeSettings.income_per_tick.resource_3 || 0);
       }
-    } else if (asset.type === 'game') {
+    } else if (asset.type === 'asset_group_1') {
       const gameData = settings.assets_group_1.assets.find((g) => g.id === asset.id);
       if (!gameData) return;
 
-      if (asset.status === 'developing') {
+      if (asset.status === 'in_progress') {
         asset.development_progress_ticks += ticks;
         if (asset.development_progress_ticks >= gameData.time_cost_ticks) {
           asset.status = 'completed';
@@ -149,13 +155,19 @@ export const hireEmployee = (
   newProfile.resources.current.resource_3 -= cost.resource_3;
 
   const employeeAsset = newProfile.assets.find(
-    (a: AcquiredAsset) => a.type === 'employee' && a.id === employeeId
+    (a: AcquiredAsset) => a.type === 'asset_group_2' && a.id === employeeId
   );
 
-  if (employeeAsset && employeeAsset.type === 'employee') {
+  if (employeeAsset) {
     employeeAsset.count += 1;
   } else {
-    newProfile.assets.push({ type: 'employee', id: employeeId, count: 1 });
+    newProfile.assets.push({
+      type: 'asset_group_2',
+      id: employeeId,
+      count: 1,
+      status: 'completed',
+      development_progress_ticks: 0,
+    });
   }
 
   if (employeeData.income_per_tick) {
@@ -184,7 +196,7 @@ export const developGame = (
     return currentProfile;
   }
 
-  if (currentProfile.assets.some((a) => a.type === 'game' && a.id === gameId)) {
+  if (currentProfile.assets.some((a) => a.type === 'asset_group_1' && a.id === gameId)) {
     console.log(`Game "${gameId}" is already owned or in development.`);
     return currentProfile;
   }
@@ -208,10 +220,11 @@ export const developGame = (
   newProfile.resources.current.resource_3 -= cost.resource_3;
 
   const newGame: AcquiredAsset = {
-    type: 'game',
+    type: 'asset_group_1',
     id: gameId,
-    status: 'developing',
+    status: 'in_progress',
     development_progress_ticks: 0,
+    count: 1,
   };
 
   newProfile.assets.push(newGame);

@@ -33,18 +33,13 @@ export interface GameSettings {
   [key: string]: any; // Allow for other dynamic properties
 }
 
-export type AcquiredAsset =
-  | {
-      type: 'employee';
-      id: string;
-      count: number;
-    }
-  | {
-      type: 'game';
-      id: string;
-      status: 'developing' | 'completed';
-      development_progress_ticks: number;
-    };
+export type AcquiredAsset = {
+  type: 'asset_group_1' | 'asset_group_2';
+  id: string;
+  count: number;
+  status: 'in_progress' | 'completed';
+  development_progress_ticks: number;
+};
 
 export interface SaveProfile {
   resources: {
