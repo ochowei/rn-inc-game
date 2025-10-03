@@ -12,23 +12,23 @@ export default function TabLayout() {
         headerShown: false,
       }}>
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: t('game', 'newGameTitle'),
+          title: t('screen', 'screen_1'),
           tabBarIcon: ({ color }) => <MaterialIcons name="home" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="develop-game"
         options={{
-          title: t('fab', 'developGame'),
+          title: t('screen', 'screen_2'),
           tabBarIcon: ({ color }) => <MaterialIcons name="business" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="hire-employee"
         options={{
-          title: t('fab', 'hireEmployee'),
+          title: t('screen', 'screen_3'),
           tabBarIcon: ({ color }) => <MaterialIcons name="person-add" size={28} color={color} />,
         }}
       />

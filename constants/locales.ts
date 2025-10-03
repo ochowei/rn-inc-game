@@ -77,6 +77,11 @@ export const locales = {
       developGame: 'Develop Game',
       hireEmployee: 'Hire Employee',
     },
+    screen: {
+      screen_1: 'Home',
+      screen_2: 'Develop',
+      screen_3: 'Hiring',
+    },
   },
   zh: {
     menu: {
@@ -155,6 +160,11 @@ export const locales = {
     fab: {
       developGame: '遊戲開發',
       hireEmployee: '僱用員工',
+    },
+    screen: {
+      screen_1: '首頁',
+      screen_2: '開發',
+      screen_3: '招募',
     },
   },
 };
