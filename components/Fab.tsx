@@ -20,16 +20,6 @@ const Fab: React.FC = () => {
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
-  const handleGameDevelopPress = () => {
-    hideModal();
-    router.push('/develop-game');
-  };
-
-  const handleHireEmployeePress = () => {
-    hideModal();
-    router.push('/hire-employee');
-  };
-
   const handleBackToMenu = () => {
     hideModal();
     unloadSave();
@@ -62,8 +52,6 @@ const Fab: React.FC = () => {
     <>
       <Portal>
         <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.modalContainer} testID="fab-modal">
-          <Button onPress={handleGameDevelopPress}>{t('fab', 'developGame')}</Button>
-          <Button onPress={handleHireEmployeePress}>{t('fab', 'hireEmployee')}</Button>
           <Button onPress={handleSavePress}>{t('game', 'save')}</Button>
           <Button onPress={handleBackToMenu}>{t('game', 'backToMenu')}</Button>
         </Modal>
