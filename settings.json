@@ -14,9 +14,10 @@
     "name": "game_development",
     "assets": [
       {
+        "id": "novel_game",
         "name": "Novel Game",
-        "development_time_ticks": 6,
-        "development_cost": {
+        "time_cost_ticks": 6,
+        "cost": {
           "resource_1": 5,
           "resource_2": 10,
           "resource_3": 20
@@ -33,9 +34,10 @@
         }
       },
       {
+        "id": "puzzle_game",
         "name": "Puzzle Game",
-        "development_time_ticks": 6,
-        "development_cost": {
+        "time_cost_ticks": 6,
+        "cost": {
           "resource_1": 10,
           "resource_2": 15,
           "resource_3": 30
@@ -57,13 +59,15 @@
     "name": "hire employee",
     "assets": [
       {
+        "id": "engineer_level_1",
         "name": "engineer_level_1",
-        "hiring_cost": {
+        "cost": {
           "resource_1": 0,
           "resource_2": 0,
           "resource_3": 100
         },
-        "resource_per_tick": {
+        "time_cost_ticks": 0,
+        "income_per_tick": {
           "resource_1": 10,
           "resource_2": 20,
           "resource_3": 0

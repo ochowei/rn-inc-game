@@ -4,6 +4,16 @@ export interface ResourceGroup {
   resource_3: number;
 }
 
+export interface Asset {
+  id: string;
+  name: string;
+  time_cost_ticks: number;
+  cost: ResourceGroup;
+  income_per_tick: ResourceGroup;
+  maintenance_cost_per_tick?: ResourceGroup;
+  resource_max?: ResourceGroup;
+}
+
 export interface GameSettings {
   initial: {
     resources: ResourceGroup;
@@ -14,22 +24,11 @@ export interface GameSettings {
   gameTickInterval: number;
   assets_group_1: {
     name: string;
-    assets: {
-      name: string;
-      development_time_ticks: number;
-      development_cost: ResourceGroup;
-      income_per_tick: ResourceGroup;
-      maintenance_cost_per_tick: ResourceGroup;
-    }[];
+    assets: Asset[];
   };
   assets_group_2: {
-    name: string;
-    assets: {
-      name: string;
-      hiring_cost: ResourceGroup;
-      resource_per_tick?: ResourceGroup;
-      resource_max?: ResourceGroup;
-    }[];
+    name:string;
+    assets: Asset[];
   };
   [key: string]: any; // Allow for other dynamic properties
 }

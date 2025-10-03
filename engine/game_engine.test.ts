@@ -19,15 +19,15 @@ describe('createNewSaveProfile', () => {
     expect(newProfile.resources.current.resource_3).toBe(settings.initial.resources.resource_3);
 
     // Calculate expected max and per_tick resources from initial assets
-    const engineerSettings = settings.assets_group_2.assets.find(e => e.name === 'engineer_level_1')!;
+    const engineerSettings = settings.assets_group_2.assets.find(e => e.id === 'engineer_level_1')!;
     const initialEngineerCount = settings.initial.assets.engineer_level_1;
 
     const expectedMaxResource1 = (engineerSettings.resource_max?.resource_1 || 0) * initialEngineerCount;
     const expectedMaxResource2 = (engineerSettings.resource_max?.resource_2 || 0) * initialEngineerCount;
 
-    const expectedPerTickResource1 = (engineerSettings.resource_per_tick?.resource_1 || 0) * initialEngineerCount;
-    const expectedPerTickResource2 = (engineerSettings.resource_per_tick?.resource_2 || 0) * initialEngineerCount;
-    const expectedPerTickResource3 = (engineerSettings.resource_per_tick?.resource_3 || 0) * initialEngineerCount;
+    const expectedPerTickResource1 = (engineerSettings.income_per_tick?.resource_1 || 0) * initialEngineerCount;
+    const expectedPerTickResource2 = (engineerSettings.income_per_tick?.resource_2 || 0) * initialEngineerCount;
+    const expectedPerTickResource3 = (engineerSettings.income_per_tick?.resource_3 || 0) * initialEngineerCount;
 
     expect(newProfile.resources.max.resource_1).toBe(expectedMaxResource1);
     expect(newProfile.resources.max.resource_2).toBe(expectedMaxResource2);
@@ -63,10 +63,10 @@ describe('updateSaveProfile', () => {
   it('should increase resources based on employees and ticks', () => {
     const updatedProfile = updateSaveProfile(initialProfile, 3, settings); // 3 ticks
 
-    const engineerData = settings.assets_group_2.assets.find(e => e.name === 'engineer_level_1')!;
-    const { resource_per_tick } = engineerData!;
-    const expectedResource1 = (resource_per_tick!.resource_1 || 0) * 3;
-    const expectedResource2 = (resource_per_tick!.resource_2 || 0) * 3;
+    const engineerData = settings.assets_group_2.assets.find(e => e.id === 'engineer_level_1')!;
+    const { income_per_tick } = engineerData!;
+    const expectedResource1 = (income_per_tick!.resource_1 || 0) * 3;
+    const expectedResource2 = (income_per_tick!.resource_2 || 0) * 3;
 
     expect(updatedProfile.resources.current.resource_1).toBe(expectedResource1);
     expect(updatedProfile.resources.current.resource_2).toBe(expectedResource2);
@@ -85,11 +85,11 @@ describe('updateSaveProfile', () => {
 
     const gameData = settings.assets_group_1.assets.find((g) => g.name === 'Novel Game')!;
     const expectedIncome = gameData.income_per_tick.resource_3 * 2;
-    const expectedMaintenance = gameData.maintenance_cost_per_tick.resource_2 * 2;
+    const expectedMaintenance = (gameData.maintenance_cost_per_tick?.resource_2 || 0) * 2;
 
-    const engineerData = settings.assets_group_2.assets.find(e => e.name === 'engineer_level_1')!;
-    const { resource_per_tick } = engineerData!;
-    const expectedResource2FromEmployees = (resource_per_tick!.resource_2 || 0) * 2;
+    const engineerData = settings.assets_group_2.assets.find(e => e.id === 'engineer_level_1')!;
+    const { income_per_tick } = engineerData!;
+    const expectedResource2FromEmployees = (income_per_tick!.resource_2 || 0) * 2;
     const initialResource2 = initialProfile.resources.current.resource_2;
 
     const expectedResource2 = initialResource2 + expectedResource2FromEmployees - expectedMaintenance;
@@ -115,9 +115,9 @@ describe('developGame', () => {
     const updatedProfile = developGame(initialProfile, gameToDevelop.name, settings);
 
     // Check if costs are deducted
-    expect(updatedProfile.resources.current.resource_1).toBe(initialProfile.resources.current.resource_1 - gameToDevelop.development_cost.resource_1);
-    expect(updatedProfile.resources.current.resource_2).toBe(initialProfile.resources.current.resource_2 - gameToDevelop.development_cost.resource_2);
-    expect(updatedProfile.resources.current.resource_3).toBe(initialProfile.resources.current.resource_3 - gameToDevelop.development_cost.resource_3);
+    expect(updatedProfile.resources.current.resource_1).toBe(initialProfile.resources.current.resource_1 - gameToDevelop.cost.resource_1);
+    expect(updatedProfile.resources.current.resource_2).toBe(initialProfile.resources.current.resource_2 - gameToDevelop.cost.resource_2);
+    expect(updatedProfile.resources.current.resource_3).toBe(initialProfile.resources.current.resource_3 - gameToDevelop.cost.resource_3);
 
     // Check if game is added to profile with 'developing' status
     expect(updatedProfile.games.length).toBe(1);
@@ -149,7 +149,7 @@ describe('developGame', () => {
     const gameToDevelop = settings.assets_group_1.assets[0];
     let profile = developGame(initialProfile, gameToDevelop.name, settings);
 
-    const developmentTime = gameToDevelop.development_time_ticks;
+    const developmentTime = gameToDevelop.time_cost_ticks;
 
     // Update profile until the game is developed
     profile = updateSaveProfile(profile, developmentTime, settings);
@@ -159,11 +159,11 @@ describe('developGame', () => {
     const profileAfterCompletion = updateSaveProfile(profile, 1, settings);
 
     const expectedIncome = gameToDevelop.income_per_tick.resource_3 * 1;
-    const expectedMaintenance = gameToDevelop.maintenance_cost_per_tick.resource_2 * 1;
+    const expectedMaintenance = (gameToDevelop.maintenance_cost_per_tick?.resource_2 || 0) * 1;
 
-    const engineerData = settings.assets_group_2.assets.find(e => e.name === 'engineer_level_1')!;
-    const { resource_per_tick } = engineerData!;
-    const resource2FromEmployees = (resource_per_tick!.resource_2 || 0) * 1;
+    const engineerData = settings.assets_group_2.assets.find(e => e.id === 'engineer_level_1')!;
+    const { income_per_tick } = engineerData!;
+    const resource2FromEmployees = (income_per_tick!.resource_2 || 0) * 1;
 
     const resource3BeforeIncome = profile.resources.current.resource_3;
     const resource2BeforeIncome = profile.resources.current.resource_2;
