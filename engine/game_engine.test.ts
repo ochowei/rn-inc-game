@@ -11,7 +11,6 @@ describe('createNewSaveProfile', () => {
     const dateSpy = jest.spyOn(global, 'Date').mockImplementation(() => mockDate as any);
 
     const newProfile: SaveProfile = createNewSaveProfile(settings);
-
     const expectedCreatedAt = mockDate.toISOString();
 
     // Check initial resources
@@ -19,19 +18,27 @@ describe('createNewSaveProfile', () => {
     expect(newProfile.resources.current.resource_2).toBe(settings.initial.resources.resource_2);
     expect(newProfile.resources.current.resource_3).toBe(settings.initial.resources.resource_3);
 
-    // Check max resources from engineer_level_1
-    expect(newProfile.resources.max.resource_1).toBe(settings.engineer_level_1.resource_max.resource_1);
-    expect(newProfile.resources.max.resource_2).toBe(settings.engineer_level_1.resource_max.resource_2);
+    // Calculate expected max and per_tick resources from initial assets
+    const engineerSettings = settings.assets_group_2.assets.find(e => e.name === 'engineer_level_1')!;
+    const initialEngineerCount = settings.initial.assets.engineer_level_1;
 
-    // Check per_tick resources from engineer_level_1
-    expect(newProfile.resources.per_tick.resource_1).toBe(settings.engineer_level_1.resource_per_tick.resource_1);
-    expect(newProfile.resources.per_tick.resource_2).toBe(settings.engineer_level_1.resource_per_tick.resource_2);
-    expect(newProfile.resources.per_tick.resource_3).toBe(0);
+    const expectedMaxResource1 = (engineerSettings.resource_max?.resource_1 || 0) * initialEngineerCount;
+    const expectedMaxResource2 = (engineerSettings.resource_max?.resource_2 || 0) * initialEngineerCount;
 
+    const expectedPerTickResource1 = (engineerSettings.resource_per_tick?.resource_1 || 0) * initialEngineerCount;
+    const expectedPerTickResource2 = (engineerSettings.resource_per_tick?.resource_2 || 0) * initialEngineerCount;
+    const expectedPerTickResource3 = (engineerSettings.resource_per_tick?.resource_3 || 0) * initialEngineerCount;
+
+    expect(newProfile.resources.max.resource_1).toBe(expectedMaxResource1);
+    expect(newProfile.resources.max.resource_2).toBe(expectedMaxResource2);
+    expect(newProfile.resources.per_tick.resource_1).toBe(expectedPerTickResource1);
+    expect(newProfile.resources.per_tick.resource_2).toBe(expectedPerTickResource2);
+    expect(newProfile.resources.per_tick.resource_3).toBe(expectedPerTickResource3);
 
     // Check initial employees and games
-    expect(newProfile.employees[0].name).toBe('engineer_level_1');
-    expect(newProfile.employees[0].count).toBe(settings.initial.assets.engineer_level_1);
+    const engineerEmployee = newProfile.employees.find(e => e.name === 'engineer_level_1');
+    expect(engineerEmployee).toBeDefined();
+    expect(engineerEmployee?.count).toBe(settings.initial.assets.engineer_level_1);
     expect(newProfile.games).toEqual([]);
 
     // Check createdAt timestamp
@@ -56,9 +63,10 @@ describe('updateSaveProfile', () => {
   it('should increase resources based on employees and ticks', () => {
     const updatedProfile = updateSaveProfile(initialProfile, 3, settings); // 3 ticks
 
-    const { resource_per_tick } = settings.engineer_level_1;
-    const expectedResource1 = resource_per_tick.resource_1 * 3;
-    const expectedResource2 = resource_per_tick.resource_2 * 3;
+    const engineerData = settings.assets_group_2.assets.find(e => e.name === 'engineer_level_1')!;
+    const { resource_per_tick } = engineerData!;
+    const expectedResource1 = (resource_per_tick!.resource_1 || 0) * 3;
+    const expectedResource2 = (resource_per_tick!.resource_2 || 0) * 3;
 
     expect(updatedProfile.resources.current.resource_1).toBe(expectedResource1);
     expect(updatedProfile.resources.current.resource_2).toBe(expectedResource2);
@@ -79,8 +87,9 @@ describe('updateSaveProfile', () => {
     const expectedIncome = gameData.income_per_tick.resource_3 * 2;
     const expectedMaintenance = gameData.maintenance_cost_per_tick.resource_2 * 2;
 
-    const { resource_per_tick } = settings.engineer_level_1;
-    const expectedResource2FromEmployees = resource_per_tick.resource_2 * 2;
+    const engineerData = settings.assets_group_2.assets.find(e => e.name === 'engineer_level_1')!;
+    const { resource_per_tick } = engineerData!;
+    const expectedResource2FromEmployees = (resource_per_tick!.resource_2 || 0) * 2;
     const initialResource2 = initialProfile.resources.current.resource_2;
 
     const expectedResource2 = initialResource2 + expectedResource2FromEmployees - expectedMaintenance;
@@ -151,8 +160,10 @@ describe('developGame', () => {
 
     const expectedIncome = gameToDevelop.income_per_tick.resource_3 * 1;
     const expectedMaintenance = gameToDevelop.maintenance_cost_per_tick.resource_2 * 1;
-    const { resource_per_tick } = settings.engineer_level_1;
-    const resource2FromEmployees = resource_per_tick.resource_2 * 1;
+
+    const engineerData = settings.assets_group_2.assets.find(e => e.name === 'engineer_level_1')!;
+    const { resource_per_tick } = engineerData!;
+    const resource2FromEmployees = (resource_per_tick!.resource_2 || 0) * 1;
 
     const resource3BeforeIncome = profile.resources.current.resource_3;
     const resource2BeforeIncome = profile.resources.current.resource_2;
