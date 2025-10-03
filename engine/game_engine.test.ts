@@ -75,7 +75,7 @@ describe('updateSaveProfile', () => {
     initialProfile.games.push({ name: 'Novel Game', status: 'completed', development_progress_ticks: 6 });
     const updatedProfile = updateSaveProfile(initialProfile, 2, settings); // 2 ticks
 
-    const gameData = settings.assets_increasing_method_1.assets.find((g) => g.name === 'Novel Game')!;
+    const gameData = settings.assets_group_1.assets.find((g) => g.name === 'Novel Game')!;
     const expectedIncome = gameData.income_per_tick.resource_3 * 2;
     const expectedMaintenance = gameData.maintenance_cost_per_tick.resource_2 * 2;
 
@@ -102,7 +102,7 @@ describe('developGame', () => {
   });
 
   it('should start developing a game if resources are sufficient', () => {
-    const gameToDevelop = settings.assets_increasing_method_1.assets[0];
+    const gameToDevelop = settings.assets_group_1.assets[0];
     const updatedProfile = developGame(initialProfile, gameToDevelop.name, settings);
 
     // Check if costs are deducted
@@ -118,7 +118,7 @@ describe('developGame', () => {
 
   it('should not develop a game if resources are insufficient', () => {
     initialProfile.resources.current.resource_3 = 0; // Not enough money
-    const gameToDevelop = settings.assets_increasing_method_1.assets[0];
+    const gameToDevelop = settings.assets_group_1.assets[0];
     const updatedProfile = developGame(initialProfile, gameToDevelop.name, settings);
 
     // Profile should not change
@@ -126,7 +126,7 @@ describe('developGame', () => {
   });
 
   it('should progress game development over ticks', () => {
-    const gameToDevelop = settings.assets_increasing_method_1.assets[0];
+    const gameToDevelop = settings.assets_group_1.assets[0];
     let profile = developGame(initialProfile, gameToDevelop.name, settings);
 
     // Update profile by a few ticks
@@ -137,7 +137,7 @@ describe('developGame', () => {
   });
 
   it('should complete game development and start generating income', () => {
-    const gameToDevelop = settings.assets_increasing_method_1.assets[0];
+    const gameToDevelop = settings.assets_group_1.assets[0];
     let profile = developGame(initialProfile, gameToDevelop.name, settings);
 
     const developmentTime = gameToDevelop.development_time_ticks;

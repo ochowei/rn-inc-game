@@ -13,7 +13,7 @@ export default function DevelopGameScreen() {
   const { t } = useLanguage();
   const { profile, developGame } = useGameEngineContext();
 
-  const canDevelop = (game: (typeof settings.assets_increasing_method_1.assets)[0]) => {
+  const canDevelop = (game: (typeof settings.assets_group_1.assets)[0]) => {
     if (!profile) return false;
     const cost = game.development_cost;
     return (
@@ -36,7 +36,7 @@ export default function DevelopGameScreen() {
     <ThemedView style={styles.container}>
       <ScrollView>
         <View style={styles.gameList}>
-          {settings.assets_increasing_method_1.assets.map((game, index) => (
+          {settings.assets_group_1.assets.map((game, index) => (
             <Card key={index} style={styles.card}>
               <Card.Content>
                 <Title>{t('games', game.name as any)}</Title>

@@ -16,7 +16,7 @@ export interface GameSettings {
     resource_max: ResourceGroup;
   };
   gameTickInterval: number;
-  assets_increasing_method_1: {
+  assets_group_1: {
     name: string;
     assets: {
       name: string;
@@ -26,7 +26,7 @@ export interface GameSettings {
       maintenance_cost_per_tick: ResourceGroup;
     }[];
   };
-  assets_increasing_method_2: {
+  assets_group_2: {
     name: string;
     assets: {
       name: string;
