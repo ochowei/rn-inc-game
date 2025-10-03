@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Pressable, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, Pressable, FlatList, ActivityIndicator, ImageBackground } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -59,57 +59,76 @@ export default function SavedGamesScreen() {
 
   if (loading) {
     return (
-      <ThemedView style={styles.container}>
-        <ActivityIndicator size="large" />
-      </ThemedView>
+      <ImageBackground
+        source={require('../assets/images/background.png')}
+        style={styles.background}
+        resizeMode="cover">
+        <ThemedView style={styles.container}>
+          <ActivityIndicator size="large" />
+        </ThemedView>
+      </ImageBackground>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <Stack.Screen options={{ title: t('savedGames', 'title') }} />
-      <FlatList
-        data={[...profiles].reverse()}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={<ThemedText>{t('savedGames', 'noSaves')}</ThemedText>}
-        extraData={profiles}
-      />
+    <ImageBackground
+      source={require('../assets/images/background.png')}
+      style={styles.background}
+      resizeMode="cover">
+      <ThemedView style={styles.container}>
+        <Stack.Screen options={{ title: t('savedGames', 'title') }} />
+        <FlatList
+          data={[...profiles].reverse()}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          ListEmptyComponent={<ThemedText>{t('savedGames', 'noSaves')}</ThemedText>}
+          extraData={profiles}
+        />
 
-      {isConfirming && (
-        <ThemedView style={styles.confirmationContainer}>
-          <ThemedView style={styles.confirmationBox}>
-            <ThemedText type="subtitle">{t('savedGames', 'confirmDelete')}</ThemedText>
-            <ThemedText>{t('savedGames', 'confirmDeleteMessage')}</ThemedText>
-            <ThemedView style={styles.confirmationButtons}>
-              <Pressable onPress={handleCancelDelete} style={[styles.button, { borderColor: tintColor }]}>
-                <ThemedText style={styles.buttonText}>{t('savedGames', 'cancel')}</ThemedText>
-              </Pressable>
-              <Pressable onPress={handleConfirmDelete} style={[styles.button, styles.deleteButton]}>
-                <ThemedText style={styles.buttonText}>{t('savedGames', 'confirm')}</ThemedText>
-              </Pressable>
+        {isConfirming && (
+          <ThemedView style={styles.confirmationContainer}>
+            <ThemedView
+              style={styles.confirmationBox}
+              lightColor="rgba(255, 255, 255, 0.9)"
+              darkColor="rgba(21, 23, 24, 0.9)">
+              <ThemedText type="subtitle">{t('savedGames', 'confirmDelete')}</ThemedText>
+              <ThemedText>{t('savedGames', 'confirmDeleteMessage')}</ThemedText>
+              <ThemedView style={styles.confirmationButtons}>
+                <Pressable onPress={handleCancelDelete} style={[styles.button, { borderColor: tintColor }]}>
+                  <ThemedText style={styles.buttonText}>{t('savedGames', 'cancel')}</ThemedText>
+                </Pressable>
+                <Pressable onPress={handleConfirmDelete} style={[styles.button, styles.deleteButton]}>
+                  <ThemedText style={styles.buttonText}>{t('savedGames', 'confirm')}</ThemedText>
+                </Pressable>
+              </ThemedView>
             </ThemedView>
           </ThemedView>
-        </ThemedView>
-      )}
-    </ThemedView>
+        )}
+      </ThemedView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: 'transparent',
   },
   saveItem: {
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 16,
+    backgroundColor: 'transparent',
   },
   button: {
     paddingVertical: 8,
@@ -144,5 +163,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '100%',
     marginTop: 10,
+    backgroundColor: 'transparent',
   },
 });
