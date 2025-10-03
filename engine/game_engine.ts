@@ -111,6 +111,51 @@ export const updateSaveProfile = (
   return newProfile;
 };
 
+export const hireEmployee = (
+  currentProfile: SaveProfile,
+  employeeName: string,
+  settings: GameSettings
+): SaveProfile => {
+  const employeeData = settings.assets_increasing_method_2.assets.find(
+    (e: { name: string }) => e.name === employeeName
+  );
+
+  if (!employeeData) {
+    console.log(`Employee "${employeeName}" not found in settings.`);
+    return currentProfile;
+  }
+
+  const { hiring_cost } = employeeData;
+  const { current: currentResources } = currentProfile.resources;
+
+  if (
+    currentResources.resource_1 < hiring_cost.resource_1 ||
+    currentResources.resource_2 < hiring_cost.resource_2 ||
+    currentResources.resource_3 < hiring_cost.resource_3
+  ) {
+    console.log(`Insufficient resources to hire "${employeeName}".`);
+    return currentProfile;
+  }
+
+  const newProfile = JSON.parse(JSON.stringify(currentProfile));
+
+  newProfile.resources.current.resource_1 -= hiring_cost.resource_1;
+  newProfile.resources.current.resource_2 -= hiring_cost.resource_2;
+  newProfile.resources.current.resource_3 -= hiring_cost.resource_3;
+
+  const employeeIndex = newProfile.employees.findIndex(
+    (e: { name: string }) => e.name === employeeName
+  );
+
+  if (employeeIndex > -1) {
+    newProfile.employees[employeeIndex].count += 1;
+  } else {
+    newProfile.employees.push({ name: employeeName, count: 1 });
+  }
+
+  return newProfile;
+};
+
 export const developGame = (
   currentProfile: SaveProfile,
   gameName: string,

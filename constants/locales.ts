@@ -67,11 +67,20 @@ export const locales = {
       'Puzzle Game': 'Puzzle Game',
       'Novel Game': 'Novel Game',
     },
+    employees: {
+      'engineer_level_1': 'Level 1 Engineer',
+    },
+    employee: {
+      cost: 'Hiring Cost',
+    },
     developGame: {
       title: 'Game Development',
       backToGame: 'Back to Game',
       develop: 'Develop',
       insufficientResources: 'Insufficient resources',
+    },
+    hireEmployee: {
+      hire: 'Hire',
     },
     fab: {
       developGame: 'Develop Game',
@@ -151,11 +160,20 @@ export const locales = {
       'Puzzle Game': '益智遊戲',
       'Novel Game': '小說遊戲',
     },
+    employees: {
+      'engineer_level_1': '等級 1 工程師',
+    },
+    employee: {
+      cost: '僱用成本',
+    },
     developGame: {
       title: '遊戲開發',
       backToGame: '返回遊戲',
       develop: '開發',
       insufficientResources: '資源不足',
+    },
+    hireEmployee: {
+      hire: '僱用',
     },
     fab: {
       developGame: '遊戲開發',
