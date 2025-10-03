@@ -1,6 +1,6 @@
-import { createNewSaveProfile, updateSaveProfile, developGame } from './game_engine';
-import { SaveProfile, GameSettings } from './types';
-import gameSettings from '../settings.json';
+import { createNewSaveProfile, updateSaveProfile, developGame } from '@/engine/game_engine';
+import { SaveProfile, GameSettings } from '@/engine/types';
+import gameSettings from '@/settings.json';
 
 // Type assertion for gameSettings
 const settings = gameSettings as GameSettings;
