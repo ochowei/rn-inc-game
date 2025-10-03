@@ -1,4 +1,6 @@
+import * as React from 'react';
 import { StyleSheet } from 'react-native';
+import { Tooltip } from 'react-native-paper';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -23,34 +25,42 @@ export function ResourceBar({ resources }: ResourceBarProps) {
       lightColor="rgba(255, 255, 255, 0.9)"
       darkColor="rgba(21, 23, 24, 0.9)"
     >
-      <ThemedView
-        style={styles.resourceItem}
-        lightColor="transparent"
-        darkColor="transparent"
-      >
-        <IconSymbol name="lightbulb.fill" size={20} color={iconColor} />
-        <ThemedText style={styles.resourceText}>
-          {t('resources', 'resource_1')}: {resources.current.resource_1} / {resources.max.resource_1}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView
-        style={styles.resourceItem}
-        lightColor="transparent"
-        darkColor="transparent"
-      >
-        <IconSymbol name="gearshape.fill" size={20} color={iconColor} />
-        <ThemedText style={styles.resourceText}>
-          {t('resources', 'resource_2')}: {resources.current.resource_2} / {resources.max.resource_2}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView
-        style={styles.resourceItem}
-        lightColor="transparent"
-        darkColor="transparent"
-      >
-        <IconSymbol name="dollarsign.circle.fill" size={20} color={iconColor} />
-        <ThemedText style={styles.resourceText}>{t('resources', 'resource_3')}: {resources.current.resource_3}</ThemedText>
-      </ThemedView>
+      <Tooltip title={t('resources', 'resource_1')} leaveTouchDelay={750}>
+        <ThemedView
+          style={styles.resourceItem}
+          lightColor="transparent"
+          darkColor="transparent"
+        >
+          <IconSymbol name="lightbulb.fill" size={20} color={iconColor} />
+          <ThemedText style={styles.resourceText}>
+            {resources.current.resource_1} / {resources.max.resource_1}
+          </ThemedText>
+        </ThemedView>
+      </Tooltip>
+      <Tooltip title={t('resources', 'resource_2')} leaveTouchDelay={750}>
+        <ThemedView
+          style={styles.resourceItem}
+          lightColor="transparent"
+          darkColor="transparent"
+        >
+          <IconSymbol name="gearshape.fill" size={20} color={iconColor} />
+          <ThemedText style={styles.resourceText}>
+            {resources.current.resource_2} / {resources.max.resource_2}
+          </ThemedText>
+        </ThemedView>
+      </Tooltip>
+      <Tooltip title={t('resources', 'resource_3')} leaveTouchDelay={750}>
+        <ThemedView
+          style={styles.resourceItem}
+          lightColor="transparent"
+          darkColor="transparent"
+        >
+          <IconSymbol name="dollarsign.circle.fill" size={20} color={iconColor} />
+          <ThemedText style={styles.resourceText}>
+            {resources.current.resource_3}
+          </ThemedText>
+        </ThemedView>
+      </Tooltip>
     </ThemedView>
   );
 }
