@@ -69,7 +69,7 @@ export default function DevelopGameScreen() {
                   <Button
                     mode="contained"
                     onPress={() => developGame(game.id)}
-                    disabled={!canDevelop(game) || isAcquired || isInProgress}
+                    disabled={!canDevelop(game)}
                   >
                     {t('developGame', 'develop')}
                   </Button>
