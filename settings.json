@@ -64,5 +64,18 @@
         }
       }
     ]
+  },
+  "assets_increasing_method_2": {
+    "name": "hire employee",
+    "assets": [
+      {
+        "name": "engineer_level_1",
+        "hiring_cost": {
+          "resource_1": 0,
+          "resource_2": 0,
+          "resource_3": 100
+        }
+      }
+    ]
   }
 }
