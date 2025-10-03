@@ -4,6 +4,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
+import Fab from '@/components/Fab';
 
 export default function GameScreen() {
   const { t } = useLanguage();
@@ -35,6 +36,7 @@ export default function GameScreen() {
             </ThemedText>
           ))}
         </ThemedView>
+        <Fab />
       </ThemedView>
     </ImageBackground>
   );
