@@ -42,6 +42,9 @@ describe('createNewSaveProfile', () => {
     const gameAssets = newProfile.assets.filter(a => a.type === 'asset_group_1');
     expect(gameAssets.length).toBe(0);
 
+    // Check inProgressAssets
+    expect(newProfile.inProgressAssets).toEqual([]);
+
     // Check createdAt timestamp
     expect(newProfile.createdAt).toBe(expectedCreatedAt);
 
@@ -84,7 +87,6 @@ describe('updateSaveProfile', () => {
     initialProfile.assets.push({
       type: 'asset_group_1',
       id: 'novel_game',
-      status: 'completed',
       development_progress_ticks: 6,
       count: 1,
     });
@@ -103,6 +105,24 @@ describe('updateSaveProfile', () => {
 
     expect(updatedProfile.resources.current.resource_3).toBe(initialProfile.resources.current.resource_3 + expectedIncome);
     expect(updatedProfile.resources.current.resource_2).toBe(expectedResource2);
+  });
+
+  it('should move a completed game from inProgressAssets to assets', () => {
+    const gameToDevelop = settings.assets_group_1.assets.find(g => g.id === 'novel_game')!;
+    initialProfile.inProgressAssets = [
+      {
+        type: 'asset_group_1',
+        id: 'novel_game',
+        status: 'in_progress',
+        development_progress_ticks: 0,
+        start_time: new Date(),
+      },
+    ];
+    const updatedProfile = updateSaveProfile(initialProfile, gameToDevelop.time_cost_ticks, settings);
+    expect(updatedProfile.inProgressAssets.length).toBe(0);
+    const completedGame = updatedProfile.assets.find(a => a.id === 'novel_game');
+    expect(completedGame).toBeDefined();
+    expect(completedGame?.count).toBe(1);
   });
 });
 
@@ -127,7 +147,7 @@ describe('developGame', () => {
     expect(updatedProfile.resources.current.resource_3).toBe(initialProfile.resources.current.resource_3 - gameToDevelop.cost.resource_3);
 
     // Check if game is added to profile with 'in_progress' status
-    const gameAsset = updatedProfile.assets.find(a => a.type === 'asset_group_1' && a.id === gameToDevelop.id);
+    const gameAsset = updatedProfile.inProgressAssets.find(a => a.type === 'asset_group_1' && a.id === gameToDevelop.id);
     expect(gameAsset).toBeDefined();
     expect(gameAsset!.status).toBe('in_progress');
   });
@@ -148,7 +168,7 @@ describe('developGame', () => {
     // Update profile by a few ticks
     profile = updateSaveProfile(profile, 2, settings);
 
-    const gameAsset = profile.assets.find(a => a.type === 'asset_group_1' && a.id === gameToDevelop.id);
+    const gameAsset = profile.inProgressAssets.find(a => a.type === 'asset_group_1' && a.id === gameToDevelop.id);
     expect(gameAsset).toBeDefined();
     expect(gameAsset!.status).toBe('in_progress');
     expect(gameAsset!.development_progress_ticks).toBe(2);
@@ -163,7 +183,10 @@ describe('developGame', () => {
     // Update profile until the game is developed
     profile = updateSaveProfile(profile, developmentTime, settings);
     const gameAsset = profile.assets.find(a => a.type === 'asset_group_1' && a.id === gameToDevelop.id);
-    expect(gameAsset!.status).toBe('completed');
+    expect(gameAsset).toBeDefined();
+
+    const gameAssetInProgress = profile.inProgressAssets.find(a => a.type === 'asset_group_1' && a.id === gameToDevelop.id);
+    expect(gameAssetInProgress).toBeUndefined();
 
     // Now, update profile by one more tick to see if income is generated
     const profileAfterCompletion = updateSaveProfile(profile, 1, settings);

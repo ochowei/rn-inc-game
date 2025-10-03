@@ -36,38 +36,47 @@ export default function DevelopGameScreen() {
     <ThemedView style={styles.container}>
       <ScrollView>
         <View style={styles.gameList}>
-          {settings.assets_group_1.assets.map((game, index) => (
-            <Card key={index} style={styles.card}>
-              <Card.Content>
-                <Title>{t('games', game.name as any)}</Title>
-                <Paragraph>{t('game', 'cost')}:</Paragraph>
-                <Paragraph>
-                  - {t('resources', 'resource_1')}: {game.cost.resource_1}
-                </Paragraph>
-                <Paragraph>
-                  - {t('resources', 'resource_2')}: {game.cost.resource_2}
-                </Paragraph>
-                <Paragraph>
-                  - {t('resources', 'resource_3')}: {game.cost.resource_3}
-                </Paragraph>
-                <Paragraph>
-                  {t('game', 'timeToComplete')}: {game.time_cost_ticks} {t('game', 'seconds')}
-                </Paragraph>
-                <Paragraph>
-                  {t('game', 'income')}: {game.income_per_tick.resource_3} ({t('resources', 'resource_3')}) {t('game', 'per10Seconds')}
-                </Paragraph>
-              </Card.Content>
-              <Card.Actions>
-                <Button
-                  mode="contained"
-                  onPress={() => developGame(game.id)}
-                  disabled={!canDevelop(game)}
-                >
-                  {t('developGame', 'develop')}
-                </Button>
-              </Card.Actions>
-            </Card>
-          ))}
+          {settings.assets_group_1.assets.map((game, index) => {
+            const isAcquired = profile.assets.some(
+              (a) => a.type === 'asset_group_1' && a.id === game.id
+            );
+            const isInProgress = profile.inProgressAssets?.some(
+              (a) => a.id === game.id
+            );
+
+            return (
+              <Card key={index} style={styles.card}>
+                <Card.Content>
+                  <Title>{t('games', game.name as any)}</Title>
+                  <Paragraph>{t('game', 'cost')}:</Paragraph>
+                  <Paragraph>
+                    - {t('resources', 'resource_1')}: {game.cost.resource_1}
+                  </Paragraph>
+                  <Paragraph>
+                    - {t('resources', 'resource_2')}: {game.cost.resource_2}
+                  </Paragraph>
+                  <Paragraph>
+                    - {t('resources', 'resource_3')}: {game.cost.resource_3}
+                  </Paragraph>
+                  <Paragraph>
+                    {t('game', 'timeToComplete')}: {game.time_cost_ticks} {t('game', 'seconds')}
+                  </Paragraph>
+                  <Paragraph>
+                    {t('game', 'income')}: {game.income_per_tick.resource_3} ({t('resources', 'resource_3')}) {t('game', 'per10Seconds')}
+                  </Paragraph>
+                </Card.Content>
+                <Card.Actions>
+                  <Button
+                    mode="contained"
+                    onPress={() => developGame(game.id)}
+                    disabled={!canDevelop(game) || isAcquired || isInProgress}
+                  >
+                    {t('developGame', 'develop')}
+                  </Button>
+                </Card.Actions>
+              </Card>
+            );
+          })}
         </View>
       </ScrollView>
     </ThemedView>

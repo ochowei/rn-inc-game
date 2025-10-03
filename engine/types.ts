@@ -37,10 +37,15 @@ export type AcquiredAsset = {
   type: 'asset_group_1' | 'asset_group_2';
   id: string;
   count: number;
-  status: 'in_progress' | 'completed';
   development_progress_ticks: number;
 };
-
+export type InProgressAsset = {
+  type: 'asset_group_1' | 'asset_group_2';
+  id: string;
+  status: 'in_progress' | 'completed';
+  start_time: Date;
+  development_progress_ticks: number;
+};
 export interface SaveProfile {
   resources: {
     current: ResourceGroup;
@@ -48,5 +53,6 @@ export interface SaveProfile {
     per_tick: ResourceGroup;
   };
   assets: AcquiredAsset[];
+  inProgressAssets: InProgressAsset[];
   createdAt: string;
 }
