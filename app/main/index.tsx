@@ -1,11 +1,9 @@
 import { StyleSheet, ActivityIndicator, ImageBackground } from 'react-native';
-import { Stack } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
-import Fab from '@/components/Fab';
 
 export default function GameScreen() {
   const { t } = useLanguage();
@@ -26,7 +24,6 @@ export default function GameScreen() {
       style={styles.background}
       resizeMode="cover">
       <ThemedView style={styles.container}>
-        <Stack.Screen options={{ title: t('game', 'newGameTitle'), headerShown: false }} />
         <ResourceBar resources={profile.resources} />
         <ThemedText type="title">{t('game', 'newGameTitle')}</ThemedText>
 
@@ -38,8 +35,6 @@ export default function GameScreen() {
             </ThemedText>
           ))}
         </ThemedView>
-
-        <Fab />
       </ThemedView>
     </ImageBackground>
   );
