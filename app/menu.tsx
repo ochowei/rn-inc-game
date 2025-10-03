@@ -39,12 +39,12 @@ export default function GameMenuScreen() {
   };
 
   const handleLoadGame = () => {
-    router.push('/saved-games');
+    router.push('/saved-profiles');
   };
 
   const handleGoToSaves = () => {
     setIsLimitModalVisible(false);
-    router.push('/saved-games');
+    router.push('/saved-profiles');
   };
 
   const handleCloseModal = () => {

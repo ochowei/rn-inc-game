@@ -9,7 +9,7 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
 
-export default function SavedGamesScreen() {
+export default function SavedProfileScreen() {
   const router = useRouter();
   const { profiles, loading, deleteProfile } = useGameStorage();
   const { loadSave } = useGameEngineContext();
