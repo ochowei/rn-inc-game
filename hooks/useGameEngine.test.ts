@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react-native';
 import { useGameEngine, FullSaveProfile } from './useGameEngine';
 import * as GameLogic from '@/engine/game_engine';
 import { useGameStorage } from './use-game-storage';
-import { GameSettings, ResourceGroup } from '@/engine/types';
+import { GameSettings } from '@/engine/types';
 import gameSettings from '@/settings.json';
 
 // Define mock functions that can be manipulated in tests
@@ -28,6 +28,7 @@ jest.mock('@/engine/game_engine', () => ({
       per_tick: { resource_1: 10, resource_2: 20, resource_3: 0 },
     },
     assets: [{ type: 'employee', id: 'engineer_level_1', count: 1 }],
+    inProgressAssets: [],
     createdAt: new Date().toISOString(),
   })),
   updateSaveProfile: jest.fn((profile, ticks, settings) => ({
@@ -51,6 +52,7 @@ const mockInitialProfile: FullSaveProfile = {
     per_tick: { resource_1: 1, resource_2: 1, resource_3: 0 },
   },
   assets: [],
+  inProgressAssets: [],
   createdAt: new Date().toISOString(),
 };
 
@@ -100,6 +102,30 @@ describe('useGameEngine', () => {
     expect(GameLogic.updateSaveProfile).toHaveBeenCalledWith(profileToLoad, expect.any(Number), gameSettings as GameSettings);
     expect(result.current.profile).not.toBeNull();
   });
+
+  it('should handle loading a save without inProgressAssets for backward compatibility', () => {
+    const pastDate = new Date(Date.now() - 1000 * 60).toISOString(); // 1 minute ago
+    const profileToLoad = { ...mockInitialProfile, createdAt: pastDate };
+    delete (profileToLoad as any).inProgressAssets; // Simulate old save format
+
+    const { result } = renderHook(() => useGameEngine());
+    act(() => {
+      result.current.loadSave(profileToLoad as FullSaveProfile);
+    });
+
+    const expectedProfile = {
+      ...profileToLoad,
+      inProgressAssets: [],
+    };
+
+    expect(GameLogic.updateSaveProfile).toHaveBeenCalledWith(
+      expectedProfile,
+      expect.any(Number),
+      gameSettings as GameSettings
+    );
+    expect(result.current.profile).not.toBeNull();
+  });
+
 
   it('should unload the current save', async () => {
     const { result } = renderHook(() => useGameEngine());

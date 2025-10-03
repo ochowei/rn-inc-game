@@ -1,4 +1,4 @@
-import { GameSettings, SaveProfile, ResourceGroup, AcquiredAsset } from './types';
+import { GameSettings, SaveProfile, ResourceGroup, AcquiredAsset, InProgressAsset } from './types';
 
 export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
   const { initial } = settings;
@@ -26,7 +26,6 @@ export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
           type: 'asset_group_2',
           id: assetId,
           count,
-          status: 'completed',
           development_progress_ticks: 0,
         });
       }
@@ -44,6 +43,7 @@ export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
       per_tick: per_tick_resources,
     },
     assets,
+    inProgressAssets: [],
     createdAt: new Date().toISOString(),
   };
 };
@@ -57,6 +57,45 @@ export const updateSaveProfile = (
 
   if (ticks <= 0) {
     return newProfile;
+  }
+
+  // Update in-progress assets
+  const justCompletedAssets: InProgressAsset[] = [];
+  if (newProfile.inProgressAssets) {
+    newProfile.inProgressAssets.forEach((asset) => {
+      const gameData = settings.assets_group_1.assets.find((g) => g.id === asset.id);
+      if (!gameData) return;
+
+      asset.development_progress_ticks += ticks;
+      if (asset.development_progress_ticks >= gameData.time_cost_ticks) {
+        asset.status = 'completed';
+        justCompletedAssets.push(asset);
+        console.log(`Game "${gameData.name}" has been completed!`);
+      }
+    });
+  }
+
+  // Move completed assets from inProgressAssets to assets
+  if (justCompletedAssets.length > 0) {
+    newProfile.inProgressAssets = newProfile.inProgressAssets.filter(
+      (asset) => asset.status !== 'completed'
+    );
+
+    justCompletedAssets.forEach((completed) => {
+      const existingAsset = newProfile.assets.find(
+        (a) => a.id === completed.id && a.type === completed.type
+      );
+      if (existingAsset) {
+        existingAsset.count += 1;
+      } else {
+        newProfile.assets.push({
+          id: completed.id,
+          type: completed.type,
+          count: 1,
+          development_progress_ticks: completed.development_progress_ticks,
+        });
+      }
+    });
   }
 
   const employeeResourcePerTick: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
@@ -75,24 +114,14 @@ export const updateSaveProfile = (
       const gameData = settings.assets_group_1.assets.find((g) => g.id === asset.id);
       if (!gameData) return;
 
-      if (asset.status === 'in_progress') {
-        asset.development_progress_ticks += ticks;
-        if (asset.development_progress_ticks >= gameData.time_cost_ticks) {
-          asset.status = 'completed';
-          console.log(`Game "${gameData.name}" has been completed!`);
-        }
-      }
+      gameIncome.resource_1 += gameData.income_per_tick.resource_1 * ticks;
+      gameIncome.resource_2 += gameData.income_per_tick.resource_2 * ticks;
+      gameIncome.resource_3 += gameData.income_per_tick.resource_3 * ticks;
 
-      if (asset.status === 'completed') {
-        gameIncome.resource_1 += gameData.income_per_tick.resource_1 * ticks;
-        gameIncome.resource_2 += gameData.income_per_tick.resource_2 * ticks;
-        gameIncome.resource_3 += gameData.income_per_tick.resource_3 * ticks;
-
-        if (gameData.maintenance_cost_per_tick) {
-          gameMaintenance.resource_1 += gameData.maintenance_cost_per_tick.resource_1 * ticks;
-          gameMaintenance.resource_2 += gameData.maintenance_cost_per_tick.resource_2 * ticks;
-          gameMaintenance.resource_3 += gameData.maintenance_cost_per_tick.resource_3 * ticks;
-        }
+      if (gameData.maintenance_cost_per_tick) {
+        gameMaintenance.resource_1 += gameData.maintenance_cost_per_tick.resource_1 * ticks;
+        gameMaintenance.resource_2 += gameData.maintenance_cost_per_tick.resource_2 * ticks;
+        gameMaintenance.resource_3 += gameData.maintenance_cost_per_tick.resource_3 * ticks;
       }
     }
   });
@@ -165,7 +194,6 @@ export const hireEmployee = (
       type: 'asset_group_2',
       id: employeeId,
       count: 1,
-      status: 'completed',
       development_progress_ticks: 0,
     });
   }
@@ -196,7 +224,14 @@ export const developGame = (
     return currentProfile;
   }
 
-  if (currentProfile.assets.some((a) => a.type === 'asset_group_1' && a.id === gameId)) {
+  const isAlreadyAcquired = currentProfile.assets.some(
+    (a) => a.type === 'asset_group_1' && a.id === gameId
+  );
+  const isAlreadyInProgress =
+    currentProfile.inProgressAssets &&
+    currentProfile.inProgressAssets.some((a) => a.type === 'asset_group_1' && a.id === gameId);
+
+  if (isAlreadyAcquired || isAlreadyInProgress) {
     console.log(`Game "${gameId}" is already owned or in development.`);
     return currentProfile;
   }
@@ -219,15 +254,18 @@ export const developGame = (
   newProfile.resources.current.resource_2 -= cost.resource_2;
   newProfile.resources.current.resource_3 -= cost.resource_3;
 
-  const newGame: AcquiredAsset = {
+  const newGame: InProgressAsset = {
     type: 'asset_group_1',
     id: gameId,
     status: 'in_progress',
     development_progress_ticks: 0,
-    count: 1,
+    start_time: new Date(),
   };
 
-  newProfile.assets.push(newGame);
+  if (!newProfile.inProgressAssets) {
+    newProfile.inProgressAssets = [];
+  }
+  newProfile.inProgressAssets.push(newGame);
 
   return newProfile;
 };

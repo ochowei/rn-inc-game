@@ -49,7 +49,13 @@ export function useGameEngine(): GameEngineHook {
     const elapsedMilliseconds = now.getTime() - createdAt.getTime();
     const ticks = Math.floor(elapsedMilliseconds / gameSettings.gameTickInterval);
 
-    const updatedCoreProfile = updateSaveProfile(profileToLoad, ticks, gameSettings as GameSettings);
+    // Ensure inProgressAssets exists for backward compatibility
+    const profileWithInProgress = {
+      ...profileToLoad,
+      inProgressAssets: profileToLoad.inProgressAssets || [],
+    };
+
+    const updatedCoreProfile = updateSaveProfile(profileWithInProgress, ticks, gameSettings as GameSettings);
     setProfile({ ...updatedCoreProfile, id: profileToLoad.id });
   }, []);
 

@@ -1,10 +1,14 @@
-import { StyleSheet, ActivityIndicator, ImageBackground } from 'react-native';
+import { StyleSheet, ActivityIndicator, ImageBackground, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
 import Fab from '@/components/Fab';
+import gameSettings from '@/settings.json';
+import { GameSettings } from '@/engine/types';
+
+const settings = gameSettings as GameSettings;
 
 export default function GameScreen() {
   const { t } = useLanguage();
@@ -19,26 +23,59 @@ export default function GameScreen() {
     );
   }
 
+  const acquiredGames = profile.assets.filter((asset) => asset.type === 'asset_group_1');
+  const employees = profile.assets.filter((asset) => asset.type === 'asset_group_2');
+  const inProgressAssets = profile.inProgressAssets || [];
+
   return (
     <ImageBackground
       source={require('@/assets/images/background.png')}
       style={styles.background}
-      resizeMode="cover">
+      resizeMode="cover"
+    >
       <ThemedView style={styles.container}>
         <ResourceBar resources={profile.resources} />
-        <ThemedView style={styles.sectionContainer}>
-          <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
-          {profile.assets.map((asset, index) => {
-            if (asset.type === 'employee') {
+        <ScrollView contentContainerStyle={styles.scrollContentContainer}>
+          <ThemedView style={styles.sectionContainer}>
+            <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
+            {employees.map((asset, index) => {
+              const employeeInfo = settings.assets_group_2.assets.find((e) => e.id === asset.id);
               return (
                 <ThemedText key={index}>
-                  {t('game', asset.id as any)}：{asset.count} {t('game', 'peopleClassifier')}
+                  {t('employees', employeeInfo?.id as any) || asset.id}：{asset.count}{' '}
+                  {t('game', 'peopleClassifier')}
                 </ThemedText>
               );
-            }
-            return null;
-          })}
-        </ThemedView>
+            })}
+          </ThemedView>
+
+          {acquiredGames.length > 0 && (
+            <ThemedView style={styles.sectionContainer}>
+              <ThemedText type="subtitle">{t('game', 'acquiredGames')}</ThemedText>
+              {acquiredGames.map((asset, index) => {
+                const gameInfo = settings.assets_group_1.assets.find((g) => g.id === asset.id);
+                return <ThemedText key={index}>{t('games', gameInfo?.id as any) || asset.id}</ThemedText>;
+              })}
+            </ThemedView>
+          )}
+
+          {inProgressAssets.length > 0 && (
+            <ThemedView style={styles.sectionContainer}>
+              <ThemedText type="subtitle">{t('game', 'inProgressGames')}</ThemedText>
+              {inProgressAssets.map((asset, index) => {
+                const gameInfo = settings.assets_group_1.assets.find((g) => g.id === asset.id);
+                const progress = gameInfo
+                  ? Math.round((asset.development_progress_ticks / gameInfo.time_cost_ticks) * 100)
+                  : 0;
+                return (
+                  <ThemedText key={index}>
+                    {t('games', gameInfo?.id as any) || asset.id}: {progress}%
+                  </ThemedText>
+                );
+              })}
+            </ThemedView>
+          )}
+        </ScrollView>
         <Fab />
       </ThemedView>
     </ImageBackground>
@@ -51,11 +88,13 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
     paddingTop: 60,
     backgroundColor: 'transparent',
+  },
+  scrollContentContainer: {
+    alignItems: 'center',
+    padding: 16,
+    width: '100%',
   },
   sectionContainer: {
     marginTop: 16,

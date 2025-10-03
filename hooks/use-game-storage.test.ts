@@ -53,6 +53,7 @@ const mockProfile: EngineSaveProfile = {
     per_tick: { resource_1: 1, resource_2: 1, resource_3: 0 },
   },
   assets: [],
+  inProgressAssets: [],
   createdAt: new Date().toISOString(),
 };
 
