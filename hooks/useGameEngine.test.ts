@@ -24,11 +24,10 @@ jest.mock('@/engine/game_engine', () => ({
   createNewSaveProfile: jest.fn((settings: GameSettings) => ({
     resources: {
       current: { ...settings.initial.resources },
-      max: { ...settings.engineer_level_1.resource_max },
-      per_tick: { ...settings.engineer_level_1.resource_per_tick },
+      max: { resource_1: 100, resource_2: 100, resource_3: 0 },
+      per_tick: { resource_1: 10, resource_2: 20, resource_3: 0 },
     },
-    employees: [{ name: 'engineer_level_1', count: settings.initial.assets.engineer_level_1 }],
-    games: [],
+    assets: [{ type: 'employee', id: 'engineer_level_1', count: 1 }],
     createdAt: new Date().toISOString(),
   })),
   updateSaveProfile: jest.fn((profile, ticks, settings) => ({
@@ -41,7 +40,7 @@ jest.mock('@/engine/game_engine', () => ({
       },
     },
   })),
-  developGame: jest.fn((profile, gameName, settings) => profile),
+  developGame: jest.fn((profile, gameId, settings) => profile),
 }));
 
 const mockInitialProfile: FullSaveProfile = {
@@ -51,8 +50,7 @@ const mockInitialProfile: FullSaveProfile = {
     max: { resource_1: 200, resource_2: 200, resource_3: 0 },
     per_tick: { resource_1: 1, resource_2: 1, resource_3: 0 },
   },
-  employees: [],
-  games: [],
+  assets: [],
   createdAt: new Date().toISOString(),
 };
 
@@ -70,7 +68,7 @@ describe('useGameEngine', () => {
         },
       },
     }));
-    (GameLogic.developGame as jest.Mock).mockClear().mockImplementation((profile, gameName, settings) => profile);
+    (GameLogic.developGame as jest.Mock).mockClear().mockImplementation((profile, gameId, settings) => profile);
     mockAddProfile.mockClear().mockResolvedValue({ ...mockInitialProfile, id: 'new-id' });
     mockUpdateProfile.mockClear();
   });
@@ -121,11 +119,11 @@ describe('useGameEngine', () => {
       await result.current.createNewSave();
     });
     act(() => {
-      result.current.developGame('New Super Game');
+      result.current.developGame('novel_game');
     });
     expect(GameLogic.developGame).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'new-id' }),
-      'New Super Game',
+      'novel_game',
       gameSettings as GameSettings
     );
   });

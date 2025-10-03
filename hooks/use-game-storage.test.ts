@@ -52,8 +52,7 @@ const mockProfile: EngineSaveProfile = {
     max: { resource_1: 200, resource_2: 200, resource_3: 0 },
     per_tick: { resource_1: 1, resource_2: 1, resource_3: 0 },
   },
-  employees: [],
-  games: [],
+  assets: [],
   createdAt: new Date().toISOString(),
 };
 

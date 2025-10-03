@@ -17,7 +17,7 @@ export interface GameEngineHook {
   loadSave: (profileToLoad: FullSaveProfile) => void;
   createNewSave: () => Promise<FullSaveProfile | undefined>;
   unloadSave: () => void;
-  developGame: (gameName: string) => void;
+  developGame: (gameId: string) => void;
   hireEmployee: (employeeId: string) => void;
   saveCurrentProgress: () => Promise<void>;
 }
@@ -102,10 +102,10 @@ export function useGameEngine(): GameEngineHook {
     }
   }, [addProfile, updateProfile]);
 
-  const developGame = useCallback((gameName: string) => {
+  const developGame = useCallback((gameId: string) => {
     setProfile((prevProfile) => {
       if (!prevProfile) return null;
-      const newCoreProfile = developGameLogic(prevProfile, gameName, gameSettings as GameSettings);
+      const newCoreProfile = developGameLogic(prevProfile, gameId, gameSettings as GameSettings);
 
       const newProfile = { ...newCoreProfile, id: prevProfile.id };
 

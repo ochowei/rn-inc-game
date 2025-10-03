@@ -28,11 +28,16 @@ export default function GameScreen() {
         <ResourceBar resources={profile.resources} />
         <ThemedView style={styles.sectionContainer}>
           <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
-          {profile.employees.map((employee, index) => (
-            <ThemedText key={index}>
-              {t('game', employee.name as any)}：{employee.count} {t('game', 'peopleClassifier')}
-            </ThemedText>
-          ))}
+          {profile.assets.map((asset, index) => {
+            if (asset.type === 'employee') {
+              return (
+                <ThemedText key={index}>
+                  {t('game', asset.id as any)}：{asset.count} {t('game', 'peopleClassifier')}
+                </ThemedText>
+              );
+            }
+            return null;
+          })}
         </ThemedView>
         <Fab />
       </ThemedView>
