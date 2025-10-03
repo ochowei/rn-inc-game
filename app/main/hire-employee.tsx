@@ -17,9 +17,9 @@ export default function HireEmployeeScreen() {
     if (!profile) return false;
     const cost = employee.hiring_cost;
     return (
-      profile.resources.current.resource_3 >= cost.resource_3 &&
       profile.resources.current.resource_1 >= cost.resource_1 &&
-      profile.resources.current.resource_2 >= cost.resource_2
+      profile.resources.current.resource_2 >= cost.resource_2 &&
+      profile.resources.current.resource_3 >= cost.resource_3
     );
   };
 
@@ -42,13 +42,13 @@ export default function HireEmployeeScreen() {
                 <Title>{t('employees', employee.name as any)}</Title>
                 <Paragraph>{t('employee', 'cost')}:</Paragraph>
                 <Paragraph>
-                  - {t('resources', 'resource_3')}: {employee.hiring_cost.resource_3}
-                </Paragraph>
-                <Paragraph>
                   - {t('resources', 'resource_1')}: {employee.hiring_cost.resource_1}
                 </Paragraph>
                 <Paragraph>
                   - {t('resources', 'resource_2')}: {employee.hiring_cost.resource_2}
+                </Paragraph>
+                <Paragraph>
+                  - {t('resources', 'resource_3')}: {employee.hiring_cost.resource_3}
                 </Paragraph>
               </Card.Content>
               <Card.Actions>
