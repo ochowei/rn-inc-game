@@ -1,6 +1,6 @@
 import { StyleSheet, Pressable, Platform, View, ImageBackground } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -18,6 +18,22 @@ export default function GameMenuScreen() {
   const tintColor = useThemeColor({}, 'tint');
 
   const [isLimitModalVisible, setIsLimitModalVisible] = useState(false);
+
+  const gameCounts = useMemo(() => {
+    return profiles.reduce(
+      (acc, profile) => {
+        profile.assets.forEach((asset) => {
+          if (asset.id === 'novel_game') {
+            acc.novel_game += asset.count;
+          } else if (asset.id === 'puzzle_game') {
+            acc.puzzle_game += asset.count;
+          }
+        });
+        return acc;
+      },
+      { novel_game: 0, puzzle_game: 0 }
+    );
+  }, [profiles]);
 
   const disabledBackgroundColor = useThemeColor({}, 'disabledBackground');
   const disabledBorderColor = useThemeColor({}, 'disabledBorder');
@@ -82,6 +98,10 @@ export default function GameMenuScreen() {
           </Pressable>
         </View>
         <ThemedText type="title">{t('menu', 'title')}</ThemedText>
+        <View style={styles.gameCountsContainer}>
+          <ThemedText style={styles.countText}>Novel Games: {gameCounts.novel_game}</ThemedText>
+          <ThemedText style={styles.countText}>Puzzle Games: {gameCounts.puzzle_game}</ThemedText>
+        </View>
         <ThemedView style={styles.buttonsContainer}>
           <Pressable onPress={handleNewGame} style={styles.button}>
             <ThemedText style={styles.buttonText}>{t('menu', 'newGame')}</ThemedText>
@@ -122,6 +142,14 @@ export default function GameMenuScreen() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
+  },
+  gameCountsContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+    backgroundColor: 'transparent',
+  },
+  countText: {
+    fontSize: 16,
   },
   container: {
     flex: 1,
