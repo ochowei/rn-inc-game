@@ -26,8 +26,6 @@ export default function GameScreen() {
       resizeMode="cover">
       <ThemedView style={styles.container}>
         <ResourceBar resources={profile.resources} />
-        <ThemedText type="title">{t('game', 'newGameTitle')}</ThemedText>
-
         <ThemedView style={styles.sectionContainer}>
           <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
           {profile.employees.map((employee, index) => (
