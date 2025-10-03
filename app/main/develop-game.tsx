@@ -60,7 +60,7 @@ export default function DevelopGameScreen() {
               <Card.Actions>
                 <Button
                   mode="contained"
-                  onPress={() => developGame(game.name)}
+                  onPress={() => developGame(game.id)}
                   disabled={!canDevelop(game)}
                 >
                   {t('developGame', 'develop')}
