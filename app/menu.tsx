@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable, Platform, View } from 'react-native';
+import { StyleSheet, Pressable, Platform, View, ImageBackground } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 
@@ -62,61 +62,73 @@ export default function GameMenuScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.languageButtons}>
-        <Pressable
-          onPress={() => setLanguage('zh')}
-          style={[styles.langButton, language === 'zh' && styles.langButtonActive]}
-        >
-          <ThemedText>{t('settings', 'chinese')}</ThemedText>
-        </Pressable>
-        <Pressable
-          onPress={() => setLanguage('en')}
-          style={[styles.langButton, language === 'en' && styles.langButtonActive]}
-        >
-          <ThemedText>{t('settings', 'english')}</ThemedText>
-        </Pressable>
-      </View>
-      <ThemedText type="title">{t('menu', 'title')}</ThemedText>
-      <ThemedView style={styles.buttonsContainer}>
-        <Pressable onPress={handleNewGame} style={styles.button}>
-          <ThemedText style={styles.buttonText}>{t('menu', 'newGame')}</ThemedText>
-        </Pressable>
-        <Pressable
-          onPress={handleLoadGame}
-          style={[styles.button, !hasSavedGames && disabledButtonStyle]}
-          disabled={!hasSavedGames}
-        >
-          <ThemedText style={styles.buttonText}>{t('menu', 'savedGame')}</ThemedText>
-        </Pressable>
-      </ThemedView>
+    <ImageBackground
+      source={require('../assets/images/background.png')}
+      style={styles.background}
+      resizeMode="cover">
+      <ThemedView style={styles.container}>
+        <View style={styles.languageButtons}>
+          <Pressable
+            onPress={() => setLanguage('zh')}
+            style={[styles.langButton, language === 'zh' && styles.langButtonActive]}
+          >
+            <ThemedText>{t('settings', 'chinese')}</ThemedText>
+          </Pressable>
+          <Pressable
+            onPress={() => setLanguage('en')}
+            style={[styles.langButton, language === 'en' && styles.langButtonActive]}
+          >
+            <ThemedText>{t('settings', 'english')}</ThemedText>
+          </Pressable>
+        </View>
+        <ThemedText type="title">{t('menu', 'title')}</ThemedText>
+        <ThemedView style={styles.buttonsContainer}>
+          <Pressable onPress={handleNewGame} style={styles.button}>
+            <ThemedText style={styles.buttonText}>{t('menu', 'newGame')}</ThemedText>
+          </Pressable>
+          <Pressable
+            onPress={handleLoadGame}
+            style={[styles.button, !hasSavedGames && disabledButtonStyle]}
+            disabled={!hasSavedGames}
+          >
+            <ThemedText style={styles.buttonText}>{t('menu', 'savedGame')}</ThemedText>
+          </Pressable>
+        </ThemedView>
 
-      {isLimitModalVisible && (
-        <ThemedView style={styles.confirmationContainer}>
-          <ThemedView style={styles.confirmationBox}>
-            <ThemedText type="subtitle">{t('menu', 'saveLimitReached')}</ThemedText>
-            <ThemedText>{t('menu', 'saveLimitMessage')}</ThemedText>
-            <ThemedView style={styles.confirmationButtons}>
-              <Pressable onPress={handleCloseModal} style={[styles.button, { borderColor: tintColor }]}>
-                <ThemedText style={styles.buttonText}>{t('menu', 'close')}</ThemedText>
-              </Pressable>
-              <Pressable onPress={handleGoToSaves} style={[styles.button, { borderColor: tintColor }]}>
-                <ThemedText style={styles.buttonText}>{t('menu', 'goToSaves')}</ThemedText>
-              </Pressable>
+        {isLimitModalVisible && (
+          <ThemedView style={styles.confirmationContainer}>
+            <ThemedView
+              style={styles.confirmationBox}
+              lightColor="rgba(255, 255, 255, 0.9)"
+              darkColor="rgba(21, 23, 24, 0.9)">
+              <ThemedText type="subtitle">{t('menu', 'saveLimitReached')}</ThemedText>
+              <ThemedText>{t('menu', 'saveLimitMessage')}</ThemedText>
+              <ThemedView style={styles.confirmationButtons}>
+                <Pressable onPress={handleCloseModal} style={[styles.button, { borderColor: tintColor }]}>
+                  <ThemedText style={styles.buttonText}>{t('menu', 'close')}</ThemedText>
+                </Pressable>
+                <Pressable onPress={handleGoToSaves} style={[styles.button, { borderColor: tintColor }]}>
+                  <ThemedText style={styles.buttonText}>{t('menu', 'goToSaves')}</ThemedText>
+                </Pressable>
+              </ThemedView>
             </ThemedView>
           </ThemedView>
-        </ThemedView>
-      )}
-    </ThemedView>
+        )}
+      </ThemedView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
+    backgroundColor: 'transparent',
   },
   languageButtons: {
     flexDirection: 'row',
@@ -139,6 +151,7 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     marginTop: 32,
     gap: 16,
+    backgroundColor: 'transparent',
   },
   button: {
     paddingVertical: 12,
@@ -172,5 +185,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '100%',
     marginTop: 10,
+    backgroundColor: 'transparent',
   },
 });
