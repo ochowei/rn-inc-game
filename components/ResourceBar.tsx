@@ -25,7 +25,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
       lightColor="rgba(255, 255, 255, 0.9)"
       darkColor="rgba(21, 23, 24, 0.9)"
     >
-      <Tooltip title={t('resources', 'resource_1')}>
+      <Tooltip title={t('resources', 'resource_1')} leaveTouchDelay={750}>
         <ThemedView
           style={styles.resourceItem}
           lightColor="transparent"
@@ -37,7 +37,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
           </ThemedText>
         </ThemedView>
       </Tooltip>
-      <Tooltip title={t('resources', 'resource_2')}>
+      <Tooltip title={t('resources', 'resource_2')} leaveTouchDelay={750}>
         <ThemedView
           style={styles.resourceItem}
           lightColor="transparent"
@@ -49,7 +49,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
           </ThemedText>
         </ThemedView>
       </Tooltip>
-      <Tooltip title={t('resources', 'resource_3')}>
+      <Tooltip title={t('resources', 'resource_3')} leaveTouchDelay={750}>
         <ThemedView
           style={styles.resourceItem}
           lightColor="transparent"
