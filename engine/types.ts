@@ -33,11 +33,18 @@ export interface GameSettings {
   [key: string]: any; // Allow for other dynamic properties
 }
 
-export interface Game {
-  name: string;
-  status: 'developing' | 'completed';
-  development_progress_ticks: number;
-}
+export type AcquiredAsset =
+  | {
+      type: 'employee';
+      id: string;
+      count: number;
+    }
+  | {
+      type: 'game';
+      id: string;
+      status: 'developing' | 'completed';
+      development_progress_ticks: number;
+    };
 
 export interface SaveProfile {
   resources: {
@@ -45,10 +52,6 @@ export interface SaveProfile {
     max: ResourceGroup;
     per_tick: ResourceGroup;
   };
-  employees: {
-    name: string;
-    count: number;
-  }[];
-  games: Game[];
+  assets: AcquiredAsset[];
   createdAt: string;
 }
