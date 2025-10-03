@@ -224,17 +224,6 @@ export const developGame = (
     return currentProfile;
   }
 
-  const isAlreadyAcquired = currentProfile.assets.some(
-    (a) => a.type === 'asset_group_1' && a.id === gameId
-  );
-  const isAlreadyInProgress =
-    currentProfile.inProgressAssets &&
-    currentProfile.inProgressAssets.some((a) => a.type === 'asset_group_1' && a.id === gameId);
-
-  if (isAlreadyAcquired || isAlreadyInProgress) {
-    console.log(`Game "${gameId}" is already owned or in development.`);
-    return currentProfile;
-  }
 
   const { cost } = gameData;
   const { current: currentResources } = currentProfile.resources;
