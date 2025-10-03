@@ -161,6 +161,19 @@ describe('developGame', () => {
     expect(updatedProfile).toEqual(initialProfile);
   });
 
+  it('should allow developing the same game multiple times', () => {
+    const gameToDevelop = settings.assets_group_1.assets[0];
+    let updatedProfile = developGame(initialProfile, gameToDevelop.id, settings);
+
+    // Develop the same game again
+    updatedProfile = developGame(updatedProfile, gameToDevelop.id, settings);
+
+    const inProgressGames = updatedProfile.inProgressAssets.filter(
+      (a) => a.type === 'asset_group_1' && a.id === gameToDevelop.id
+    );
+    expect(inProgressGames.length).toBe(2);
+  });
+
   it('should progress game development over ticks', () => {
     const gameToDevelop = settings.assets_group_1.assets[0];
     let profile = developGame(initialProfile, gameToDevelop.id, settings);
