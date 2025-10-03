@@ -25,7 +25,6 @@ export default function RootLayout() {
             <Stack>
               <Stack.Screen name="menu" options={{ headerShown: false }} />
               <Stack.Screen name="main" options={{ headerShown: false }} />
-              <Stack.Screen name="develop-game" options={{ headerShown: false }} />
               <Stack.Screen name="saved-games" />
               <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
               <Stack.Screen name="+not-found" />
