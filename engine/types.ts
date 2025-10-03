@@ -26,6 +26,13 @@ export interface GameSettings {
       maintenance_cost_per_tick: ResourceGroup;
     }[];
   };
+  assets_increasing_method_2: {
+    name: string;
+    assets: {
+      name: string;
+      hiring_cost: ResourceGroup;
+    }[];
+  };
   [key: string]: any; // Allow for other dynamic properties
 }
 
