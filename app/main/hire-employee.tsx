@@ -11,7 +11,7 @@ const settings = gameSettings as GameSettings;
 
 export default function HireEmployeeScreen() {
   const { t } = useLanguage();
-  const { profile, hireEmployee } = useGameEngineContext();
+  const { profile, addAsset } = useGameEngineContext();
 
   const canHire = (employee: (typeof settings.assets_group_2.assets)[0]) => {
     if (!profile) return false;
@@ -54,7 +54,7 @@ export default function HireEmployeeScreen() {
               <Card.Actions>
                 <Button
                   mode="contained"
-                  onPress={() => hireEmployee(employee.id)}
+                  onPress={() => addAsset('asset_group_2', employee.id)}
                   disabled={!canHire(employee)}
                 >
                   {t('hireEmployee', 'hire')}

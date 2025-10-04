@@ -153,79 +153,25 @@ export const updateSaveProfile = (
   return newProfile;
 };
 
-export const hireEmployee = (
+export const addAsset = (
   currentProfile: SaveProfile,
-  employeeId: string,
+  assetType: 'asset_group_1' | 'asset_group_2',
+  assetId: string,
   settings: GameSettings
 ): SaveProfile => {
-  const employeeData = settings.assets_group_2.assets.find((e) => e.id === employeeId);
-
-  if (!employeeData) {
-    console.log(`Employee "${employeeId}" not found in settings.`);
-    return currentProfile;
-  }
-
-  const { cost } = employeeData;
-  const { current: currentResources } = currentProfile.resources;
-
-  if (
-    currentResources.resource_1 < cost.resource_1 ||
-    currentResources.resource_2 < cost.resource_2 ||
-    currentResources.resource_3 < cost.resource_3
-  ) {
-    console.log(`Insufficient resources to hire "${employeeId}".`);
-    return currentProfile;
-  }
-
-  const newProfile = JSON.parse(JSON.stringify(currentProfile));
-
-  newProfile.resources.current.resource_1 -= cost.resource_1;
-  newProfile.resources.current.resource_2 -= cost.resource_2;
-  newProfile.resources.current.resource_3 -= cost.resource_3;
-
-  const employeeAsset = newProfile.assets.find(
-    (a: AcquiredAsset) => a.type === 'asset_group_2' && a.id === employeeId
-  );
-
-  if (employeeAsset) {
-    employeeAsset.count += 1;
+  let assetData;
+  if (assetType === 'asset_group_1') {
+    assetData = settings.assets_group_1.assets.find((a) => a.id === assetId);
   } else {
-    newProfile.assets.push({
-      type: 'asset_group_2',
-      id: employeeId,
-      count: 1,
-      development_progress_ticks: 0,
-    });
+    assetData = settings.assets_group_2.assets.find((a) => a.id === assetId);
   }
 
-  if (employeeData.income_per_tick) {
-    newProfile.resources.per_tick.resource_1 += employeeData.income_per_tick.resource_1;
-    newProfile.resources.per_tick.resource_2 += employeeData.income_per_tick.resource_2;
-    newProfile.resources.per_tick.resource_3 += employeeData.income_per_tick.resource_3;
-  }
-  if (employeeData.resource_max) {
-    newProfile.resources.max.resource_1 += employeeData.resource_max.resource_1;
-    newProfile.resources.max.resource_2 += employeeData.resource_max.resource_2;
-    newProfile.resources.max.resource_3 += employeeData.resource_max.resource_3;
-  }
-
-  return newProfile;
-};
-
-export const developGame = (
-  currentProfile: SaveProfile,
-  gameId: string,
-  settings: GameSettings
-): SaveProfile => {
-  const gameData = settings.assets_group_1.assets.find((g) => g.id === gameId);
-
-  if (!gameData) {
-    console.log(`Game "${gameId}" not found in settings.`);
+  if (!assetData) {
+    console.log(`Asset "${assetId}" of type "${assetType}" not found in settings.`);
     return currentProfile;
   }
 
-
-  const { cost } = gameData;
+  const { cost } = assetData;
   const { current: currentResources } = currentProfile.resources;
 
   if (
@@ -233,7 +179,7 @@ export const developGame = (
     currentResources.resource_2 < cost.resource_2 ||
     currentResources.resource_3 < cost.resource_3
   ) {
-    console.log(`Insufficient resources to develop "${gameId}".`);
+    console.log(`Insufficient resources to acquire asset "${assetId}".`);
     return currentProfile;
   }
 
@@ -243,18 +189,45 @@ export const developGame = (
   newProfile.resources.current.resource_2 -= cost.resource_2;
   newProfile.resources.current.resource_3 -= cost.resource_3;
 
-  const newGame: InProgressAsset = {
-    type: 'asset_group_1',
-    id: gameId,
-    status: 'in_progress',
-    development_progress_ticks: 0,
-    start_time: new Date(),
-  };
+  if (assetType === 'asset_group_1') {
+    const newGame: InProgressAsset = {
+      type: 'asset_group_1',
+      id: assetId,
+      status: 'in_progress',
+      development_progress_ticks: 0,
+      start_time: new Date(),
+    };
+    if (!newProfile.inProgressAssets) {
+      newProfile.inProgressAssets = [];
+    }
+    newProfile.inProgressAssets.push(newGame);
+  } else if (assetType === 'asset_group_2') {
+    const employeeAsset = newProfile.assets.find(
+      (a: AcquiredAsset) => a.type === 'asset_group_2' && a.id === assetId
+    );
 
-  if (!newProfile.inProgressAssets) {
-    newProfile.inProgressAssets = [];
+    if (employeeAsset) {
+      employeeAsset.count += 1;
+    } else {
+      newProfile.assets.push({
+        type: 'asset_group_2',
+        id: assetId,
+        count: 1,
+        development_progress_ticks: 0,
+      });
+    }
+
+    if (assetData.income_per_tick) {
+      newProfile.resources.per_tick.resource_1 += assetData.income_per_tick.resource_1 || 0;
+      newProfile.resources.per_tick.resource_2 += assetData.income_per_tick.resource_2 || 0;
+      newProfile.resources.per_tick.resource_3 += assetData.income_per_tick.resource_3 || 0;
+    }
+    if (assetData.resource_max) {
+      newProfile.resources.max.resource_1 += assetData.resource_max.resource_1 || 0;
+      newProfile.resources.max.resource_2 += assetData.resource_max.resource_2 || 0;
+      newProfile.resources.max.resource_3 += assetData.resource_max.resource_3 || 0;
+    }
   }
-  newProfile.inProgressAssets.push(newGame);
 
   return newProfile;
 };

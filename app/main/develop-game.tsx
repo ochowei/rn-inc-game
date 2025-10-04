@@ -11,7 +11,7 @@ const settings = gameSettings as GameSettings;
 
 export default function DevelopGameScreen() {
   const { t } = useLanguage();
-  const { profile, developGame } = useGameEngineContext();
+  const { profile, addAsset } = useGameEngineContext();
 
   const canDevelop = (game: (typeof settings.assets_group_1.assets)[0]) => {
     if (!profile) return false;
@@ -68,7 +68,7 @@ export default function DevelopGameScreen() {
                 <Card.Actions>
                   <Button
                     mode="contained"
-                    onPress={() => developGame(game.id)}
+                    onPress={() => addAsset('asset_group_1', game.id)}
                     disabled={!canDevelop(game)}
                   >
                     {t('developGame', 'develop')}

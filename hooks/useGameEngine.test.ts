@@ -41,7 +41,7 @@ jest.mock('@/engine/game_engine', () => ({
       },
     },
   })),
-  developGame: jest.fn((profile, gameId, settings) => profile),
+  addAsset: jest.fn((profile, assetType, assetId, settings) => profile),
 }));
 
 const mockInitialProfile: FullSaveProfile = {
@@ -70,7 +70,7 @@ describe('useGameEngine', () => {
         },
       },
     }));
-    (GameLogic.developGame as jest.Mock).mockClear().mockImplementation((profile, gameId, settings) => profile);
+    (GameLogic.addAsset as jest.Mock).mockClear().mockImplementation((profile, assetType, assetId, settings) => profile);
     mockAddProfile.mockClear().mockResolvedValue({ ...mockInitialProfile, id: 'new-id' });
     mockUpdateProfile.mockClear();
   });
@@ -139,16 +139,17 @@ describe('useGameEngine', () => {
     expect(result.current.profile).toBeNull();
   });
 
-  it('should develop a game', async () => {
+  it('should add an asset', async () => {
     const { result } = renderHook(() => useGameEngine());
     await act(async () => {
       await result.current.createNewSave();
     });
     act(() => {
-      result.current.developGame('novel_game');
+      result.current.addAsset('asset_group_1', 'novel_game');
     });
-    expect(GameLogic.developGame).toHaveBeenCalledWith(
+    expect(GameLogic.addAsset).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'new-id' }),
+      'asset_group_1',
       'novel_game',
       gameSettings as GameSettings
     );
