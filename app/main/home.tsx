@@ -1,5 +1,4 @@
 import { StyleSheet, ActivityIndicator, ImageBackground, ScrollView } from 'react-native';
-import { useMemo } from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ResourceBar } from '@/components/ResourceBar';
@@ -14,20 +13,6 @@ const settings = gameSettings as GameSettings;
 export default function GameScreen() {
   const { t } = useLanguage();
   const { profile } = useGameEngineContext();
-
-  const gameCounts = useMemo(() => {
-    const counts = { novel_game: 0, puzzle_game: 0 };
-    if (profile) {
-      profile.assets.forEach((asset) => {
-        if (asset.id === 'novel_game') {
-          counts.novel_game += asset.count;
-        } else if (asset.id === 'puzzle_game') {
-          counts.puzzle_game += asset.count;
-        }
-      });
-    }
-    return counts;
-  }, [profile]);
 
   if (!profile) {
     return (
@@ -52,11 +37,6 @@ export default function GameScreen() {
         <ResourceBar resources={profile.resources} />
         <ScrollView contentContainerStyle={styles.scrollContentContainer}>
           <ThemedView style={styles.sectionContainer}>
-            <ThemedText type="subtitle">{t('game', 'gameStatus')}</ThemedText>
-            <ThemedText>Novel Games: {gameCounts.novel_game}</ThemedText>
-            <ThemedText>Puzzle Games: {gameCounts.puzzle_game}</ThemedText>
-          </ThemedView>
-          <ThemedView style={styles.sectionContainer}>
             <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
             {employees.map((asset, index) => {
               const employeeInfo = settings.assets_group_2.assets.find((e) => e.id === asset.id);
@@ -74,7 +54,11 @@ export default function GameScreen() {
               <ThemedText type="subtitle">{t('game', 'acquiredGames')}</ThemedText>
               {acquiredGames.map((asset, index) => {
                 const gameInfo = settings.assets_group_1.assets.find((g) => g.id === asset.id);
-                return <ThemedText key={index}>{t('games', gameInfo?.id as any) || asset.id}</ThemedText>;
+                return (
+                  <ThemedText key={index}>
+                    {t('games', gameInfo?.id as any) || asset.id}: {asset.count}
+                  </ThemedText>
+                );
               })}
             </ThemedView>
           )}
