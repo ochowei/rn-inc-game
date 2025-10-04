@@ -54,7 +54,11 @@ export default function GameScreen() {
               <ThemedText type="subtitle">{t('game', 'acquiredGames')}</ThemedText>
               {acquiredGames.map((asset, index) => {
                 const gameInfo = settings.assets_group_1.assets.find((g) => g.id === asset.id);
-                return <ThemedText key={index}>{t('games', gameInfo?.id as any) || asset.id}</ThemedText>;
+                return (
+                  <ThemedText key={index}>
+                    {t('games', gameInfo?.id as any) || asset.id}: {asset.count}
+                  </ThemedText>
+                );
               })}
             </ThemedView>
           )}
