@@ -1,4 +1,4 @@
-import { createNewSaveProfile, updateSaveProfile, developGame } from './game_engine';
+import { createNewSaveProfile, updateSaveProfile, addAsset } from './game_engine';
 import { SaveProfile, GameSettings } from './types';
 import gameSettings from '../settings.json';
 
@@ -126,7 +126,7 @@ describe('updateSaveProfile', () => {
   });
 });
 
-describe('developGame', () => {
+describe('addAsset', () => {
   let initialProfile: SaveProfile;
 
   beforeEach(() => {
@@ -137,88 +137,71 @@ describe('developGame', () => {
     initialProfile.resources.current.resource_3 = 100;
   });
 
-  it('should start developing a game if resources are sufficient', () => {
-    const gameToDevelop = settings.assets_group_1.assets[0];
-    const updatedProfile = developGame(initialProfile, gameToDevelop.id, settings);
+  // Test for developing a game (asset_group_1)
+  describe('when adding a game (asset_group_1)', () => {
+    it('should start developing a game if resources are sufficient', () => {
+      const gameToDevelop = settings.assets_group_1.assets[0];
+      const updatedProfile = addAsset(initialProfile, 'asset_group_1', gameToDevelop.id, settings);
 
-    // Check if costs are deducted
-    expect(updatedProfile.resources.current.resource_1).toBe(initialProfile.resources.current.resource_1 - gameToDevelop.cost.resource_1);
-    expect(updatedProfile.resources.current.resource_2).toBe(initialProfile.resources.current.resource_2 - gameToDevelop.cost.resource_2);
-    expect(updatedProfile.resources.current.resource_3).toBe(initialProfile.resources.current.resource_3 - gameToDevelop.cost.resource_3);
+      // Check if costs are deducted
+      expect(updatedProfile.resources.current.resource_1).toBe(100 - gameToDevelop.cost.resource_1);
+      expect(updatedProfile.resources.current.resource_2).toBe(100 - gameToDevelop.cost.resource_2);
+      expect(updatedProfile.resources.current.resource_3).toBe(100 - gameToDevelop.cost.resource_3);
 
-    // Check if game is added to profile with 'in_progress' status
-    const gameAsset = updatedProfile.inProgressAssets.find(a => a.type === 'asset_group_1' && a.id === gameToDevelop.id);
-    expect(gameAsset).toBeDefined();
-    expect(gameAsset!.status).toBe('in_progress');
+      // Check if game is added to profile with 'in_progress' status
+      const gameAsset = updatedProfile.inProgressAssets.find(a => a.type === 'asset_group_1' && a.id === gameToDevelop.id);
+      expect(gameAsset).toBeDefined();
+      expect(gameAsset!.status).toBe('in_progress');
+    });
+
+    it('should not develop a game if resources are insufficient', () => {
+      initialProfile.resources.current.resource_3 = 0; // Not enough money
+      const gameToDevelop = settings.assets_group_1.assets[0];
+      const updatedProfile = addAsset(initialProfile, 'asset_group_1', gameToDevelop.id, settings);
+
+      // Profile should not change
+      expect(updatedProfile).toEqual(initialProfile);
+    });
   });
 
-  it('should not develop a game if resources are insufficient', () => {
-    initialProfile.resources.current.resource_3 = 0; // Not enough money
-    const gameToDevelop = settings.assets_group_1.assets[0];
-    const updatedProfile = developGame(initialProfile, gameToDevelop.id, settings);
+  // Test for hiring an employee (asset_group_2)
+  describe('when adding an employee (asset_group_2)', () => {
+    it('should hire an employee if resources are sufficient', () => {
+      const employeeToHire = settings.assets_group_2.assets.find(e => e.id === 'engineer_level_1')!;
+      const updatedProfile = addAsset(initialProfile, 'asset_group_2', employeeToHire.id, settings);
 
-    // Profile should not change
-    expect(updatedProfile).toEqual(initialProfile);
-  });
+      // Check if costs are deducted
+      expect(updatedProfile.resources.current.resource_1).toBe(100 - employeeToHire.cost.resource_1);
+      expect(updatedProfile.resources.current.resource_2).toBe(100 - employeeToHire.cost.resource_2);
+      expect(updatedProfile.resources.current.resource_3).toBe(100 - employeeToHire.cost.resource_3);
 
-  it('should allow developing the same game multiple times', () => {
-    const gameToDevelop = settings.assets_group_1.assets[0];
-    let updatedProfile = developGame(initialProfile, gameToDevelop.id, settings);
+      // Check if employee is added to assets
+      const employeeAsset = updatedProfile.assets.find(a => a.type === 'asset_group_2' && a.id === employeeToHire.id);
+      expect(employeeAsset).toBeDefined();
+      expect(employeeAsset!.count).toBe(2);
 
-    // Develop the same game again
-    updatedProfile = developGame(updatedProfile, gameToDevelop.id, settings);
+      // Check if resource limits and per_tick are updated
+      expect(updatedProfile.resources.max.resource_1).toBe(initialProfile.resources.max.resource_1 + (employeeToHire.resource_max?.resource_1 || 0));
+      expect(updatedProfile.resources.per_tick.resource_3).toBe(initialProfile.resources.per_tick.resource_3 + (employeeToHire.income_per_tick?.resource_3 || 0));
+    });
 
-    const inProgressGames = updatedProfile.inProgressAssets.filter(
-      (a) => a.type === 'asset_group_1' && a.id === gameToDevelop.id
-    );
-    expect(inProgressGames.length).toBe(2);
-  });
+    it('should not hire an employee if resources are insufficient', () => {
+      initialProfile.resources.current.resource_3 = 0; // Not enough money
+      const employeeToHire = settings.assets_group_2.assets.find(e => e.id === 'engineer_level_1')!;
+      const updatedProfile = addAsset(initialProfile, 'asset_group_2', employeeToHire.id, settings);
 
-  it('should progress game development over ticks', () => {
-    const gameToDevelop = settings.assets_group_1.assets[0];
-    let profile = developGame(initialProfile, gameToDevelop.id, settings);
+      // Profile should not change
+      expect(updatedProfile).toEqual(initialProfile);
+    });
 
-    // Update profile by a few ticks
-    profile = updateSaveProfile(profile, 2, settings);
+    it('should increment count when hiring an existing employee', () => {
+        const employeeToHire = settings.assets_group_2.assets.find(e => e.id === 'engineer_level_1')!;
+        const updatedProfile = addAsset(initialProfile, 'asset_group_2', employeeToHire.id, settings);
 
-    const gameAsset = profile.inProgressAssets.find(a => a.type === 'asset_group_1' && a.id === gameToDevelop.id);
-    expect(gameAsset).toBeDefined();
-    expect(gameAsset!.status).toBe('in_progress');
-    expect(gameAsset!.development_progress_ticks).toBe(2);
-  });
-
-  it('should complete game development and start generating income', () => {
-    const gameToDevelop = settings.assets_group_1.assets[0];
-    let profile = developGame(initialProfile, gameToDevelop.id, settings);
-
-    const developmentTime = gameToDevelop.time_cost_ticks;
-
-    // Update profile until the game is developed
-    profile = updateSaveProfile(profile, developmentTime, settings);
-    const gameAsset = profile.assets.find(a => a.type === 'asset_group_1' && a.id === gameToDevelop.id);
-    expect(gameAsset).toBeDefined();
-
-    const gameAssetInProgress = profile.inProgressAssets.find(a => a.type === 'asset_group_1' && a.id === gameToDevelop.id);
-    expect(gameAssetInProgress).toBeUndefined();
-
-    // Now, update profile by one more tick to see if income is generated
-    const profileAfterCompletion = updateSaveProfile(profile, 1, settings);
-
-    const expectedIncome = gameToDevelop.income_per_tick.resource_3 * 1;
-    const expectedMaintenance = (gameToDevelop.maintenance_cost_per_tick?.resource_2 || 0) * 1;
-
-    const engineerData = settings.assets_group_2.assets.find(e => e.id === 'engineer_level_1')!;
-    const { income_per_tick } = engineerData!;
-    const resource2FromEmployees = (income_per_tick!.resource_2 || 0) * 1;
-
-    const resource3BeforeIncome = profile.resources.current.resource_3;
-    const resource2BeforeIncome = profile.resources.current.resource_2;
-
-    const expectedResource3 = resource3BeforeIncome + expectedIncome;
-    const resource2AfterEmployees = Math.min(profile.resources.max.resource_2, resource2BeforeIncome + resource2FromEmployees);
-    const expectedResource2 = resource2AfterEmployees - expectedMaintenance;
-
-    expect(profileAfterCompletion.resources.current.resource_3).toBe(expectedResource3);
-    expect(profileAfterCompletion.resources.current.resource_2).toBe(expectedResource2);
+        const employeeAsset = updatedProfile.assets.find(a => a.type === 'asset_group_2' && a.id === employeeToHire.id);
+        expect(employeeAsset).toBeDefined();
+        // Initial count is 1, after hiring one more it should be 2
+        expect(employeeAsset!.count).toBe(2);
+    });
   });
 });

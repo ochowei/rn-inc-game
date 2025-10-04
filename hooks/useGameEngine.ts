@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   updateSaveProfile,
-  developGame as developGameLogic,
+  addAsset as addAssetLogic,
   createNewSaveProfile as createNewSaveLogic,
-  hireEmployee as hireEmployeeLogic,
 } from '@/engine/game_engine';
 import { SaveProfile as EngineSaveProfile, GameSettings } from '@/engine/types';
 import { useGameStorage, SaveProfile as StoredSaveProfile } from './use-game-storage';
@@ -17,8 +16,7 @@ export interface GameEngineHook {
   loadSave: (profileToLoad: FullSaveProfile) => void;
   createNewSave: () => Promise<FullSaveProfile | undefined>;
   unloadSave: () => void;
-  developGame: (gameId: string) => void;
-  hireEmployee: (employeeId: string) => void;
+  addAsset: (assetType: 'asset_group_1' | 'asset_group_2', assetId: string) => void;
   saveCurrentProgress: () => Promise<void>;
 }
 
@@ -108,46 +106,39 @@ export function useGameEngine(): GameEngineHook {
     }
   }, [addProfile, updateProfile]);
 
-  const developGame = useCallback((gameId: string) => {
-    setProfile((prevProfile) => {
-      if (!prevProfile) return null;
-      const newCoreProfile = developGameLogic(prevProfile, gameId, gameSettings as GameSettings);
-
-      const newProfile = { ...newCoreProfile, id: prevProfile.id };
-
-      if (newCoreProfile !== prevProfile) {
-        saveProfileNow(newProfile);
-      }
-      return newProfile;
-    });
-  }, [saveProfileNow]);
-
   const saveCurrentProgress = useCallback(async () => {
     if (!profile) return;
     await saveProfileNow(profile);
   }, [profile, saveProfileNow]);
 
-  const hireEmployee = useCallback((employeeId: string) => {
-    setProfile((prevProfile) => {
-      if (!prevProfile) return null;
-      const newCoreProfile = hireEmployeeLogic(prevProfile, employeeId, gameSettings as GameSettings);
+  const addAsset = useCallback(
+    (assetType: 'asset_group_1' | 'asset_group_2', assetId: string) => {
+      setProfile((prevProfile) => {
+        if (!prevProfile) return null;
+        const newCoreProfile = addAssetLogic(
+          prevProfile,
+          assetType,
+          assetId,
+          gameSettings as GameSettings
+        );
 
-      const newProfile = { ...newCoreProfile, id: prevProfile.id };
+        const newProfile = { ...newCoreProfile, id: prevProfile.id };
 
-      if (newCoreProfile !== prevProfile) {
-        saveProfileNow(newProfile);
-      }
-      return newProfile;
-    });
-  }, [saveProfileNow]);
+        if (newCoreProfile !== prevProfile) {
+          saveProfileNow(newProfile);
+        }
+        return newProfile;
+      });
+    },
+    [saveProfileNow]
+  );
 
   return {
     profile,
     loadSave,
     createNewSave,
     unloadSave,
-    developGame,
-    hireEmployee,
+    addAsset,
     saveCurrentProgress,
   };
 }
