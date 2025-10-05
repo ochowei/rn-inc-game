@@ -1,10 +1,10 @@
 import { Audio } from 'expo-av';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export const useAudio = () => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [bgm, setBgm] = useState<Audio.Sound | null>(null);
-  const [playBGM, setPlayBGM] = useState(true);
+  const [playBGM, setPlayBGM] = useState(true); // User's preference
 
   useEffect(() => {
     let localSound: Audio.Sound | null = null;
@@ -38,24 +38,32 @@ export const useAudio = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const manageBgmPlayback = async () => {
-      if (!bgm) return;
+  const playBGM_func = useCallback(async () => {
+    if (bgm && playBGM) { // Respects user's preference
       const status = await bgm.getStatusAsync();
-      if (!status.isLoaded) return;
-
-      if (playBGM) {
-        if (!status.isPlaying) {
-          await bgm.playAsync();
-        }
-      } else {
-        if (status.isPlaying) {
-          await bgm.stopAsync();
-        }
+      if (status.isLoaded && !status.isPlaying) {
+        await bgm.playAsync();
       }
-    };
-    manageBgmPlayback();
+    }
   }, [bgm, playBGM]);
+
+  const stopBGM_func = useCallback(async () => {
+    if (bgm) {
+      const status = await bgm.getStatusAsync();
+      if (status.isLoaded && status.isPlaying) {
+        await bgm.stopAsync();
+      }
+    }
+  }, [bgm]);
+
+  // Effect to handle user toggling BGM on/off directly
+  useEffect(() => {
+    if (playBGM) {
+      playBGM_func();
+    } else {
+      stopBGM_func();
+    }
+  }, [playBGM, playBGM_func, stopBGM_func]);
 
   const playClickSound = async () => {
     if (sound) {
@@ -63,5 +71,5 @@ export const useAudio = () => {
     }
   };
 
-  return { playClickSound, setPlayBGM, playBGM };
+  return { playClickSound, setPlayBGM, playBGM, playBGM_func, stopBGM_func };
 };
