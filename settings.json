@@ -10,6 +10,7 @@
     }
   },
   "gameTickInterval": 5000,
+  "unlimited_resources": ["resource_3"],
   "assets_group_1": {
     "name": "game_development",
     "assets": [
