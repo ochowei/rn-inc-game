@@ -13,7 +13,8 @@ export const locales = {
     options: {
       title: 'Options',
       back: 'Back',
-      toggleBGM: 'Mute BGM',
+      muteBGM: 'Mute BGM',
+      playBGM: 'Play BGM',
     },
     game: {
       newGameTitle: 'New Game',
@@ -115,7 +116,8 @@ export const locales = {
     options: {
       title: '選項',
       back: '返回',
-      toggleBGM: '靜音背景音樂',
+      muteBGM: '靜音背景音樂',
+      playBGM: '播放背景音樂',
     },
     game: {
       newGameTitle: '新遊戲',

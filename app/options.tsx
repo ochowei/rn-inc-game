@@ -29,7 +29,9 @@ export default function OptionsScreen() {
         <ThemedText type="title">{t('options', 'title')}</ThemedText>
         <View style={styles.optionsContainer}>
           <View style={styles.optionRow}>
-            <ThemedText style={styles.label}>{t('options', 'toggleBGM')}</ThemedText>
+            <ThemedText style={styles.label}>
+              {isMuted ? t('options', 'playBGM') : t('options', 'muteBGM')}
+            </ThemedText>
             <Checkbox
               status={isMuted ? 'checked' : 'unchecked'}
               onPress={toggleMute}
