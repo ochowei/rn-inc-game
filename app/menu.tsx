@@ -8,12 +8,14 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { useGameStorage } from '@/hooks/use-game-storage';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
+import { useAudioContext } from '@/contexts/AudioContext';
 
 export default function GameMenuScreen() {
   const router = useRouter();
   const { profiles, fetchProfiles } = useGameStorage();
   const { createNewSave } = useGameEngineContext();
   const { language, setLanguage, t } = useLanguage();
+  const { playClickSound } = useAudioContext();
   const hasSavedGames = profiles.length > 0;
   const tintColor = useThemeColor({}, 'tint');
 
@@ -29,6 +31,7 @@ export default function GameMenuScreen() {
   );
 
   const handleNewGame = async () => {
+    playClickSound();
     const newProfile = await createNewSave();
     if (newProfile) {
       router.push('/main/');
@@ -39,15 +42,18 @@ export default function GameMenuScreen() {
   };
 
   const handleLoadGame = () => {
+    playClickSound();
     router.push('/saved-profiles');
   };
 
   const handleGoToSaves = () => {
+    playClickSound();
     setIsLimitModalVisible(false);
     router.push('/saved-profiles');
   };
 
   const handleCloseModal = () => {
+    playClickSound();
     setIsLimitModalVisible(false);
   };
 
