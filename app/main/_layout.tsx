@@ -12,10 +12,10 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        listeners: {
-          tabPress: () => {
-            playClickSound();
-          },
+      }}
+      screenListeners={{
+        tabPress: () => {
+          playClickSound();
         },
       }}>
       <Tabs.Screen
