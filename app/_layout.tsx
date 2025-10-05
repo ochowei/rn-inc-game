@@ -1,6 +1,6 @@
 import 'react-native-reanimated';
 import { useFonts } from 'expo-font';
-import { Stack, useRouterState } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
@@ -13,25 +13,32 @@ import { AudioProvider, useAudioContext } from '@/contexts/AudioContext';
 // BGM Manager Component to handle background music across different screens
 const BGMManager = () => {
   const { playBGM, stopBGM } = useAudioContext();
-  // Get the current route name
-  const route = useRouterState().routes.at(-1);
-  const routeName = route?.name;
+  const pathname = usePathname();
+
+  console.log('BGMManager rendering. Current pathname:', pathname);
 
   useEffect(() => {
+    console.log('BGMManager useEffect triggered for pathname:', pathname);
+    // Extract the screen name from the path, removing the leading slash
+    const currentScreen = pathname.substring(1);
+
     // Define which screens should have BGM
     const gameScreens = ['menu', 'main', 'saved-profiles'];
-    if (routeName && gameScreens.includes(routeName)) {
+    if (gameScreens.includes(currentScreen)) {
+      console.log('Playing BGM for screen:', currentScreen);
       playBGM();
     } else {
+      console.log('Stopping BGM for screen:', currentScreen);
       // Stop BGM on any other screen
       stopBGM();
     }
-  }, [routeName, playBGM, stopBGM]);
+  }, [pathname, playBGM, stopBGM]);
 
   return null; // This component does not render anything
 };
 
 export default function RootLayout() {
+  console.log('RootLayout rendering');
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
