@@ -1,4 +1,4 @@
-import { GameSettings, SaveProfile, ResourceGroup, AcquiredAsset, InProgressAsset } from './types';
+import { GameSettings, SaveProfile, ResourceGroup, AcquiredAsset, InProgressAsset, Asset } from './types';
 
 export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
   const { initial } = settings;
@@ -98,57 +98,59 @@ export const updateSaveProfile = (
     });
   }
 
-  const employeeResourcePerTick: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
-  const gameIncome: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
-  const gameMaintenance: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
+  // Recalculate all resource modifiers from all assets
+  const total_income_per_tick: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
+  const total_maintenance_per_tick: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
+  const max_resources: ResourceGroup = { resource_1: 0, resource_2: 0, resource_3: 0 };
 
   newProfile.assets.forEach((asset) => {
-    if (asset.type === 'asset_group_2') {
-      const employeeSettings = settings.assets_group_2.assets.find((e) => e.id === asset.id);
-      if (employeeSettings && employeeSettings.income_per_tick) {
-        employeeResourcePerTick.resource_1 += asset.count * (employeeSettings.income_per_tick.resource_1 || 0);
-        employeeResourcePerTick.resource_2 += asset.count * (employeeSettings.income_per_tick.resource_2 || 0);
-        employeeResourcePerTick.resource_3 += asset.count * (employeeSettings.income_per_tick.resource_3 || 0);
+    let assetSettings;
+    if (asset.type === 'asset_group_1') {
+      assetSettings = settings.assets_group_1.assets.find((a: Asset) => a.id === asset.id);
+    } else if (asset.type === 'asset_group_2') {
+      assetSettings = settings.assets_group_2.assets.find((a: Asset) => a.id === asset.id);
+    }
+
+    if (assetSettings) {
+      const count = asset.count || 1;
+      if (assetSettings.income_per_tick) {
+        total_income_per_tick.resource_1 += (assetSettings.income_per_tick.resource_1 || 0) * count;
+        total_income_per_tick.resource_2 += (assetSettings.income_per_tick.resource_2 || 0) * count;
+        total_income_per_tick.resource_3 += (assetSettings.income_per_tick.resource_3 || 0) * count;
       }
-    } else if (asset.type === 'asset_group_1') {
-      const gameData = settings.assets_group_1.assets.find((g) => g.id === asset.id);
-      if (!gameData) return;
-
-      gameIncome.resource_1 += gameData.income_per_tick.resource_1 * ticks;
-      gameIncome.resource_2 += gameData.income_per_tick.resource_2 * ticks;
-      gameIncome.resource_3 += gameData.income_per_tick.resource_3 * ticks;
-
-      if (gameData.maintenance_cost_per_tick) {
-        gameMaintenance.resource_1 += gameData.maintenance_cost_per_tick.resource_1 * ticks;
-        gameMaintenance.resource_2 += gameData.maintenance_cost_per_tick.resource_2 * ticks;
-        gameMaintenance.resource_3 += gameData.maintenance_cost_per_tick.resource_3 * ticks;
+      if (assetSettings.maintenance_cost_per_tick) {
+        total_maintenance_per_tick.resource_1 +=
+          (assetSettings.maintenance_cost_per_tick.resource_1 || 0) * count;
+        total_maintenance_per_tick.resource_2 +=
+          (assetSettings.maintenance_cost_per_tick.resource_2 || 0) * count;
+        total_maintenance_per_tick.resource_3 +=
+          (assetSettings.maintenance_cost_per_tick.resource_3 || 0) * count;
+      }
+      if (assetSettings.resource_max) {
+        max_resources.resource_1 += (assetSettings.resource_max.resource_1 || 0) * count;
+        max_resources.resource_2 += (assetSettings.resource_max.resource_2 || 0) * count;
+        max_resources.resource_3 += (assetSettings.resource_max.resource_3 || 0) * count;
       }
     }
   });
 
-  // Apply employee generation
-  newProfile.resources.current.resource_1 = Math.min(
-    newProfile.resources.max.resource_1,
-    newProfile.resources.current.resource_1 + employeeResourcePerTick.resource_1 * ticks
-  );
-  newProfile.resources.current.resource_2 = Math.min(
-    newProfile.resources.max.resource_2,
-    newProfile.resources.current.resource_2 + employeeResourcePerTick.resource_2 * ticks
-  );
-  newProfile.resources.current.resource_3 = Math.min(
-    newProfile.resources.max.resource_3 || Infinity,
-    newProfile.resources.current.resource_3 + employeeResourcePerTick.resource_3 * ticks
-  );
+  // Update profile state for display and logic
+  newProfile.resources.max = max_resources;
+  newProfile.resources.per_tick = total_income_per_tick;
 
-  // Apply game income
-  newProfile.resources.current.resource_1 += gameIncome.resource_1;
-  newProfile.resources.current.resource_2 += gameIncome.resource_2;
-  newProfile.resources.current.resource_3 += gameIncome.resource_3;
+  // Apply income and maintenance for the tick period
+  const { current } = newProfile.resources;
+  current.resource_1 += (total_income_per_tick.resource_1 - total_maintenance_per_tick.resource_1) * ticks;
+  current.resource_2 += (total_income_per_tick.resource_2 - total_maintenance_per_tick.resource_2) * ticks;
+  current.resource_3 += (total_income_per_tick.resource_3 - total_maintenance_per_tick.resource_3) * ticks;
 
-  // Apply game maintenance
-  newProfile.resources.current.resource_1 = Math.max(0, newProfile.resources.current.resource_1 - gameMaintenance.resource_1);
-  newProfile.resources.current.resource_2 = Math.max(0, newProfile.resources.current.resource_2 - gameMaintenance.resource_2);
-  newProfile.resources.current.resource_3 = Math.max(0, newProfile.resources.current.resource_3 - gameMaintenance.resource_3);
+  // Clamp to max and min
+  current.resource_1 = Math.max(0, Math.min(current.resource_1, newProfile.resources.max.resource_1));
+  current.resource_2 = Math.max(0, Math.min(current.resource_2, newProfile.resources.max.resource_2));
+  current.resource_3 = Math.max(
+    0,
+    Math.min(current.resource_3, newProfile.resources.max.resource_3 || Infinity)
+  );
 
   return newProfile;
 };
