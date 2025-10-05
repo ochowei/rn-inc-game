@@ -1,74 +1,60 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTheme } from '@/hooks/useTheme';
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { LoginButton } from '@/components/LoginButton';
 import { useLanguage } from '@/hooks/use-language';
 import { useAudioContext } from '@/contexts/AudioContext';
+import { SoundPressable } from '@/components/ui/SoundPressable';
 
 export default function SettingsScreen() {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
-  const { isMuted, toggleMute, playClickSound } = useAudioContext();
-
-  const handleSetTheme = (newTheme: 'light' | 'dark' | 'system') => {
-    playClickSound();
-    setTheme(newTheme);
-  };
-
-  const handleSetLanguage = (newLang: 'zh' | 'en') => {
-    playClickSound();
-    setLanguage(newLang);
-  };
-
-  const handleToggleMute = () => {
-    playClickSound();
-    toggleMute();
-  };
+  const { isMuted, toggleMute } = useAudioContext();
 
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title">{t('settings', 'title')}</ThemedText>
       <ThemedView style={styles.optionsContainer}>
         <ThemedText type="subtitle">{t('settings', 'theme')}</ThemedText>
-        <Pressable
+        <SoundPressable
           style={[styles.button, theme === 'light' && styles.buttonActive]}
-          onPress={() => handleSetTheme('light')}>
+          onPress={() => setTheme('light')}>
           <ThemedText style={theme === 'light' && styles.buttonTextActive}>{t('settings', 'light')}</ThemedText>
-        </Pressable>
-        <Pressable
+        </SoundPressable>
+        <SoundPressable
           style={[styles.button, theme === 'dark' && styles.buttonActive]}
-          onPress={() => handleSetTheme('dark')}>
+          onPress={() => setTheme('dark')}>
           <ThemedText style={theme === 'dark' && styles.buttonTextActive}>{t('settings', 'dark')}</ThemedText>
-        </Pressable>
-        <Pressable
+        </SoundPressable>
+        <SoundPressable
           style={[styles.button, theme === 'system' && styles.buttonActive]}
-          onPress={() => handleSetTheme('system')}>
+          onPress={() => setTheme('system')}>
           <ThemedText style={theme === 'system' && styles.buttonTextActive}>{t('settings', 'system')}</ThemedText>
-        </Pressable>
+        </SoundPressable>
       </ThemedView>
       <ThemedView style={styles.optionsContainer}>
         <ThemedText type="subtitle">{t('settings', 'language')}</ThemedText>
-        <Pressable
+        <SoundPressable
           style={[styles.button, language === 'zh' && styles.buttonActive]}
-          onPress={() => handleSetLanguage('zh')}>
+          onPress={() => setLanguage('zh')}>
           <ThemedText style={language === 'zh' && styles.buttonTextActive}>{t('settings', 'chinese')}</ThemedText>
-        </Pressable>
-        <Pressable
+        </SoundPressable>
+        <SoundPressable
           style={[styles.button, language === 'en' && styles.buttonActive]}
-          onPress={() => handleSetLanguage('en')}>
+          onPress={() => setLanguage('en')}>
           <ThemedText style={language === 'en' && styles.buttonTextActive}>{t('settings', 'english')}</ThemedText>
-        </Pressable>
+        </SoundPressable>
       </ThemedView>
       <ThemedView style={styles.optionsContainer}>
         <ThemedText type="subtitle">{t('settings', 'sound')}</ThemedText>
-        <Pressable
+        <SoundPressable
           style={[styles.button, isMuted && styles.buttonActive]}
-          onPress={handleToggleMute}>
+          onPress={toggleMute}>
           <ThemedText style={isMuted ? styles.buttonTextActive : {}}>
             {isMuted ? t('settings', 'unmute') : t('settings', 'mute')}
           </ThemedText>
-        </Pressable>
+        </SoundPressable>
       </ThemedView>
       <LoginButton />
     </ThemedView>

@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable, Platform, View, ImageBackground } from 'react-native';
+import { StyleSheet, Platform, View, ImageBackground } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 
@@ -8,14 +8,13 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { useGameStorage } from '@/hooks/use-game-storage';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
-import { useAudioContext } from '@/contexts/AudioContext';
+import { SoundPressable } from '@/components/ui/SoundPressable';
 
 export default function GameMenuScreen() {
   const router = useRouter();
   const { profiles, fetchProfiles } = useGameStorage();
   const { createNewSave } = useGameEngineContext();
   const { language, setLanguage, t } = useLanguage();
-  const { playClickSound } = useAudioContext();
   const hasSavedGames = profiles.length > 0;
   const tintColor = useThemeColor({}, 'tint');
 
@@ -31,7 +30,6 @@ export default function GameMenuScreen() {
   );
 
   const handleNewGame = async () => {
-    playClickSound();
     const newProfile = await createNewSave();
     if (newProfile) {
       router.push('/main/');
@@ -42,18 +40,15 @@ export default function GameMenuScreen() {
   };
 
   const handleLoadGame = () => {
-    playClickSound();
     router.push('/saved-profiles');
   };
 
   const handleGoToSaves = () => {
-    playClickSound();
     setIsLimitModalVisible(false);
     router.push('/saved-profiles');
   };
 
   const handleCloseModal = () => {
-    playClickSound();
     setIsLimitModalVisible(false);
   };
 
@@ -74,31 +69,31 @@ export default function GameMenuScreen() {
       resizeMode="cover">
       <ThemedView style={styles.container}>
         <View style={styles.languageButtons}>
-          <Pressable
+          <SoundPressable
             onPress={() => setLanguage('zh')}
             style={[styles.langButton, language === 'zh' && styles.langButtonActive]}
           >
             <ThemedText>{t('settings', 'chinese')}</ThemedText>
-          </Pressable>
-          <Pressable
+          </SoundPressable>
+          <SoundPressable
             onPress={() => setLanguage('en')}
             style={[styles.langButton, language === 'en' && styles.langButtonActive]}
           >
             <ThemedText>{t('settings', 'english')}</ThemedText>
-          </Pressable>
+          </SoundPressable>
         </View>
         <ThemedText type="title">{t('menu', 'title')}</ThemedText>
         <ThemedView style={styles.buttonsContainer}>
-          <Pressable onPress={handleNewGame} style={styles.button}>
+          <SoundPressable onPress={handleNewGame} style={styles.button}>
             <ThemedText style={styles.buttonText}>{t('menu', 'newGame')}</ThemedText>
-          </Pressable>
-          <Pressable
+          </SoundPressable>
+          <SoundPressable
             onPress={handleLoadGame}
             style={[styles.button, !hasSavedGames && disabledButtonStyle]}
             disabled={!hasSavedGames}
           >
             <ThemedText style={styles.buttonText}>{t('menu', 'savedGame')}</ThemedText>
-          </Pressable>
+          </SoundPressable>
         </ThemedView>
 
         {isLimitModalVisible && (
@@ -110,12 +105,12 @@ export default function GameMenuScreen() {
               <ThemedText type="subtitle">{t('menu', 'saveLimitReached')}</ThemedText>
               <ThemedText>{t('menu', 'saveLimitMessage')}</ThemedText>
               <ThemedView style={styles.confirmationButtons}>
-                <Pressable onPress={handleCloseModal} style={[styles.button, { borderColor: tintColor }]}>
+                <SoundPressable onPress={handleCloseModal} style={[styles.button, { borderColor: tintColor }]}>
                   <ThemedText style={styles.buttonText}>{t('menu', 'close')}</ThemedText>
-                </Pressable>
-                <Pressable onPress={handleGoToSaves} style={[styles.button, { borderColor: tintColor }]}>
+                </SoundPressable>
+                <SoundPressable onPress={handleGoToSaves} style={[styles.button, { borderColor: tintColor }]}>
                   <ThemedText style={styles.buttonText}>{t('menu', 'goToSaves')}</ThemedText>
-                </Pressable>
+                </SoundPressable>
               </ThemedView>
             </ThemedView>
           </ThemedView>
