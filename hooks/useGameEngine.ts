@@ -30,15 +30,33 @@ export function useGameEngine(): GameEngineHook {
       return;
     }
 
-    const intervalId = setInterval(() => {
+    const gameTickInterval = gameSettings.gameTickInterval;
+    let intervalId: NodeJS.Timeout | null = null;
+
+    const gameTick = () => {
       setProfile((prevProfile) => {
         if (!prevProfile) return null;
         const updatedCoreProfile = updateSaveProfile(prevProfile, 1, gameSettings as GameSettings);
         return { ...updatedCoreProfile, id: prevProfile.id };
       });
-    }, gameSettings.gameTickInterval);
+    };
 
-    return () => clearInterval(intervalId);
+    const startTicking = () => {
+      // First tick, right now.
+      gameTick();
+      // Subsequent ticks
+      intervalId = setInterval(gameTick, gameTickInterval);
+    };
+
+    const delay = gameTickInterval - (Date.now() % gameTickInterval);
+    const timeoutId = setTimeout(startTicking, delay);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, [profile]); // Effect should only re-run when the game profile changes
 
   const loadSave = useCallback((profileToLoad: FullSaveProfile) => {
