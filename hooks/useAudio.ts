@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 export const useAudio = () => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [bgm, setBgm] = useState<Audio.Sound | null>(null);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isBgmOn, setIsBgmOn] = useState(true);
+  const [isSfxOn, setIsSfxOn] = useState(true);
 
   const loadSounds = async () => {
     try {
@@ -31,14 +32,24 @@ export const useAudio = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (bgm) {
+      if (isBgmOn) {
+        playBGM();
+      } else {
+        stopBGM();
+      }
+    }
+  }, [isBgmOn, bgm]);
+
   const playClickSound = async () => {
-    if (sound && !isMuted) {
+    if (sound && isSfxOn) {
       await sound.replayAsync();
     }
   };
 
   const playBGM = async () => {
-    if (bgm && !isMuted) {
+    if (bgm) {
       const status = await bgm.getStatusAsync();
       if (status.isLoaded && !status.isPlaying) {
         await bgm.playAsync();
@@ -51,26 +62,18 @@ export const useAudio = () => {
         const status = await bgm.getStatusAsync();
         if (status.isLoaded && status.isPlaying) {
             await bgm.stopAsync();
+            await bgm.setPositionAsync(0); // Reset position
         }
     }
   };
 
-  const toggleMute = async () => {
-    const newMuteState = !isMuted;
-    setIsMuted(newMuteState);
-    if (bgm) {
-        await bgm.setIsMutedAsync(newMuteState);
-    }
-    if (sound) {
-        await sound.setIsMutedAsync(newMuteState);
-    }
-    if (!newMuteState && bgm) {
-        const status = await bgm.getStatusAsync();
-        if(status.isLoaded && !status.isPlaying) {
-            playBGM();
-        }
-    }
+  const toggleBGM = () => {
+    setIsBgmOn(previousState => !previousState);
   };
 
-  return { playClickSound, playBGM, stopBGM, toggleMute, isMuted, loadSounds };
+  const toggleSfx = () => {
+    setIsSfxOn(previousState => !previousState);
+  };
+
+  return { playClickSound, playBGM, stopBGM, toggleBGM, toggleSfx, isBgmOn, isSfxOn, loadSounds };
 };

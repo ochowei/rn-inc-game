@@ -31,7 +31,7 @@ export function useGameEngine(): GameEngineHook {
     }
 
     const gameTickInterval = gameSettings.gameTickInterval;
-    let intervalId: NodeJS.Timeout | null = null;
+    let intervalId: any = null;
 
     const gameTick = () => {
       setProfile((prevProfile) => {

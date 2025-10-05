@@ -13,7 +13,7 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 export default function OptionsScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { isMuted, toggleMute } = useAudioContext();
+  const { isBgmOn, toggleBGM, isSfxOn, toggleSfx } = useAudioContext();
   const color = useThemeColor({}, 'text');
 
   const handleBack = () => {
@@ -29,10 +29,18 @@ export default function OptionsScreen() {
         <ThemedText type="title">{t('options', 'title')}</ThemedText>
         <View style={styles.optionsContainer}>
           <View style={styles.optionRow}>
-            <ThemedText style={styles.label}>{t('options', 'toggleBGM')}</ThemedText>
+            <ThemedText style={styles.label}>{t('options', 'playBGM')}</ThemedText>
             <Checkbox
-              status={isMuted ? 'checked' : 'unchecked'}
-              onPress={toggleMute}
+              status={isBgmOn ? 'checked' : 'unchecked'}
+              onPress={toggleBGM}
+              color={color}
+            />
+          </View>
+          <View style={styles.optionRow}>
+            <ThemedText style={styles.label}>{t('options', 'toggleSFX')}</ThemedText>
+            <Checkbox
+              status={isSfxOn ? 'checked' : 'unchecked'}
+              onPress={toggleSfx}
               color={color}
             />
           </View>

@@ -6,8 +6,10 @@ interface AudioContextType {
   playClickSound: () => Promise<void>;
   playBGM: () => Promise<void>;
   stopBGM: () => Promise<void>;
-  toggleMute: () => Promise<void>;
-  isMuted: boolean;
+  toggleBGM: () => void;
+  toggleSfx: () => void;
+  isBgmOn: boolean;
+  isSfxOn: boolean;
 }
 
 // Create the context with a default undefined value
@@ -23,8 +25,10 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
     playClickSound: audio.playClickSound,
     playBGM: audio.playBGM,
     stopBGM: audio.stopBGM,
-    toggleMute: audio.toggleMute,
-    isMuted: audio.isMuted,
+    toggleBGM: audio.toggleBGM,
+    toggleSfx: audio.toggleSfx,
+    isBgmOn: audio.isBgmOn,
+    isSfxOn: audio.isSfxOn,
   };
 
   return (
