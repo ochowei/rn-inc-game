@@ -12,7 +12,7 @@ export const useAudio = () => {
         require('../assets/audio/click.mp3')
       );
       const { sound: bgmSound } = await Audio.Sound.createAsync(
-        require('../assets/audio/bgm.mp3')
+        require('../assets/audio/bgm-1.mp3')
       );
       await bgmSound.setIsLoopingAsync(true);
       setSound(clickSound);
