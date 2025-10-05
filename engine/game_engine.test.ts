@@ -76,11 +76,77 @@ describe('updateSaveProfile', () => {
     expect(updatedProfile.resources.current.resource_2).toBe(expectedResource2);
   });
 
-  it('should not exceed max resources', () => {
+  it('should cap resources that are not in the unlimited list', () => {
     const updatedProfile = updateSaveProfile(initialProfile, 100, settings); // a lot of ticks
 
     expect(updatedProfile.resources.current.resource_1).toBe(initialProfile.resources.max.resource_1);
     expect(updatedProfile.resources.current.resource_2).toBe(initialProfile.resources.max.resource_2);
+  });
+
+  it('should allow unlimited resources to exceed their max capacity', () => {
+    // Add a completed game to generate resource_3
+    initialProfile.assets.push({
+      type: 'asset_group_1',
+      id: 'novel_game',
+      count: 1,
+      development_progress_ticks: 6,
+    });
+
+    const updatedProfile = updateSaveProfile(initialProfile, 500, settings); // a lot of ticks
+
+    // resource_1 and resource_2 should be capped
+    expect(updatedProfile.resources.current.resource_1).toBe(updatedProfile.resources.max.resource_1);
+    expect(updatedProfile.resources.current.resource_2).toBe(updatedProfile.resources.max.resource_2);
+
+    // resource_3 is unlimited, so it should accumulate beyond any "max" value.
+    const novelGameData = settings.assets_group_1.assets.find(g => g.id === 'novel_game')!;
+    const r3IncomePerTick = novelGameData.income_per_tick.resource_3;
+    const expectedR3 = initialProfile.resources.current.resource_3 + r3IncomePerTick * 500;
+
+    expect(updatedProfile.resources.current.resource_3).toBe(expectedR3);
+    // The initial max for R3 is 0, so it should be greater than that.
+    expect(updatedProfile.resources.current.resource_3).toBeGreaterThan(updatedProfile.resources.max.resource_3);
+  });
+
+  it('should cap a resource if it is removed from the unlimited list', () => {
+    // Create a temporary settings object where resource_3 is NOT unlimited
+    const limitedSettings: GameSettings = JSON.parse(JSON.stringify(settings));
+    limitedSettings.unlimited_resources = []; // No unlimited resources
+
+    // In the default settings, resource_3 has no max capacity.
+    // Let's give it one by adding a new asset that provides it.
+    const managerAsset = {
+        id: "manager_level_1",
+        name: "Manager",
+        cost: { resource_1: 0, resource_2: 0, resource_3: 0 },
+        time_cost_ticks: 0,
+        income_per_tick: { resource_1: 0, resource_2: 0, resource_3: 0 },
+        resource_max: { resource_1: 0, resource_2: 0, resource_3: 500 }
+    };
+    limitedSettings.assets_group_2.assets.push(managerAsset);
+
+    // Add this new manager asset to the profile to establish a max
+    initialProfile.assets.push({
+        type: 'asset_group_2',
+        id: 'manager_level_1',
+        count: 1,
+        development_progress_ticks: 0,
+    });
+
+    // Add a completed game to generate resource_3
+    initialProfile.assets.push({
+      type: 'asset_group_1',
+      id: 'novel_game',
+      count: 1,
+      development_progress_ticks: 6,
+    });
+
+    const updatedProfile = updateSaveProfile(initialProfile, 1000, limitedSettings); // a lot of ticks
+
+    // Now, resource_3 should be capped at its max value from the manager.
+    // The recalculation inside updateSaveProfile should set resources.max.resource_3 to 500.
+    expect(updatedProfile.resources.max.resource_3).toBe(500);
+    expect(updatedProfile.resources.current.resource_3).toBe(500);
   });
 
   it('should calculate game income and maintenance correctly for completed games', () => {
@@ -104,7 +170,7 @@ describe('updateSaveProfile', () => {
     const expectedResource2 = initialResource2 + expectedResource2FromEmployees - expectedMaintenance;
 
     expect(updatedProfile.resources.current.resource_3).toBe(initialProfile.resources.current.resource_3 + expectedIncome);
-    expect(updatedProfile.resources.current.resource_2).toBe(expectedResource2);
+    expect(updatedProfile.resources.current.resource_2).toBe(Math.max(0, expectedResource2));
   });
 
   it('should move a completed game from inProgressAssets to assets', () => {

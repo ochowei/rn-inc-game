@@ -140,17 +140,26 @@ export const updateSaveProfile = (
 
   // Apply income and maintenance for the tick period
   const { current } = newProfile.resources;
-  current.resource_1 += (total_income_per_tick.resource_1 - total_maintenance_per_tick.resource_1) * ticks;
-  current.resource_2 += (total_income_per_tick.resource_2 - total_maintenance_per_tick.resource_2) * ticks;
-  current.resource_3 += (total_income_per_tick.resource_3 - total_maintenance_per_tick.resource_3) * ticks;
+  const netIncomePerTick: ResourceGroup = {
+    resource_1: total_income_per_tick.resource_1 - total_maintenance_per_tick.resource_1,
+    resource_2: total_income_per_tick.resource_2 - total_maintenance_per_tick.resource_2,
+    resource_3: total_income_per_tick.resource_3 - total_maintenance_per_tick.resource_3,
+  };
 
-  // Clamp to max and min
-  current.resource_1 = Math.max(0, Math.min(current.resource_1, newProfile.resources.max.resource_1));
-  current.resource_2 = Math.max(0, Math.min(current.resource_2, newProfile.resources.max.resource_2));
-  current.resource_3 = Math.max(
-    0,
-    Math.min(current.resource_3, newProfile.resources.max.resource_3 || Infinity)
-  );
+  for (const resourceId in netIncomePerTick) {
+    const key = resourceId as keyof ResourceGroup;
+    const increment = netIncomePerTick[key] * ticks;
+
+    let newAmount = current[key] + increment;
+
+    // Apply max cap if the resource is not unlimited
+    if (!settings.unlimited_resources.includes(key)) {
+      newAmount = Math.min(newAmount, newProfile.resources.max[key]);
+    }
+
+    // Clamp to 0
+    current[key] = Math.max(0, newAmount);
+  }
 
   return newProfile;
 };

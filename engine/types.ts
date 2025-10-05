@@ -22,6 +22,7 @@ export interface GameSettings {
     };
   };
   gameTickInterval: number;
+  unlimited_resources: string[];
   assets_group_1: {
     name: string;
     assets: Asset[];
