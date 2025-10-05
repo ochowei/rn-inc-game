@@ -6,8 +6,8 @@ interface AudioContextType {
   playClickSound: () => Promise<void>;
   playBGM: () => Promise<void>;
   stopBGM: () => Promise<void>;
-  toggleBGM: () => void;
-  toggleSfx: () => void;
+  toggleBGM: () => Promise<void>;
+  toggleSfx: () => Promise<void>;
   isBgmOn: boolean;
   isSfxOn: boolean;
 }

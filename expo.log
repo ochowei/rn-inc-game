@@ -3,4 +3,6 @@
 > expo start --web
 
 Starting project at /app
-Starting Metro Bundler
+› Port 8081 is running this app in another window
+  /app (pid 3414)
+› Skipping dev server
