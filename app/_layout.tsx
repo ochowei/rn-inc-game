@@ -56,6 +56,7 @@ export default function RootLayout() {
               <BGMManager />
               <Stack>
                 <Stack.Screen name="menu" options={{ headerShown: false }} />
+                <Stack.Screen name="options" options={{ headerShown: false }} />
                 <Stack.Screen name="main" options={{ headerShown: false }} />
                 <Stack.Screen name="saved-profiles" />
                 <Stack.Screen name="(drawer)" options={{ headerShown: false }} />

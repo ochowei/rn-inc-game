@@ -8,6 +8,13 @@ export const locales = {
       saveLimitMessage: 'Please delete unnecessary saves, you can only have up to 5 saves.',
       close: 'Close',
       goToSaves: 'Go to Saves',
+      options: 'Options',
+    },
+    options: {
+      title: 'Options',
+      back: 'Back',
+      mute: 'Mute BGM',
+      unmute: 'Unmute BGM',
     },
     game: {
       newGameTitle: 'New Game',
@@ -104,6 +111,13 @@ export const locales = {
       saveLimitMessage: '請先刪除多餘的存檔，最多只能有 5 個存檔。',
       close: '關閉',
       goToSaves: '前往存檔',
+      options: '選項',
+    },
+    options: {
+      title: '選項',
+      back: '返回',
+      mute: '靜音',
+      unmute: '取消靜音',
     },
     game: {
       newGameTitle: '新遊戲',

@@ -94,6 +94,12 @@ export default function GameMenuScreen() {
           >
             <ThemedText style={styles.buttonText}>{t('menu', 'savedGame')}</ThemedText>
           </SoundPressable>
+          <SoundPressable
+            onPress={() => router.push('/options')}
+            style={styles.button}
+          >
+            <ThemedText style={styles.buttonText}>{t('menu', 'options')}</ThemedText>
+          </SoundPressable>
         </ThemedView>
 
         {isLimitModalVisible && (
