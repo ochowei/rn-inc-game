@@ -1,6 +1,6 @@
 import { StyleSheet, Pressable, Platform, View, ImageBackground } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -15,7 +15,7 @@ export default function GameMenuScreen() {
   const { profiles, fetchProfiles } = useGameStorage();
   const { createNewSave } = useGameEngineContext();
   const { language, setLanguage, t } = useLanguage();
-  const { playBGM, stopBGM, playClickSound } = useAudioContext();
+  const { playClickSound } = useAudioContext();
   const hasSavedGames = profiles.length > 0;
   const tintColor = useThemeColor({}, 'tint');
 
@@ -27,12 +27,7 @@ export default function GameMenuScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchProfiles();
-      playBGM();
-
-      return () => {
-        stopBGM();
-      };
-    }, [fetchProfiles, playBGM, stopBGM])
+    }, [fetchProfiles])
   );
 
   const handleNewGame = async () => {
