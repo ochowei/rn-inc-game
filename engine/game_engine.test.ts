@@ -149,28 +149,42 @@ describe('updateSaveProfile', () => {
     expect(updatedProfile.resources.current.resource_3).toBe(500);
   });
 
-  it('should calculate game income and maintenance correctly for completed games', () => {
+  it('should apply maintenance cost correctly based on resource type', () => {
+    // Add a completed game that has maintenance costs
     initialProfile.assets.push({
       type: 'asset_group_1',
-      id: 'novel_game',
-      development_progress_ticks: 6,
+      id: 'novel_game', // This game has maintenance for resource_2 (limited) and resource_3 (unlimited)
       count: 1,
+      development_progress_ticks: 999, // Already completed
     });
-    const updatedProfile = updateSaveProfile(initialProfile, 2, settings); // 2 ticks
 
     const gameData = settings.assets_group_1.assets.find((g) => g.id === 'novel_game')!;
-    const expectedIncome = gameData.income_per_tick.resource_3 * 2;
-    const expectedMaintenance = (gameData.maintenance_cost_per_tick?.resource_2 || 0) * 2;
+    const maintenanceR2 = gameData.maintenance_cost_per_tick!.resource_2!;
+    const maintenanceR3 = gameData.maintenance_cost_per_tick!.resource_3!;
 
+    const initialMaxR2 = initialProfile.resources.max.resource_2;
+    const initialPerTickR3 = initialProfile.resources.per_tick.resource_3;
+    const gameIncomeR3 = gameData.income_per_tick.resource_3;
+
+    const updatedProfile = updateSaveProfile(initialProfile, 1, settings);
+
+    // 1. Verify Limited Resource (resource_2): Maintenance should reduce MAX capacity.
+    const expectedMaxR2 = initialMaxR2 - maintenanceR2;
+    expect(updatedProfile.resources.max.resource_2).toBe(expectedMaxR2);
+
+    // Current amount should not be directly reduced by maintenance, only capped by the new max.
     const engineerData = settings.assets_group_2.assets.find(e => e.id === 'engineer_level_1')!;
-    const { income_per_tick } = engineerData!;
-    const expectedResource2FromEmployees = (income_per_tick!.resource_2 || 0) * 2;
-    const initialResource2 = initialProfile.resources.current.resource_2;
+    const incomeR2 = engineerData.income_per_tick!.resource_2 || 0;
+    const expectedCurrentR2 = Math.min(initialProfile.resources.current.resource_2 + incomeR2, expectedMaxR2);
+    expect(updatedProfile.resources.current.resource_2).toBe(expectedCurrentR2);
 
-    const expectedResource2 = initialResource2 + expectedResource2FromEmployees - expectedMaintenance;
+    // 2. Verify Unlimited Resource (resource_3): Maintenance should reduce NET INCOME.
+    const expectedNetR3PerTick = (initialPerTickR3 + gameIncomeR3) - maintenanceR3;
+    const expectedCurrentR3 = initialProfile.resources.current.resource_3 + expectedNetR3PerTick;
+    expect(updatedProfile.resources.current.resource_3).toBe(expectedCurrentR3);
 
-    expect(updatedProfile.resources.current.resource_3).toBe(initialProfile.resources.current.resource_3 + expectedIncome);
-    expect(updatedProfile.resources.current.resource_2).toBe(Math.max(0, expectedResource2));
+    // Max for R3 should remain unaffected by its own maintenance.
+    expect(updatedProfile.resources.max.resource_3).toBe(initialProfile.resources.max.resource_3);
   });
 
   it('should move a completed game from inProgressAssets to assets', () => {
