@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { Modal, Portal, Button, FAB } from 'react-native-paper';
-import { StyleSheet, Pressable } from 'react-native';
+import { Modal, Portal } from 'react-native-paper';
+import { StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
 import { useLanguage } from '@/hooks/use-language';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { SoundButton } from './ui/SoundButton';
+import { SoundFAB } from './ui/SoundFAB';
+import { SoundPressable } from './ui/SoundPressable';
 
 const Fab: React.FC = () => {
   const [visible, setVisible] = useState(false);
@@ -52,11 +55,11 @@ const Fab: React.FC = () => {
     <>
       <Portal>
         <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.modalContainer} testID="fab-modal">
-          <Button onPress={handleSavePress}>{t('game', 'save')}</Button>
-          <Button onPress={handleBackToMenu}>{t('game', 'backToMenu')}</Button>
+          <SoundButton onPress={handleSavePress}>{t('game', 'save')}</SoundButton>
+          <SoundButton onPress={handleBackToMenu}>{t('game', 'backToMenu')}</SoundButton>
         </Modal>
       </Portal>
-      <FAB style={styles.fab} icon="plus" onPress={showModal} testID="fab-button" />
+      <SoundFAB style={styles.fab} icon="plus" onPress={showModal} testID="fab-button" />
 
       {isConfirmationVisible && (
         <ThemedView style={styles.confirmationContainer}>
@@ -66,9 +69,9 @@ const Fab: React.FC = () => {
             darkColor="rgba(21, 23, 24, 0.9)">
             <ThemedText type="subtitle">{modalContent.title}</ThemedText>
             <ThemedText>{modalContent.message}</ThemedText>
-            <Pressable onPress={handleCloseConfirmation} style={[styles.button, { borderColor: tintColor }]}>
+            <SoundPressable onPress={handleCloseConfirmation} style={[styles.button, { borderColor: tintColor }]}>
               <ThemedText style={styles.buttonText}>{t('game', 'close')}</ThemedText>
-            </Pressable>
+            </SoundPressable>
           </ThemedView>
         </ThemedView>
       )}

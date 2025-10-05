@@ -4,8 +4,9 @@ import { ThemedView } from '@/components/ThemedView';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
 import gameSettings from '@/settings.json';
-import { Card, Title, Paragraph, Button } from 'react-native-paper';
+import { Card, Title, Paragraph } from 'react-native-paper';
 import { GameSettings } from '@/engine/types';
+import { SoundButton } from '@/components/ui/SoundButton';
 
 const settings = gameSettings as GameSettings;
 
@@ -52,13 +53,13 @@ export default function HireEmployeeScreen() {
                 </Paragraph>
               </Card.Content>
               <Card.Actions>
-                <Button
+                <SoundButton
                   mode="contained"
                   onPress={() => addAsset('asset_group_2', employee.id)}
                   disabled={!canHire(employee)}
                 >
                   {t('hireEmployee', 'hire')}
-                </Button>
+                </SoundButton>
               </Card.Actions>
             </Card>
           ))}

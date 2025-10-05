@@ -2,14 +2,21 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useLanguage } from '@/hooks/use-language';
+import { useAudioContext } from '@/contexts/AudioContext';
 
 export default function TabLayout() {
   const { t } = useLanguage();
+  const { playClickSound } = useAudioContext();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        listeners: {
+          tabPress: () => {
+            playClickSound();
+          },
+        },
       }}>
       <Tabs.Screen
         name="home"

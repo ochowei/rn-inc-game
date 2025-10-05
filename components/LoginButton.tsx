@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { ThemedView } from './ThemedView';
 import { ThemedText } from './ThemedText';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useLanguage } from '@/hooks/use-language';
+import { SoundPressable } from './ui/SoundPressable';
 
 const user = {
   name: 'Jason',
@@ -25,14 +26,6 @@ export function LoginButton() {
   const borderColor = useThemeColor({}, 'icon');
   const { t } = useLanguage();
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-  };
-
   return (
     <ThemedView style={styles.container}>
       {isLoggedIn ? (
@@ -42,14 +35,14 @@ export function LoginButton() {
             <ThemedText>{t('login', 'email')}: {user.email}</ThemedText>
             <ThemedText>{t('login', 'password')}: {user.password}</ThemedText>
           </View>
-          <Pressable style={[styles.button, { borderColor }]} onPress={handleLogout}>
+          <SoundPressable style={[styles.button, { borderColor }]} onPress={() => setIsLoggedIn(false)}>
             <ThemedText>{t('login', 'logout')}</ThemedText>
-          </Pressable>
+          </SoundPressable>
         </View>
       ) : (
-        <Pressable style={[styles.button, { borderColor }]} onPress={handleLogin}>
+        <SoundPressable style={[styles.button, { borderColor }]} onPress={() => setIsLoggedIn(true)}>
           <ThemedText>{t('login', 'login')}</ThemedText>
-        </Pressable>
+        </SoundPressable>
       )}
     </ThemedView>
   );

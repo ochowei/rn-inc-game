@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Pressable, FlatList, ActivityIndicator, ImageBackground } from 'react-native';
+import { StyleSheet, FlatList, ActivityIndicator, ImageBackground } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -8,33 +8,29 @@ import { useGameStorage, SaveProfile } from '@/hooks/use-game-storage';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
-import { useAudioContext } from '@/contexts/AudioContext';
+import { SoundPressable } from '@/components/ui/SoundPressable';
 
 export default function SavedProfileScreen() {
   const router = useRouter();
   const { profiles, loading, deleteProfile } = useGameStorage();
   const { loadSave } = useGameEngineContext();
   const { t } = useLanguage();
-  const { playClickSound } = useAudioContext();
   const tintColor = useThemeColor({}, 'tint');
 
   const [isConfirming, setIsConfirming] = useState(false);
   const [profileToDelete, setProfileToDelete] = useState<string | null>(null);
 
   const handleLoadSave = (saveProfile: SaveProfile) => {
-    playClickSound();
     loadSave(saveProfile);
     router.push('/main/');
   };
 
   const handleDeleteGame = (id: string) => {
-    playClickSound();
     setProfileToDelete(id);
     setIsConfirming(true);
   };
 
   const handleConfirmDelete = async () => {
-    playClickSound();
     if (profileToDelete !== null) {
       await deleteProfile(profileToDelete);
       setIsConfirming(false);
@@ -43,7 +39,6 @@ export default function SavedProfileScreen() {
   };
 
   const handleCancelDelete = () => {
-    playClickSound();
     setIsConfirming(false);
     setProfileToDelete(null);
   };
@@ -53,12 +48,12 @@ export default function SavedProfileScreen() {
       <ThemedText>{t('savedGames', 'saveSlot')} {index + 1}</ThemedText>
       <ThemedText>{new Date(item.createdAt).toLocaleString()}</ThemedText>
       <ThemedView style={styles.buttonsContainer}>
-        <Pressable onPress={() => handleLoadSave(item)} style={[styles.button, { borderColor: tintColor }]}>
+        <SoundPressable onPress={() => handleLoadSave(item)} style={[styles.button, { borderColor: tintColor }]}>
           <ThemedText style={styles.buttonText}>{t('savedGames', 'load')}</ThemedText>
-        </Pressable>
-        <Pressable onPress={() => handleDeleteGame(item.id)} style={[styles.button, styles.deleteButton]}>
+        </SoundPressable>
+        <SoundPressable onPress={() => handleDeleteGame(item.id)} style={[styles.button, styles.deleteButton]}>
           <ThemedText style={styles.buttonText}>{t('savedGames', 'delete')}</ThemedText>
-        </Pressable>
+        </SoundPressable>
       </ThemedView>
     </ThemedView>
   );
@@ -100,12 +95,12 @@ export default function SavedProfileScreen() {
               <ThemedText type="subtitle">{t('savedGames', 'confirmDelete')}</ThemedText>
               <ThemedText>{t('savedGames', 'confirmDeleteMessage')}</ThemedText>
               <ThemedView style={styles.confirmationButtons}>
-                <Pressable onPress={handleCancelDelete} style={[styles.button, { borderColor: tintColor }]}>
+                <SoundPressable onPress={handleCancelDelete} style={[styles.button, { borderColor: tintColor }]}>
                   <ThemedText style={styles.buttonText}>{t('savedGames', 'cancel')}</ThemedText>
-                </Pressable>
-                <Pressable onPress={handleConfirmDelete} style={[styles.button, styles.deleteButton]}>
+                </SoundPressable>
+                <SoundPressable onPress={handleConfirmDelete} style={[styles.button, styles.deleteButton]}>
                   <ThemedText style={styles.buttonText}>{t('savedGames', 'confirm')}</ThemedText>
-                </Pressable>
+                </SoundPressable>
               </ThemedView>
             </ThemedView>
           </ThemedView>
