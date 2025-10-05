@@ -8,28 +8,33 @@ import { useGameStorage, SaveProfile } from '@/hooks/use-game-storage';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
+import { useAudioContext } from '@/contexts/AudioContext';
 
 export default function SavedProfileScreen() {
   const router = useRouter();
   const { profiles, loading, deleteProfile } = useGameStorage();
   const { loadSave } = useGameEngineContext();
   const { t } = useLanguage();
+  const { playClickSound } = useAudioContext();
   const tintColor = useThemeColor({}, 'tint');
 
   const [isConfirming, setIsConfirming] = useState(false);
   const [profileToDelete, setProfileToDelete] = useState<string | null>(null);
 
   const handleLoadSave = (saveProfile: SaveProfile) => {
+    playClickSound();
     loadSave(saveProfile);
     router.push('/main/');
   };
 
   const handleDeleteGame = (id: string) => {
+    playClickSound();
     setProfileToDelete(id);
     setIsConfirming(true);
   };
 
   const handleConfirmDelete = async () => {
+    playClickSound();
     if (profileToDelete !== null) {
       await deleteProfile(profileToDelete);
       setIsConfirming(false);
@@ -38,6 +43,7 @@ export default function SavedProfileScreen() {
   };
 
   const handleCancelDelete = () => {
+    playClickSound();
     setIsConfirming(false);
     setProfileToDelete(null);
   };

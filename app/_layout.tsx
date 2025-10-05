@@ -7,6 +7,7 @@ import { PaperProvider } from 'react-native-paper';
 import { ThemeProvider } from '@/hooks/useTheme';
 import { LanguageProvider } from '@/hooks/use-language';
 import { GameEngineProvider } from '@/contexts/GameEngineContext';
+import { AudioProvider } from '@/contexts/AudioContext';
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -18,21 +19,23 @@ export default function RootLayout() {
   }
 
   return (
-    <LanguageProvider>
-      <ThemeProvider>
-        <PaperProvider>
-          <GameEngineProvider>
-            <Stack>
-              <Stack.Screen name="menu" options={{ headerShown: false }} />
-              <Stack.Screen name="main" options={{ headerShown: false }} />
-              <Stack.Screen name="saved-profiles" />
-              <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-            <StatusBar style="auto" />
-          </GameEngineProvider>
-        </PaperProvider>
-      </ThemeProvider>
-    </LanguageProvider>
+    <AudioProvider>
+      <LanguageProvider>
+        <ThemeProvider>
+          <PaperProvider>
+            <GameEngineProvider>
+              <Stack>
+                <Stack.Screen name="menu" options={{ headerShown: false }} />
+                <Stack.Screen name="main" options={{ headerShown: false }} />
+                <Stack.Screen name="saved-profiles" />
+                <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+              <StatusBar style="auto" />
+            </GameEngineProvider>
+          </PaperProvider>
+        </ThemeProvider>
+      </LanguageProvider>
+    </AudioProvider>
   );
 }

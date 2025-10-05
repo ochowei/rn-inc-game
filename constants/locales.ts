@@ -51,6 +51,9 @@ export const locales = {
       language: 'Language',
       chinese: 'Chinese',
       english: 'English',
+      sound: 'Sound',
+      mute: 'Mute',
+      unmute: 'Unmute',
     },
     login: {
       email: 'Email',
@@ -144,6 +147,9 @@ export const locales = {
       language: '語言',
       chinese: '中文',
       english: '英文',
+      sound: '音效',
+      mute: '靜音',
+      unmute: '取消靜音',
     },
     login: {
       email: '電子郵件',
