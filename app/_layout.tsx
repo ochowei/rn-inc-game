@@ -23,8 +23,8 @@ const BGMManager = () => {
     const currentScreen = pathname.substring(1);
 
     // Define which screens should have BGM
-    const gameScreens = ['menu', 'main', 'saved-profiles'];
-    if (gameScreens.includes(currentScreen)) {
+    const gameScreens = ['menu', 'main', 'saved-profiles', 'options'];
+    if (gameScreens.some(screen => currentScreen.startsWith(screen))) {
       console.log('Playing BGM for screen:', currentScreen);
       playBGM();
     } else {
