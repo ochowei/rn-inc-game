@@ -34,7 +34,7 @@ export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
 
   const owned_containers: OwnedContainer[] = [
     {
-      id: `container_${Date.now()}`,
+      id: `container_${new Date().getTime()}`,
       typeId: 'studio_1',
     },
   ];
@@ -268,7 +268,7 @@ export const purchaseContainer = (
   }
 
   const newContainer: OwnedContainer = {
-    id: `container_${Date.now()}`,
+    id: `container_${new Date().getTime()}`,
     typeId: containerTypeId,
   };
 
