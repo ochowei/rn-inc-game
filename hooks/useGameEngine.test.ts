@@ -42,6 +42,7 @@ jest.mock('@/engine/game_engine', () => ({
     },
   })),
   addAsset: jest.fn((profile, assetType, assetId, settings) => profile),
+  purchaseContainer: jest.fn((profile, containerTypeId, settings) => profile),
 }));
 
 const mockInitialProfile: FullSaveProfile = {
@@ -71,6 +72,7 @@ describe('useGameEngine', () => {
       },
     }));
     (GameLogic.addAsset as jest.Mock).mockClear().mockImplementation((profile, assetType, assetId, settings) => profile);
+    (GameLogic.purchaseContainer as jest.Mock).mockClear().mockImplementation((profile, containerTypeId, settings) => profile);
     mockAddProfile.mockClear().mockResolvedValue({ ...mockInitialProfile, id: 'new-id' });
     mockUpdateProfile.mockClear();
   });
@@ -151,6 +153,21 @@ describe('useGameEngine', () => {
       expect.objectContaining({ id: 'new-id' }),
       'asset_group_1',
       'novel_game',
+      gameSettings as GameSettings
+    );
+  });
+
+  it('should purchase a container', async () => {
+    const { result } = renderHook(() => useGameEngine());
+    await act(async () => {
+      await result.current.createNewSave();
+    });
+    act(() => {
+      result.current.purchaseContainer('studio_1');
+    });
+    expect(GameLogic.purchaseContainer).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'new-id' }),
+      'studio_1',
       gameSettings as GameSettings
     );
   });

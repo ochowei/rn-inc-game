@@ -92,6 +92,22 @@ export const locales = {
     hireEmployee: {
       hire: 'Hire',
     },
+    purchaseContainer: {
+      ownedContainers: 'Owned Containers',
+      availableContainers: 'Available Containers',
+      cost: 'Cost',
+      capacity: 'Capacity',
+      purchase: 'Purchase',
+      noOwnedContainers: 'You do not own any containers yet.',
+    },
+    containers: {
+      studio_1: 'Small Garage',
+      studio_2: 'Downtown Office',
+    },
+    assets: {
+      asset_group_1: 'Game Capacity',
+      asset_group_2: 'Employee Capacity',
+    },
     fab: {
       developGame: 'Develop Game',
       hireEmployee: 'Hire Employee',
@@ -100,6 +116,7 @@ export const locales = {
       screen_1: 'Home',
       screen_2: 'Develop',
       screen_3: 'Hiring',
+      screen_4: 'Store',
     },
   },
   zh: {
@@ -195,6 +212,22 @@ export const locales = {
     hireEmployee: {
       hire: '僱用',
     },
+    purchaseContainer: {
+      ownedContainers: '擁有的貨櫃',
+      availableContainers: '可購買的貨櫃',
+      cost: '成本',
+      capacity: '容量',
+      purchase: '購買',
+      noOwnedContainers: '您尚未擁有任何貨櫃。',
+    },
+    containers: {
+      studio_1: '小型車庫',
+      studio_2: '市中心辦公室',
+    },
+    assets: {
+      asset_group_1: '遊戲容量',
+      asset_group_2: '員工容量',
+    },
     fab: {
       developGame: '遊戲開發',
       hireEmployee: '僱用員工',
@@ -203,6 +236,7 @@ export const locales = {
       screen_1: '首頁',
       screen_2: '開發',
       screen_3: '招募',
+      screen_4: '商店',
     },
   },
 };
