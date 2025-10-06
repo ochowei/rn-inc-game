@@ -20,7 +20,7 @@ const BGMManager = () => {
     const currentScreen = pathname === '/' ? 'menu' : pathname.substring(1);
 
     // Define which screens should have BGM
-    const gameScreens = ['menu', 'main', 'saved-profiles', 'options'];
+    const gameScreens = ['press-to-start', 'menu', 'main', 'saved-profiles', 'options'];
     if (gameScreens.some(screen => currentScreen.startsWith(screen))) {
       playBGM_func();
     } else {
@@ -50,6 +50,7 @@ export default function RootLayout() {
             <GameEngineProvider>
               <BGMManager />
               <Stack>
+                <Stack.Screen name="press-to-start" options={{ headerShown: false }} />
                 <Stack.Screen name="menu" options={{ headerShown: false }} />
                 <Stack.Screen name="options" options={{ headerShown: false }} />
                 <Stack.Screen name="main" options={{ headerShown: false }} />
