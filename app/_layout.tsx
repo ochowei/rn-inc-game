@@ -12,27 +12,22 @@ import { AudioProvider, useAudioContext } from '@/contexts/AudioContext';
 
 // BGM Manager Component to handle background music across different screens
 const BGMManager = () => {
-  const { playBGM, stopBGM } = useAudioContext();
+  const { playBGM_func, stopBGM_func } = useAudioContext();
   const pathname = usePathname();
 
-  console.log('BGMManager rendering. Current pathname:', pathname);
-
   useEffect(() => {
-    console.log('BGMManager useEffect triggered for pathname:', pathname);
-    // Extract the screen name from the path, removing the leading slash
-    const currentScreen = pathname.substring(1);
+    // Treat the root path as the menu screen for BGM purposes
+    const currentScreen = pathname === '/' ? 'menu' : pathname.substring(1);
 
     // Define which screens should have BGM
     const gameScreens = ['menu', 'main', 'saved-profiles', 'options'];
     if (gameScreens.some(screen => currentScreen.startsWith(screen))) {
-      console.log('Playing BGM for screen:', currentScreen);
-      playBGM();
+      playBGM_func();
     } else {
-      console.log('Stopping BGM for screen:', currentScreen);
       // Stop BGM on any other screen
-      stopBGM();
+      stopBGM_func();
     }
-  }, [pathname, playBGM, stopBGM]);
+  }, [pathname, playBGM_func, stopBGM_func]);
 
   return null; // This component does not render anything
 };

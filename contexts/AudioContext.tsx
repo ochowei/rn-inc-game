@@ -1,13 +1,19 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  Dispatch,
+  SetStateAction,
+} from 'react';
 import { useAudio } from '../hooks/useAudio';
 
 // Define the shape of the context data
 interface AudioContextType {
   playClickSound: () => Promise<void>;
-  playBGM: () => Promise<void>;
-  stopBGM: () => Promise<void>;
-  toggleMute: () => Promise<void>;
-  isMuted: boolean;
+  setPlayBGM: Dispatch<SetStateAction<boolean>>;
+  playBGM: boolean;
+  playBGM_func: () => Promise<void>;
+  stopBGM_func: () => Promise<void>;
 }
 
 // Create the context with a default undefined value
@@ -21,10 +27,10 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   // The value provided to the context consumers
   const contextValue = {
     playClickSound: audio.playClickSound,
+    setPlayBGM: audio.setPlayBGM,
     playBGM: audio.playBGM,
-    stopBGM: audio.stopBGM,
-    toggleMute: audio.toggleMute,
-    isMuted: audio.isMuted,
+    playBGM_func: audio.playBGM_func,
+    stopBGM_func: audio.stopBGM_func,
   };
 
   return (

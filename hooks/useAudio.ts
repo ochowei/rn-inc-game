@@ -1,76 +1,75 @@
 import { Audio } from 'expo-av';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export const useAudio = () => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [bgm, setBgm] = useState<Audio.Sound | null>(null);
-  const [isMuted, setIsMuted] = useState(false);
-
-  const loadSounds = async () => {
-    try {
-      const { sound: clickSound } = await Audio.Sound.createAsync(
-        require('../assets/audio/click.mp3')
-      );
-      const { sound: bgmSound } = await Audio.Sound.createAsync(
-        require('../assets/audio/bgm-1.mp3')
-      );
-      await bgmSound.setIsLoopingAsync(true);
-      setSound(clickSound);
-      setBgm(bgmSound);
-    } catch (error) {
-      console.error("Failed to load sounds", error);
-    }
-  };
+  const [playBGM, setPlayBGM] = useState(true); // User's preference
 
   useEffect(() => {
+    let localSound: Audio.Sound | null = null;
+    let localBgm: Audio.Sound | null = null;
+
+    const loadSounds = async () => {
+      try {
+        const { sound: clickSound } = await Audio.Sound.createAsync(
+          require('../assets/audio/click.mp3')
+        );
+        const { sound: bgmSound } = await Audio.Sound.createAsync(
+          require('../assets/audio/bgm-1.mp3')
+        );
+        await bgmSound.setIsLoopingAsync(true);
+
+        localSound = clickSound;
+        localBgm = bgmSound;
+
+        setSound(clickSound);
+        setBgm(bgmSound);
+      } catch (error) {
+        console.error('Failed to load sounds', error);
+      }
+    };
+
     loadSounds();
 
     return () => {
-      sound?.unloadAsync();
-      bgm?.unloadAsync();
+      localSound?.unloadAsync();
+      localBgm?.unloadAsync();
     };
   }, []);
 
-  const playClickSound = async () => {
-    if (sound && !isMuted) {
-      await sound.replayAsync();
-    }
-  };
-
-  const playBGM = async () => {
-    if (bgm && !isMuted) {
+  const playBGM_func = useCallback(async () => {
+    if (bgm && playBGM) { // Respects user's preference
       const status = await bgm.getStatusAsync();
       if (status.isLoaded && !status.isPlaying) {
         await bgm.playAsync();
       }
     }
-  };
+  }, [bgm, playBGM]);
 
-  const stopBGM = async () => {
+  const stopBGM_func = useCallback(async () => {
     if (bgm) {
-        const status = await bgm.getStatusAsync();
-        if (status.isLoaded && status.isPlaying) {
-            await bgm.stopAsync();
-        }
+      const status = await bgm.getStatusAsync();
+      if (status.isLoaded && status.isPlaying) {
+        await bgm.stopAsync();
+      }
     }
-  };
+  }, [bgm]);
 
-  const toggleMute = async () => {
-    const newMuteState = !isMuted;
-    setIsMuted(newMuteState);
-    if (bgm) {
-        await bgm.setIsMutedAsync(newMuteState);
+  // Effect to handle user toggling BGM on/off directly
+  useEffect(() => {
+    if (playBGM) {
+      playBGM_func();
+    } else {
+      stopBGM_func();
     }
+  }, [playBGM, playBGM_func, stopBGM_func]);
+
+  const playClickSound = async () => {
     if (sound) {
-        await sound.setIsMutedAsync(newMuteState);
-    }
-    if (!newMuteState && bgm) {
-        const status = await bgm.getStatusAsync();
-        if(status.isLoaded && !status.isPlaying) {
-            playBGM();
-        }
+      await sound.replayAsync();
     }
   };
 
-  return { playClickSound, playBGM, stopBGM, toggleMute, isMuted, loadSounds };
+  return { playClickSound, setPlayBGM, playBGM, playBGM_func, stopBGM_func };
 };

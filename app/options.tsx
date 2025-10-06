@@ -1,20 +1,17 @@
-import { StyleSheet, ImageBackground, View } from 'react-native';
+import { StyleSheet, ImageBackground, View, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Checkbox } from 'react-native-paper';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useLanguage } from '@/hooks/use-language';
 import { useAudioContext } from '@/contexts/AudioContext';
 import { SoundPressable } from '@/components/ui/SoundPressable';
-import { useThemeColor } from '@/hooks/useThemeColor';
 
 export default function OptionsScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { isMuted, toggleMute } = useAudioContext();
-  const color = useThemeColor({}, 'text');
+  const { playBGM, setPlayBGM } = useAudioContext();
 
   const handleBack = () => {
     router.back();
@@ -29,12 +26,8 @@ export default function OptionsScreen() {
         <ThemedText type="title">{t('options', 'title')}</ThemedText>
         <View style={styles.optionsContainer}>
           <View style={styles.optionRow}>
-            <ThemedText style={styles.label}>{t('options', 'toggleBGM')}</ThemedText>
-            <Checkbox
-              status={isMuted ? 'checked' : 'unchecked'}
-              onPress={toggleMute}
-              color={color}
-            />
+            <ThemedText style={styles.label}>{t('options', 'playBGM')}</ThemedText>
+            <Switch value={playBGM} onValueChange={setPlayBGM} />
           </View>
         </View>
         <SoundPressable onPress={handleBack} style={styles.button}>
