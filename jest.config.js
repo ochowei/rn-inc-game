@@ -1,18 +1,6 @@
 module.exports = {
-  preset: 'ts-jest',
+  preset: 'jest-expo',
   testEnvironment: 'jsdom',
-  transform: {
-    '^.+\\.(js|jsx)$': 'babel-jest',
-    '^.+\\.(ts|tsx)$': [
-      'ts-jest',
-      {
-        tsconfig: 'tsconfig.json',
-      },
-    ],
-  },
-  transformIgnorePatterns: [
-    "node_modules/(?!(@react-native|react-native|expo-.*|@expo/.*|@react-navigation/.*)/)",
-  ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
     '\\.(mp3)$': '<rootDir>/__mocks__/fileMock.js',

@@ -1,31 +1,41 @@
 import { Audio } from 'expo-av';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { Platform } from 'react-native';
+
+const bgmPlaylist = [
+  require('../assets/audio/lofiuranus-240148.mp3'),
+  require('../assets/audio/lofineputunus-244088.mp3'),
+  require('../assets/audio/lofi-terra-233036.mp3'),
+];
 
 export const useAudio = () => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [bgm, setBgm] = useState<Audio.Sound | null>(null);
-  const [playBGM, setPlayBGM] = useState(true); // User's preference
-  const [playSoundEffect, setPlaySoundEffect] = useState(true); // User's preference for sound effects
+  const [playlist, setPlaylist] = useState<Audio.Sound[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [playBGM, setPlayBGM] = useState(true);
+  const [playSoundEffect, setPlaySoundEffect] = useState(true);
+  const [hasInteracted, setHasInteracted] = useState(Platform.OS !== 'web');
+  const isPlayingRef = useRef(false);
 
   useEffect(() => {
     let localSound: Audio.Sound | null = null;
-    let localBgm: Audio.Sound | null = null;
+    const loadedPlaylist: Audio.Sound[] = [];
 
     const loadSounds = async () => {
       try {
         const { sound: clickSound } = await Audio.Sound.createAsync(
           require('../assets/audio/click.mp3')
         );
-        const { sound: bgmSound } = await Audio.Sound.createAsync(
-          require('../assets/audio/bgm-1.mp3')
-        );
-        await bgmSound.setIsLoopingAsync(true);
-
         localSound = clickSound;
-        localBgm = bgmSound;
-
         setSound(clickSound);
-        setBgm(bgmSound);
+
+        for (const track of bgmPlaylist) {
+          const { sound: bgmSound } = await Audio.Sound.createAsync(track);
+          loadedPlaylist.push(bgmSound);
+        }
+        setPlaylist(loadedPlaylist);
+        setIsLoaded(true);
       } catch (error) {
         console.error('Failed to load sounds', error);
       }
@@ -35,36 +45,73 @@ export const useAudio = () => {
 
     return () => {
       localSound?.unloadAsync();
-      localBgm?.unloadAsync();
+      loadedPlaylist.forEach((sound) => sound.unloadAsync());
     };
   }, []);
 
   const playBGM_func = useCallback(async () => {
-    if (bgm && playBGM) { // Respects user's preference
-      const status = await bgm.getStatusAsync();
-      if (status.isLoaded && !status.isPlaying) {
-        await bgm.playAsync();
+    if (playlist.length === 0 || !playBGM || isPlayingRef.current) return;
+
+    isPlayingRef.current = true;
+    const sound = playlist[currentTrackIndex];
+
+    sound.setOnPlaybackStatusUpdate((status) => {
+      if (status.isLoaded && status.didJustFinish) {
+        sound.setOnPlaybackStatusUpdate(null);
+        const nextTrackIndex = (currentTrackIndex + 1) % playlist.length;
+        setCurrentTrackIndex(nextTrackIndex);
+        isPlayingRef.current = false;
       }
+    });
+
+    const status = await sound.getStatusAsync();
+    if (status.isLoaded && !status.isPlaying) {
+      await sound.playAsync();
     }
-  }, [bgm, playBGM]);
+  }, [playlist, currentTrackIndex, playBGM]);
 
   const stopBGM_func = useCallback(async () => {
-    if (bgm) {
-      const status = await bgm.getStatusAsync();
-      if (status.isLoaded && status.isPlaying) {
-        await bgm.stopAsync();
-      }
+    if (playlist.length === 0) return;
+    isPlayingRef.current = false;
+    const sound = playlist[currentTrackIndex];
+    const status = await sound.getStatusAsync();
+    if (status.isLoaded && status.isPlaying) {
+      await sound.stopAsync();
     }
-  }, [bgm]);
+  }, [playlist, currentTrackIndex]);
 
-  // Effect to handle user toggling BGM on/off directly
   useEffect(() => {
-    if (playBGM) {
+    if (Platform.OS === 'web' && !hasInteracted) {
+      const handleFirstInteraction = () => {
+        setHasInteracted(true);
+        window.removeEventListener('click', handleFirstInteraction);
+        window.removeEventListener('keydown', handleFirstInteraction);
+      };
+
+      window.addEventListener('click', handleFirstInteraction);
+      window.addEventListener('keydown', handleFirstInteraction);
+
+      return () => {
+        window.removeEventListener('click', handleFirstInteraction);
+        window.removeEventListener('keydown', handleFirstInteraction);
+      };
+    }
+  }, [hasInteracted]);
+
+  useEffect(() => {
+    if (playBGM && hasInteracted) {
       playBGM_func();
     } else {
       stopBGM_func();
     }
-  }, [playBGM, playBGM_func, stopBGM_func]);
+  }, [playBGM, hasInteracted, playBGM_func, stopBGM_func]);
+
+  useEffect(() => {
+    if(playBGM && hasInteracted) {
+      playBGM_func();
+    }
+  }, [currentTrackIndex, playBGM, hasInteracted, playBGM_func]);
+
 
   const playClickSound = async () => {
     if (sound && playSoundEffect) {
@@ -80,5 +127,6 @@ export const useAudio = () => {
     stopBGM_func,
     playSoundEffect,
     setPlaySoundEffect,
+    isLoaded,
   };
 };
