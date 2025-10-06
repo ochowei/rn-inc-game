@@ -121,7 +121,8 @@ describe('addAsset with capacity limits', () => {
 
   beforeEach(() => {
     profile = createNewSaveProfile(settings);
-    profile.resources.current.resource_3 = 10000; // Plenty of money
+    // Set a higher resource amount to cover both container purchase and asset hiring
+    profile.resources.current.resource_3 = 11000;
   });
 
   it('should block adding an asset if capacity is full', () => {
