@@ -5,6 +5,7 @@ export const useAudio = () => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [bgm, setBgm] = useState<Audio.Sound | null>(null);
   const [playBGM, setPlayBGM] = useState(true); // User's preference
+  const [playSoundEffect, setPlaySoundEffect] = useState(true); // User's preference for sound effects
 
   useEffect(() => {
     let localSound: Audio.Sound | null = null;
@@ -66,10 +67,18 @@ export const useAudio = () => {
   }, [playBGM, playBGM_func, stopBGM_func]);
 
   const playClickSound = async () => {
-    if (sound) {
+    if (sound && playSoundEffect) {
       await sound.replayAsync();
     }
   };
 
-  return { playClickSound, setPlayBGM, playBGM, playBGM_func, stopBGM_func };
+  return {
+    playClickSound,
+    setPlayBGM,
+    playBGM,
+    playBGM_func,
+    stopBGM_func,
+    playSoundEffect,
+    setPlaySoundEffect,
+  };
 };

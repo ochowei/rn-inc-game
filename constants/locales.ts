@@ -14,6 +14,7 @@ export const locales = {
       title: 'Options',
       back: 'Back',
       playBGM: 'Play BGM',
+      playSoundEffect: 'Play SFX',
     },
     game: {
       newGameTitle: 'New Game',
@@ -116,6 +117,7 @@ export const locales = {
       title: '選項',
       back: '返回',
       playBGM: '播放背景音樂',
+      playSoundEffect: '播放音效',
     },
     game: {
       newGameTitle: '新遊戲',
