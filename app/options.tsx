@@ -11,7 +11,7 @@ import { SoundPressable } from '@/components/ui/SoundPressable';
 export default function OptionsScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { playBGM, setPlayBGM } = useAudioContext();
+  const { playBGM, setPlayBGM, playSoundEffect, setPlaySoundEffect } = useAudioContext();
 
   const handleBack = () => {
     router.back();
@@ -28,6 +28,10 @@ export default function OptionsScreen() {
           <View style={styles.optionRow}>
             <ThemedText style={styles.label}>{t('options', 'playBGM')}</ThemedText>
             <Switch value={playBGM} onValueChange={setPlayBGM} />
+          </View>
+          <View style={styles.optionRow}>
+            <ThemedText style={styles.label}>{t('options', 'playSoundEffect')}</ThemedText>
+            <Switch value={playSoundEffect} onValueChange={setPlaySoundEffect} />
           </View>
         </View>
         <SoundPressable onPress={handleBack} style={styles.button}>
