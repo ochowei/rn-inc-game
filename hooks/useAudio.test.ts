@@ -1,20 +1,20 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { Audio } from 'expo-av';
 import { useAudio } from './useAudio';
 
-// Mock Sound objects
-const mockClickSound = {
+// Helper function to create a mock sound
+const createMockSound = () => ({
   unloadAsync: jest.fn().mockResolvedValue(undefined),
   replayAsync: jest.fn().mockResolvedValue(undefined),
-};
-
-const mockBgmSound = {
-  unloadAsync: jest.fn().mockResolvedValue(undefined),
   playAsync: jest.fn().mockResolvedValue(undefined),
   stopAsync: jest.fn().mockResolvedValue(undefined),
-  setIsLoopingAsync: jest.fn().mockResolvedValue(undefined),
   getStatusAsync: jest.fn().mockResolvedValue({ isLoaded: true, isPlaying: false }),
-};
+  setOnPlaybackStatusUpdate: jest.fn(),
+});
+
+// Mock Sound objects
+const mockClickSound = createMockSound();
+const mockBgmSounds = [createMockSound(), createMockSound(), createMockSound()];
 
 // Mock expo-av
 jest.mock('expo-av', () => ({
@@ -29,85 +29,84 @@ const createAsyncMock = Audio.Sound.createAsync as jest.Mock;
 
 describe('useAudio', () => {
   beforeEach(() => {
-    // Reset mocks before each test
     jest.clearAllMocks();
-    // Re-prime the mocks for each test run
-    createAsyncMock
+    // Setup mock implementations for createAsync
+createAsyncMock
       .mockResolvedValueOnce({ sound: mockClickSound })
-      .mockResolvedValueOnce({ sound: mockBgmSound });
-    // Reset BGM status mock
-    (mockBgmSound.getStatusAsync as jest.Mock).mockResolvedValue({ isLoaded: true, isPlaying: false });
+      .mockResolvedValueOnce({ sound: mockBgmSounds[0] })
+      .mockResolvedValueOnce({ sound: mockBgmSounds[1] })
+      .mockResolvedValueOnce({ sound: mockBgmSounds[2] });
   });
 
-  it('should load sounds on mount and play BGM by default', async () => {
-    const { result } = renderHook(() => useAudio());
-    await waitFor(() => expect(result.current.playBGM).toBe(true));
+  it('should load all sounds on mount and play the first BGM track', async () => {
+    renderHook(() => useAudio());
 
-    expect(createAsyncMock).toHaveBeenCalledWith(require('../assets/audio/click.mp3'));
-    expect(createAsyncMock).toHaveBeenCalledWith(require('../assets/audio/bgm-1.mp3'));
-    expect(mockBgmSound.setIsLoopingAsync).toHaveBeenCalledWith(true);
-
-    // BGM should play by default because playBGM is initially true
-    await waitFor(() => expect(mockBgmSound.playAsync).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(createAsyncMock).toHaveBeenCalledTimes(4);
+      expect(mockBgmSounds[0].playAsync).toHaveBeenCalled();
+    });
   });
 
-  it('should play click sound', async () => {
-    const { result } = renderHook(() => useAudio());
-    await waitFor(() => expect(createAsyncMock).toHaveBeenCalledTimes(2));
+  it('should play the next track when the current one finishes', async () => {
+    renderHook(() => useAudio());
 
-    await act(async () => {
-      await result.current.playClickSound();
+    await waitFor(() => expect(mockBgmSounds[0].playAsync).toHaveBeenCalled());
+
+    const statusUpdateCallback = mockBgmSounds[0].setOnPlaybackStatusUpdate.mock.calls[0][0];
+    act(() => {
+      statusUpdateCallback({ isLoaded: true, didJustFinish: true });
     });
 
-    expect(mockClickSound.replayAsync).toHaveBeenCalled();
+    await waitFor(() => expect(mockBgmSounds[1].playAsync).toHaveBeenCalled());
   });
 
-  it('should stop BGM when playBGM is set to false', async () => {
-    // Simulate BGM is already playing
-    (mockBgmSound.getStatusAsync as jest.Mock).mockResolvedValue({ isLoaded: true, isPlaying: true });
-    const { result } = renderHook(() => useAudio());
-    await waitFor(() => expect(result.current.playBGM).toBe(true));
+  it('should loop back to the first track after the last one finishes', async () => {
+    renderHook(() => useAudio());
+    await waitFor(() => expect(mockBgmSounds[0].playAsync).toHaveBeenCalled());
 
-    await act(() => {
+    const firstTrackCallback = mockBgmSounds[0].setOnPlaybackStatusUpdate.mock.calls[0][0];
+    act(() => firstTrackCallback({ isLoaded: true, didJustFinish: true }));
+    await waitFor(() => expect(mockBgmSounds[1].playAsync).toHaveBeenCalled());
+
+    const secondTrackCallback = mockBgmSounds[1].setOnPlaybackStatusUpdate.mock.calls[0][0];
+    act(() => secondTrackCallback({ isLoaded: true, didJustFinish: true }));
+    await waitFor(() => expect(mockBgmSounds[2].playAsync).toHaveBeenCalled());
+
+    const thirdTrackCallback = mockBgmSounds[2].setOnPlaybackStatusUpdate.mock.calls[0][0];
+    act(() => thirdTrackCallback({ isLoaded: true, didJustFinish: true }));
+
+    await waitFor(() => expect(mockBgmSounds[0].playAsync).toHaveBeenCalledTimes(2));
+  });
+
+  it('should stop BGM when setPlayBGM is false', async () => {
+    // Mock the first getStatusAsync call to return isPlaying: false, so playAsync is called.
+    mockBgmSounds[0].getStatusAsync.mockResolvedValueOnce({ isLoaded: true, isPlaying: false });
+    const { result } = renderHook(() => useAudio());
+
+    // Wait for the BGM to start playing.
+    await waitFor(() => expect(mockBgmSounds[0].playAsync).toHaveBeenCalled());
+
+    // Now, mock getStatusAsync to return isPlaying: true for the stop function.
+    mockBgmSounds[0].getStatusAsync.mockResolvedValue({ isLoaded: true, isPlaying: true });
+
+    act(() => {
       result.current.setPlayBGM(false);
     });
 
-    expect(result.current.playBGM).toBe(false);
-    await waitFor(() => expect(mockBgmSound.stopAsync).toHaveBeenCalled());
+    await waitFor(() => expect(mockBgmSounds[0].stopAsync).toHaveBeenCalled());
   });
 
-  it('should play BGM when playBGM is set to true after being disabled', async () => {
-    // Start with BGM playing, so playAsync is not called on mount
-    (mockBgmSound.getStatusAsync as jest.Mock).mockResolvedValueOnce({ isLoaded: true, isPlaying: true });
-    const { result } = renderHook(() => useAudio());
-    await waitFor(() => expect(result.current.playBGM).toBe(true));
-
-    // Disable BGM
-    await act(async () => {
-      result.current.setPlayBGM(false);
-    });
-
-    await waitFor(() => expect(result.current.playBGM).toBe(false));
-    await waitFor(() => expect(mockBgmSound.stopAsync).toHaveBeenCalled());
-
-    // Enable BGM again
-    (mockBgmSound.getStatusAsync as jest.Mock).mockResolvedValue({ isLoaded: true, isPlaying: false });
-    await act(async () => {
-      result.current.setPlayBGM(true);
-    });
-
-    await waitFor(() => expect(result.current.playBGM).toBe(true));
-    // Should be called once when re-enabled
-    await waitFor(() => expect(mockBgmSound.playAsync).toHaveBeenCalledTimes(1));
-  });
-
-  it('should unload sounds on unmount', async () => {
+  it('should unload all sounds on unmount', async () => {
     const { unmount } = renderHook(() => useAudio());
-    await waitFor(() => expect(createAsyncMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(createAsyncMock).toHaveBeenCalledTimes(4));
 
     unmount();
 
-    expect(mockClickSound.unloadAsync).toHaveBeenCalled();
-    expect(mockBgmSound.unloadAsync).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockClickSound.unloadAsync).toHaveBeenCalled();
+      mockBgmSounds.forEach(sound => {
+        expect(sound.unloadAsync).toHaveBeenCalled();
+      });
+    });
   });
 });
