@@ -25,7 +25,7 @@ export default function LoadingScreen() {
       const totalAssets = assetsToLoad.length;
       for (let i = 0; i < totalAssets; i++) {
         await Asset.loadAsync(assetsToLoad[i]);
-        setProgress((prevProgress) => prevProgress + 1 / totalAssets);
+        setProgress((i + 1) / totalAssets);
       }
     };
 
@@ -34,7 +34,12 @@ export default function LoadingScreen() {
 
   useEffect(() => {
     if (progress >= 1) {
-      router.replace('/press-to-start');
+      // Use a timeout to give a moment for the user to see the completed bar
+      const timer = setTimeout(() => {
+        router.replace('/press-to-start');
+      }, 500);
+
+      return () => clearTimeout(timer);
     }
   }, [progress]);
 
