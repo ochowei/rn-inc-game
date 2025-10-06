@@ -1,4 +1,4 @@
-import { createNewSaveProfile, updateSaveProfile, addAsset } from './game_engine';
+import { createNewSaveProfile, updateSaveProfile, addAsset, purchaseContainer, calculateTotalCapacity } from './game_engine';
 import { SaveProfile, GameSettings } from './types';
 import gameSettings from '../settings.json';
 
@@ -49,6 +49,138 @@ describe('createNewSaveProfile', () => {
     expect(newProfile.createdAt).toBe(expectedCreatedAt);
 
     dateSpy.mockRestore();
+  });
+});
+
+describe('calculateTotalCapacity', () => {
+  let profile: SaveProfile;
+
+  beforeEach(() => {
+    profile = createNewSaveProfile(settings);
+  });
+
+  it('should correctly calculate the total capacity from all owned containers', () => {
+    // Initially, the profile has one "studio_1"
+    const initialCapacity = calculateTotalCapacity(profile, settings);
+    expect(initialCapacity['asset_group_1']).toBe(30);
+    expect(initialCapacity['asset_group_2']).toBe(10);
+
+    // Add a second container
+    profile.owned_containers.push({ id: 'c2', typeId: 'studio_2' });
+    const updatedCapacity = calculateTotalCapacity(profile, settings);
+    expect(updatedCapacity['asset_group_1']).toBe(30 + 100);
+    expect(updatedCapacity['asset_group_2']).toBe(10 + 25);
+  });
+
+  it('should return an empty object if the profile has no containers', () => {
+    profile.owned_containers = [];
+    const capacity = calculateTotalCapacity(profile, settings);
+    expect(capacity).toEqual({});
+  });
+});
+
+describe('purchaseContainer', () => {
+  let profile: SaveProfile;
+
+  beforeEach(() => {
+    profile = createNewSaveProfile(settings);
+    // Give the player enough resources to buy a studio
+    profile.resources.current.resource_3 = 15000;
+  });
+
+  it('should add the container and deduct the cost if resources are sufficient', () => {
+    const studio2 = settings.container_types.find(c => c.id === 'studio_2')!;
+    const initialContainerCount = profile.owned_containers.length;
+    const initialResources = profile.resources.current.resource_3;
+
+    const updatedProfile = purchaseContainer(profile, 'studio_2', settings);
+
+    // Check if container was added
+    expect(updatedProfile.owned_containers.length).toBe(initialContainerCount + 1);
+    expect(updatedProfile.owned_containers.find(c => c.typeId === 'studio_2')).toBeDefined();
+
+    // Check if cost was deducted
+    const cost = studio2.cost.find(c => c.resource_id === 'resource_3')!.amount;
+    expect(updatedProfile.resources.current.resource_3).toBe(initialResources - cost);
+  });
+
+  it('should not purchase the container if resources are insufficient', () => {
+    profile.resources.current.resource_3 = 500; // Not enough for studio_2
+    const updatedProfile = purchaseContainer(profile, 'studio_2', settings);
+    expect(updatedProfile).toEqual(profile); // Profile should be unchanged
+  });
+
+  it('should not purchase a container that does not exist', () => {
+    const updatedProfile = purchaseContainer(profile, 'non_existent_studio', settings);
+    expect(updatedProfile).toEqual(profile); // Profile should be unchanged
+  });
+});
+
+describe('addAsset with capacity limits', () => {
+  let profile: SaveProfile;
+
+  beforeEach(() => {
+    profile = createNewSaveProfile(settings);
+    // Set a higher resource amount to cover both container purchase and asset hiring
+    profile.resources.current.resource_3 = 11000;
+  });
+
+  it('should block adding an asset if capacity is full', () => {
+    const employeeCapacity = settings.container_types.find(c => c.id === 'studio_1')!.capacities['asset_group_2'];
+    // Fill up the employee capacity. Initial profile has 1 engineer.
+    profile.assets.find(a => a.id === 'engineer_level_1')!.count = employeeCapacity;
+
+    // Try to hire one more
+    const updatedProfile = addAsset(profile, 'asset_group_2', 'engineer_level_1', settings);
+
+    // The profile should not have changed
+    expect(updatedProfile).toEqual(profile);
+    const employeeAsset = updatedProfile.assets.find(a => a.id === 'engineer_level_1');
+    expect(employeeAsset?.count).toBe(employeeCapacity);
+  });
+
+  it('should allow adding an asset if there is capacity', () => {
+    const employeeCapacity = settings.container_types.find(c => c.id === 'studio_1')!.capacities['asset_group_2'];
+    // We have 1 engineer, capacity is 10. We can hire more.
+    const initialCount = profile.assets.find(a => a.id === 'engineer_level_1')!.count;
+
+    const updatedProfile = addAsset(profile, 'asset_group_2', 'engineer_level_1', settings);
+
+    const employeeAsset = updatedProfile.assets.find(a => a.id === 'engineer_level_1');
+    expect(employeeAsset?.count).toBe(initialCount + 1);
+    expect(employeeAsset?.count).toBeLessThanOrEqual(employeeCapacity);
+  });
+
+  it('should correctly account for in-progress assets when checking capacity', () => {
+    const gameCapacity = settings.container_types.find(c => c.id === 'studio_1')!.capacities['asset_group_1'];
+
+    // Fill up game capacity with a mix of completed and in-progress games
+    profile.assets.push({ type: 'asset_group_1', id: 'puzzle_game', count: gameCapacity - 1, development_progress_ticks: 999 });
+    profile.inProgressAssets.push({ type: 'asset_group_1', id: 'novel_game', status: 'in_progress', development_progress_ticks: 1, start_time: new Date() });
+
+    // Now we are at capacity (29 completed, 1 in progress). Try to add one more.
+    const updatedProfile = addAsset(profile, 'asset_group_1', 'novel_game', settings);
+
+    // It should be blocked
+    expect(updatedProfile.inProgressAssets.length).toBe(1);
+    expect(updatedProfile).toEqual(profile);
+  });
+
+  it('should allow adding an asset after purchasing a new container', () => {
+    const employeeCapacity = settings.container_types.find(c => c.id === 'studio_1')!.capacities['asset_group_2'];
+    // Fill up the initial employee capacity
+    profile.assets.find(a => a.id === 'engineer_level_1')!.count = employeeCapacity;
+
+    // Try to hire one more - should fail
+    const profileBeforePurchase = addAsset(profile, 'asset_group_2', 'engineer_level_1', settings);
+    expect(profileBeforePurchase.assets.find(a => a.id === 'engineer_level_1')!.count).toBe(employeeCapacity);
+
+    // Now, purchase a new container
+    const profileAfterPurchase = purchaseContainer(profile, 'studio_2', settings);
+
+    // Try to hire again - should succeed
+    const finalProfile = addAsset(profileAfterPurchase, 'asset_group_2', 'engineer_level_1', settings);
+    expect(finalProfile.assets.find(a => a.id === 'engineer_level_1')!.count).toBe(employeeCapacity + 1);
   });
 });
 
