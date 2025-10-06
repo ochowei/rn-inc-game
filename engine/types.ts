@@ -14,6 +14,13 @@ export interface Asset {
   resource_max?: ResourceGroup;
 }
 
+export interface ContainerType {
+  id: string;
+  name: string;
+  cost: { resource_id: keyof ResourceGroup; amount: number }[];
+  capacities: { [asset_group_id: string]: number };
+}
+
 export interface GameSettings {
   initial: {
     resources: ResourceGroup;
@@ -28,9 +35,10 @@ export interface GameSettings {
     assets: Asset[];
   };
   assets_group_2: {
-    name:string;
+    name: string;
     assets: Asset[];
   };
+  container_types: ContainerType[];
   [key: string]: any; // Allow for other dynamic properties
 }
 
@@ -47,6 +55,12 @@ export type InProgressAsset = {
   start_time: Date;
   development_progress_ticks: number;
 };
+
+export interface OwnedContainer {
+  id: string;
+  typeId: string;
+}
+
 export interface SaveProfile {
   resources: {
     current: ResourceGroup;
@@ -55,5 +69,6 @@ export interface SaveProfile {
   };
   assets: AcquiredAsset[];
   inProgressAssets: InProgressAsset[];
+  owned_containers: OwnedContainer[];
   createdAt: string;
 }

@@ -1,4 +1,4 @@
-import { GameSettings, SaveProfile, ResourceGroup, AcquiredAsset, InProgressAsset, Asset } from './types';
+import { GameSettings, SaveProfile, ResourceGroup, AcquiredAsset, InProgressAsset, Asset, OwnedContainer } from './types';
 
 export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
   const { initial } = settings;
@@ -32,6 +32,13 @@ export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
     }
   }
 
+  const owned_containers: OwnedContainer[] = [
+    {
+      id: `container_${Date.now()}`,
+      typeId: 'studio_1',
+    },
+  ];
+
   return {
     resources: {
       current: {
@@ -44,8 +51,41 @@ export const createNewSaveProfile = (settings: GameSettings): SaveProfile => {
     },
     assets,
     inProgressAssets: [],
+    owned_containers,
     createdAt: new Date().toISOString(),
   };
+};
+
+export const calculateTotalCapacity = (
+  profile: SaveProfile,
+  settings: GameSettings
+): Record<string, number> => {
+  const totalCapacity: Record<string, number> = {};
+
+  if (!profile.owned_containers || !settings.container_types) {
+    return totalCapacity;
+  }
+
+  profile.owned_containers.forEach((ownedContainer) => {
+    const containerType = settings.container_types.find(
+      (ct) => ct.id === ownedContainer.typeId
+    );
+
+    if (containerType) {
+      for (const assetGroupId in containerType.capacities) {
+        if (Object.prototype.hasOwnProperty.call(containerType.capacities, assetGroupId)) {
+          const capacity = containerType.capacities[assetGroupId];
+          if (totalCapacity[assetGroupId]) {
+            totalCapacity[assetGroupId] += capacity;
+          } else {
+            totalCapacity[assetGroupId] = capacity;
+          }
+        }
+      }
+    }
+  });
+
+  return totalCapacity;
 };
 
 export const updateSaveProfile = (
@@ -195,6 +235,48 @@ export const updateSaveProfile = (
   return newProfile;
 };
 
+export const purchaseContainer = (
+  currentProfile: SaveProfile,
+  containerTypeId: string,
+  settings: GameSettings
+): SaveProfile => {
+  const containerType = settings.container_types.find(
+    (ct) => ct.id === containerTypeId
+  );
+
+  if (!containerType) {
+    console.log(`Container type "${containerTypeId}" not found in settings.`);
+    return currentProfile;
+  }
+
+  const { cost } = containerType;
+  const { current: currentResources } = currentProfile.resources;
+
+  for (const costItem of cost) {
+    if (currentResources[costItem.resource_id] < costItem.amount) {
+      console.log(
+        `Insufficient resources to purchase container "${containerTypeId}".`
+      );
+      return currentProfile;
+    }
+  }
+
+  const newProfile = JSON.parse(JSON.stringify(currentProfile));
+
+  for (const costItem of cost) {
+    newProfile.resources.current[costItem.resource_id] -= costItem.amount;
+  }
+
+  const newContainer: OwnedContainer = {
+    id: `container_${Date.now()}`,
+    typeId: containerTypeId,
+  };
+
+  newProfile.owned_containers.push(newContainer);
+
+  return newProfile;
+};
+
 export const addAsset = (
   currentProfile: SaveProfile,
   assetType: 'asset_group_1' | 'asset_group_2',
@@ -211,6 +293,27 @@ export const addAsset = (
   if (!assetData) {
     console.log(`Asset "${assetId}" of type "${assetType}" not found in settings.`);
     return currentProfile;
+  }
+
+  // Check for capacity
+  const totalCapacity = calculateTotalCapacity(currentProfile, settings);
+  const capacityForAssetGroup = totalCapacity[assetType];
+
+  if (capacityForAssetGroup !== undefined) {
+    const currentOwnedCount = currentProfile.assets
+      .filter((a) => a.type === assetType)
+      .reduce((sum, a) => sum + a.count, 0);
+
+    const inProgressCount = (currentProfile.inProgressAssets || [])
+      .filter((a) => a.type === assetType)
+      .length;
+
+    const totalCurrentCount = currentOwnedCount + inProgressCount;
+
+    if (totalCurrentCount >= capacityForAssetGroup) {
+      console.log(`Capacity for asset group "${assetType}" is full.`);
+      return currentProfile;
+    }
   }
 
   const { cost } = assetData;

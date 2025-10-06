@@ -11,6 +11,30 @@
   },
   "gameTickInterval": 5000,
   "unlimited_resources": ["resource_3"],
+  "container_types": [
+    {
+      "id": "studio_1",
+      "name": "Small Garage",
+      "cost": [
+        { "resource_id": "resource_3", "amount": 1000 }
+      ],
+      "capacities": {
+        "asset_group_1": 30,
+        "asset_group_2": 10
+      }
+    },
+    {
+      "id": "studio_2",
+      "name": "Downtown Office",
+      "cost": [
+        { "resource_id": "resource_3", "amount": 10000 }
+      ],
+      "capacities": {
+        "asset_group_1": 100,
+        "asset_group_2": 25
+      }
+    }
+  ],
   "assets_group_1": {
     "name": "game_development",
     "assets": [
