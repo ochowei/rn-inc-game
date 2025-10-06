@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   updateSaveProfile,
   addAsset as addAssetLogic,
+  purchaseContainer as purchaseContainerLogic,
   createNewSaveProfile as createNewSaveLogic,
 } from '@/engine/game_engine';
 import { SaveProfile as EngineSaveProfile, GameSettings } from '@/engine/types';
@@ -17,6 +18,7 @@ export interface GameEngineHook {
   createNewSave: () => Promise<FullSaveProfile | undefined>;
   unloadSave: () => void;
   addAsset: (assetType: 'asset_group_1' | 'asset_group_2', assetId: string) => void;
+  purchaseContainer: (containerTypeId: string) => void;
   saveCurrentProgress: () => Promise<void>;
 }
 
@@ -151,12 +153,34 @@ export function useGameEngine(): GameEngineHook {
     [saveProfileNow]
   );
 
+  const purchaseContainer = useCallback(
+    (containerTypeId: string) => {
+      setProfile((prevProfile) => {
+        if (!prevProfile) return null;
+        const newCoreProfile = purchaseContainerLogic(
+          prevProfile,
+          containerTypeId,
+          gameSettings as GameSettings
+        );
+
+        const newProfile = { ...newCoreProfile, id: prevProfile.id };
+
+        if (newCoreProfile !== prevProfile) {
+          saveProfileNow(newProfile);
+        }
+        return newProfile;
+      });
+    },
+    [saveProfileNow]
+  );
+
   return {
     profile,
     loadSave,
     createNewSave,
     unloadSave,
     addAsset,
+    purchaseContainer,
     saveCurrentProgress,
   };
 }
