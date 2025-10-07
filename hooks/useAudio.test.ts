@@ -44,6 +44,10 @@ const createAsyncMock = Audio.Sound.createAsync as jest.Mock;
 describe('useAudio', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset the mock implementation for getStatusAsync before each test
+    mockBgmSounds.forEach((sound) => {
+      sound.getStatusAsync.mockResolvedValue({ isLoaded: true, isPlaying: false });
+    });
     createAsyncMock
       .mockResolvedValueOnce({ sound: mockClickSound })
       .mockResolvedValueOnce({ sound: mockBgmSounds[0] })
@@ -104,6 +108,30 @@ describe('useAudio', () => {
           expect(mockClickSound.unloadAsync).toHaveBeenCalled();
           mockBgmSounds.forEach(sound => expect(sound.unloadAsync).toHaveBeenCalled());
         });
+      });
+
+      it('should toggle mute state and control BGM and SFX', async () => {
+        const { result } = renderHook(() => useAudio());
+        await waitFor(() => expect(result.current.isLoaded).toBe(true));
+
+        // Initial state
+        expect(result.current.isMuted).toBe(false);
+        expect(result.current.playBGM).toBe(true);
+        expect(result.current.playSoundEffect).toBe(true);
+
+        // Mute
+        act(() => result.current.toggleMute());
+
+        expect(result.current.isMuted).toBe(true);
+        expect(result.current.playBGM).toBe(false);
+        expect(result.current.playSoundEffect).toBe(false);
+
+        // Unmute
+        act(() => result.current.toggleMute());
+
+        expect(result.current.isMuted).toBe(false);
+        expect(result.current.playBGM).toBe(true);
+        expect(result.current.playSoundEffect).toBe(true);
       });
   });
 

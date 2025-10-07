@@ -16,6 +16,8 @@ interface AudioContextType {
   stopBGM_func: () => Promise<void>;
   playSoundEffect: boolean;
   setPlaySoundEffect: Dispatch<SetStateAction<boolean>>;
+  isMuted: boolean;
+  toggleMute: () => void;
 }
 
 // Create the context with a default undefined value
@@ -35,6 +37,8 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
     stopBGM_func: audio.stopBGM_func,
     playSoundEffect: audio.playSoundEffect,
     setPlaySoundEffect: audio.setPlaySoundEffect,
+    isMuted: audio.isMuted,
+    toggleMute: audio.toggleMute,
   };
 
   return (
