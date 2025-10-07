@@ -35,7 +35,7 @@ export default function GameScreen() {
       <ThemedView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContentContainer}>
           <ThemedView style={styles.sectionContainer}>
-            <ThemedText type="subtitle">{t('game', 'employees')}</TheThemedText>
+            <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
             {employees.map((asset, index) => {
               const employeeInfo = settings.assets_group_2.assets.find((e) => e.id === asset.id);
               return (
