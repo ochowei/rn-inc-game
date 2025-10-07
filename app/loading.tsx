@@ -45,8 +45,10 @@ export default function LoadingScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>資源載入中...</Text>
-      <ProgressBar progress={progress} style={styles.progressBar} />
+      <View style={styles.content}>
+        <Text style={styles.text}>資源載入中...</Text>
+        <ProgressBar progress={progress} style={styles.progressBar} />
+      </View>
     </View>
   );
 }
@@ -58,8 +60,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  progressBar: {
+  content: {
     width: '80%',
+    alignItems: 'center',
+  },
+  progressBar: {
+    width: '100%',
     height: 10,
   },
   text: {
