@@ -15,23 +15,13 @@ export default function HireEmployeeScreen() {
   const { profile, addAsset } = useGameEngineContext();
 
   const canHire = (employee: (typeof settings.assets_group_2.assets)[0]) => {
-    if (!profile) return false;
     const cost = employee.cost;
     return (
-      profile.resources.current.resource_1 >= cost.resource_1 &&
-      profile.resources.current.resource_2 >= cost.resource_2 &&
-      profile.resources.current.resource_3 >= cost.resource_3
+      profile!.resources.current.resource_1 >= cost.resource_1 &&
+      profile!.resources.current.resource_2 >= cost.resource_2 &&
+      profile!.resources.current.resource_3 >= cost.resource_3
     );
   };
-
-  if (!profile) {
-    return (
-      <ThemedView style={styles.container}>
-        <ActivityIndicator size="large" />
-        <ThemedText>Loading Game...</ThemedText>
-      </ThemedView>
-    );
-  }
 
   return (
     <ThemedView style={styles.container}>

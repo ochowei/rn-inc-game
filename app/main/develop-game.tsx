@@ -15,23 +15,13 @@ export default function DevelopGameScreen() {
   const { profile, addAsset } = useGameEngineContext();
 
   const canDevelop = (game: (typeof settings.assets_group_1.assets)[0]) => {
-    if (!profile) return false;
     const cost = game.cost;
     return (
-      profile.resources.current.resource_1 >= cost.resource_1 &&
-      profile.resources.current.resource_2 >= cost.resource_2 &&
-      profile.resources.current.resource_3 >= cost.resource_3
+      profile!.resources.current.resource_1 >= cost.resource_1 &&
+      profile!.resources.current.resource_2 >= cost.resource_2 &&
+      profile!.resources.current.resource_3 >= cost.resource_3
     );
   };
-
-  if (!profile) {
-    return (
-      <ThemedView style={styles.container}>
-        <ActivityIndicator size="large" />
-        <ThemedText>Loading Game...</ThemedText>
-      </ThemedView>
-    );
-  }
 
   return (
     <ThemedView style={styles.container}>

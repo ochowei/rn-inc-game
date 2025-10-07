@@ -13,16 +13,7 @@ export default function GameScreen() {
   const { t } = useLanguage();
   const { profile } = useGameEngineContext();
 
-  if (!profile) {
-    return (
-      <ThemedView style={styles.container}>
-        <ActivityIndicator size="large" />
-        <ThemedText>Loading Game...</ThemedText>
-      </ThemedView>
-    );
-  }
-
-  const acquiredGames = profile.assets.filter((asset) => asset.type === 'asset_group_1');
+  const acquiredGames = profile!.assets.filter((asset) => asset.type === 'asset_group_1');
   const employees = profile.assets.filter((asset) => asset.type === 'asset_group_2');
   const inProgressAssets = profile.inProgressAssets || [];
 
