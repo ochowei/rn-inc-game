@@ -10,7 +10,7 @@ import { SoundPressable } from '@/components/ui/SoundPressable';
 
 export default function OptionsScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { playBGM, setPlayBGM, playSoundEffect, setPlaySoundEffect } = useAudioContext();
 
   const handleBack = () => {
@@ -32,6 +32,23 @@ export default function OptionsScreen() {
           <View style={styles.optionRow}>
             <ThemedText style={styles.label}>{t('options', 'playSoundEffect')}</ThemedText>
             <Switch value={playSoundEffect} onValueChange={setPlaySoundEffect} />
+          </View>
+          <View style={styles.optionRow}>
+            <ThemedText style={styles.label}>{t('options', 'language')}</ThemedText>
+            <View style={styles.languageButtons}>
+              <SoundPressable
+                onPress={() => setLanguage('zh')}
+                style={[styles.langButton, language === 'zh' && styles.langButtonActive]}
+              >
+                <ThemedText>{t('settings', 'chinese')}</ThemedText>
+              </SoundPressable>
+              <SoundPressable
+                onPress={() => setLanguage('en')}
+                style={[styles.langButton, language === 'en' && styles.langButtonActive]}
+              >
+                <ThemedText>{t('settings', 'english')}</ThemedText>
+              </SoundPressable>
+            </View>
           </View>
         </View>
         <SoundPressable onPress={handleBack} style={styles.button}>
@@ -72,6 +89,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  languageButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  langButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  langButtonActive: {
+    backgroundColor: '#0a7ea4',
+    borderColor: '#0a7ea4',
   },
   button: {
     marginTop: 32,

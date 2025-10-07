@@ -14,7 +14,7 @@ export default function GameMenuScreen() {
   const router = useRouter();
   const { profiles, fetchProfiles } = useGameStorage();
   const { createNewSave } = useGameEngineContext();
-  const { language, setLanguage, t } = useLanguage();
+  const { t } = useLanguage();
   const hasSavedGames = profiles.length > 0;
   const tintColor = useThemeColor({}, 'tint');
 
@@ -68,20 +68,6 @@ export default function GameMenuScreen() {
       style={styles.background}
       resizeMode="cover">
       <ThemedView style={styles.container}>
-        <View style={styles.languageButtons}>
-          <SoundPressable
-            onPress={() => setLanguage('zh')}
-            style={[styles.langButton, language === 'zh' && styles.langButtonActive]}
-          >
-            <ThemedText>{t('settings', 'chinese')}</ThemedText>
-          </SoundPressable>
-          <SoundPressable
-            onPress={() => setLanguage('en')}
-            style={[styles.langButton, language === 'en' && styles.langButtonActive]}
-          >
-            <ThemedText>{t('settings', 'english')}</ThemedText>
-          </SoundPressable>
-        </View>
         <ThemedText type="title">{t('menu', 'title')}</ThemedText>
         <ThemedView style={styles.buttonsContainer}>
           <SoundPressable onPress={handleNewGame} style={styles.button}>
@@ -136,24 +122,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 16,
     backgroundColor: 'transparent',
-  },
-  languageButtons: {
-    flexDirection: 'row',
-    gap: 10,
-    position: 'absolute',
-    top: 40,
-    right: 16,
-  },
-  langButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  langButtonActive: {
-    backgroundColor: '#0a7ea4',
-    borderColor: '#0a7ea4',
   },
   buttonsContainer: {
     marginTop: 32,
