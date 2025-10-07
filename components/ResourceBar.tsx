@@ -24,6 +24,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
       style={[styles.container, { borderBottomColor: borderColor }]}
       lightColor="rgba(255, 255, 255, 0.9)"
       darkColor="rgba(21, 23, 24, 0.9)"
+      testID="resource-bar"
     >
       <Tooltip title={t('resources', 'resource_1')} leaveTouchDelay={750}>
         <ThemedView
@@ -32,7 +33,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
           darkColor="transparent"
         >
           <IconSymbol name="lightbulb.fill" size={20} color={iconColor} />
-          <ThemedText style={styles.resourceText}>
+          <ThemedText style={styles.resourceText} testID="resource-creativity">
             {resources.current.resource_1} / {resources.max.resource_1}
           </ThemedText>
         </ThemedView>
@@ -44,7 +45,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
           darkColor="transparent"
         >
           <IconSymbol name="gearshape.fill" size={20} color={iconColor} />
-          <ThemedText style={styles.resourceText}>
+          <ThemedText style={styles.resourceText} testID="resource-productivity">
             {resources.current.resource_2} / {resources.max.resource_2}
           </ThemedText>
         </ThemedView>
@@ -56,7 +57,7 @@ export function ResourceBar({ resources }: ResourceBarProps) {
           darkColor="transparent"
         >
           <IconSymbol name="dollarsign.circle.fill" size={20} color={iconColor} />
-          <ThemedText style={styles.resourceText}>
+          <ThemedText style={styles.resourceText} testID="resource-money">
             {resources.current.resource_3}
           </ThemedText>
         </ThemedView>
@@ -71,11 +72,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingVertical: 8,
     paddingHorizontal: 16,
-    width: '100%',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
     borderBottomWidth: 1,
   },
   resourceItem: {
