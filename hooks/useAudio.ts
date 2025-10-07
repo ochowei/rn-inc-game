@@ -16,7 +16,14 @@ export const useAudio = () => {
   const [playBGM, setPlayBGM] = useState(true);
   const [playSoundEffect, setPlaySoundEffect] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(Platform.OS !== 'web');
-  const isPlayingRef = useRef(false);
+  const [isMuted, setIsMuted] = useState(false);
+
+  const toggleMute = useCallback(() => {
+    const newMutedState = !isMuted;
+    setIsMuted(newMutedState);
+    setPlayBGM(!newMutedState);
+    setPlaySoundEffect(!newMutedState);
+  }, [isMuted]);
 
   useEffect(() => {
     let localSound: Audio.Sound | null = null;
@@ -50,9 +57,8 @@ export const useAudio = () => {
   }, []);
 
   const playBGM_func = useCallback(async () => {
-    if (playlist.length === 0 || !playBGM || isPlayingRef.current) return;
+    if (playlist.length === 0 || !playBGM) return;
 
-    isPlayingRef.current = true;
     const sound = playlist[currentTrackIndex];
 
     sound.setOnPlaybackStatusUpdate((status) => {
@@ -60,7 +66,6 @@ export const useAudio = () => {
         sound.setOnPlaybackStatusUpdate(null);
         const nextTrackIndex = (currentTrackIndex + 1) % playlist.length;
         setCurrentTrackIndex(nextTrackIndex);
-        isPlayingRef.current = false;
       }
     });
 
@@ -72,7 +77,6 @@ export const useAudio = () => {
 
   const stopBGM_func = useCallback(async () => {
     if (playlist.length === 0) return;
-    isPlayingRef.current = false;
     const sound = playlist[currentTrackIndex];
     const status = await sound.getStatusAsync();
     if (status.isLoaded && status.isPlaying) {
@@ -104,13 +108,7 @@ export const useAudio = () => {
     } else {
       stopBGM_func();
     }
-  }, [playBGM, hasInteracted, playBGM_func, stopBGM_func]);
-
-  useEffect(() => {
-    if(playBGM && hasInteracted) {
-      playBGM_func();
-    }
-  }, [currentTrackIndex, playBGM, hasInteracted, playBGM_func]);
+  }, [playBGM, hasInteracted, currentTrackIndex, playBGM_func, stopBGM_func]);
 
 
   const playClickSound = async () => {
@@ -128,5 +126,7 @@ export const useAudio = () => {
     playSoundEffect,
     setPlaySoundEffect,
     isLoaded,
+    isMuted,
+    toggleMute,
   };
 };
