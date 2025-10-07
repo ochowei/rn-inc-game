@@ -1,7 +1,6 @@
 import { StyleSheet, ActivityIndicator, ImageBackground, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { ResourceBar } from '@/components/ResourceBar';
 import { useLanguage } from '@/hooks/use-language';
 import { useGameEngineContext } from '@/contexts/GameEngineContext';
 import Fab from '@/components/Fab';
@@ -34,10 +33,9 @@ export default function GameScreen() {
       resizeMode="cover"
     >
       <ThemedView style={styles.container}>
-        <ResourceBar resources={profile.resources} />
         <ScrollView contentContainerStyle={styles.scrollContentContainer}>
           <ThemedView style={styles.sectionContainer}>
-            <ThemedText type="subtitle">{t('game', 'employees')}</ThemedText>
+            <ThemedText type="subtitle">{t('game', 'employees')}</TheThemedText>
             {employees.map((asset, index) => {
               const employeeInfo = settings.assets_group_2.assets.find((e) => e.id === asset.id);
               return (

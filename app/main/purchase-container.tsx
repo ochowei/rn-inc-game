@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+    paddingTop: 70,
   },
   title: {
     fontSize: 20,
