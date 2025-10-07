@@ -20,6 +20,7 @@ export const locales = {
       newGameTitle: 'New Game',
       backToMenu: 'Back to Main Menu',
       save: 'Save',
+      options: 'Options',
       assets: 'Assets',
       engineer: 'Engineer',
       peopleClassifier: '', // In English, we usually don't use classifiers for people like in Chinese.
@@ -140,6 +141,7 @@ export const locales = {
       newGameTitle: '新遊戲',
       backToMenu: '返回主選單',
       save: '儲存',
+      options: '選項',
       assets: '資產',
       engineer: '工程師',
       peopleClassifier: '名',

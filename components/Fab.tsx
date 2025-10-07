@@ -29,6 +29,11 @@ const Fab: React.FC = () => {
     router.push('/menu');
   };
 
+  const handleOptionsPress = () => {
+    hideModal();
+    router.push('/options');
+  };
+
   const handleSavePress = async () => {
     hideModal();
     try {
@@ -56,6 +61,7 @@ const Fab: React.FC = () => {
       <Portal>
         <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.modalContainer} testID="fab-modal">
           <SoundButton onPress={handleSavePress}>{t('game', 'save')}</SoundButton>
+          <SoundButton onPress={handleOptionsPress}>{t('game', 'options')}</SoundButton>
           <SoundButton onPress={handleBackToMenu}>{t('game', 'backToMenu')}</SoundButton>
         </Modal>
       </Portal>
